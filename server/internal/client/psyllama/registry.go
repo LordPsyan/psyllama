@@ -1,7 +1,7 @@
 // Package ollama provides a client for interacting with an Ollama registry
 // which pushes and pulls model manifests and layers as defined by the
 // [ollama.com/manifest].
-package ollama
+package psyllama
 
 import (
 	"bufio"
@@ -36,8 +36,8 @@ import (
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/ollama/ollama/server/internal/cache/blob"
-	"github.com/ollama/ollama/server/internal/internal/names"
+	"github.com/LordPsyan/psyllama/server/internal/cache/blob"
+	"github.com/LordPsyan/psyllama/server/internal/internal/names"
 
 	_ "embed"
 )
@@ -74,18 +74,18 @@ const (
 )
 
 var defaultCache = sync.OnceValues(func() (*blob.DiskCache, error) {
-	dir := os.Getenv("OLLAMA_MODELS")
+	dir := os.Getenv("PSYLLAMA_MODELS")
 	if dir == "" {
 		home, _ := os.UserHomeDir()
 		home = cmp.Or(home, ".")
-		dir = filepath.Join(home, ".ollama", "models")
+		dir = filepath.Join(home, ".psyllama", "models")
 	}
 	return blob.Open(dir)
 })
 
 // DefaultCache returns the default cache used by the registry. It is
-// configured from the OLLAMA_MODELS environment variable, or defaults to
-// $HOME/.ollama/models, or, if an error occurs obtaining the home directory,
+// configured from the PSYLLAMA_MODELS environment variable, or defaults to
+// $HOME/.psyllama/models, or, if an error occurs obtaining the home directory,
 // it uses the current working directory.
 func DefaultCache() (*blob.DiskCache, error) {
 	return defaultCache()
@@ -167,7 +167,7 @@ func (e *Error) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const DefaultMask = "registry.ollama.ai/library/_:latest"
+const DefaultMask = "registry.psyllama.ai/library/_:latest"
 
 var defaultMask = func() names.Name {
 	n := names.Parse(DefaultMask)
@@ -260,8 +260,8 @@ func (r *Registry) parseName(name string) (names.Name, error) {
 }
 
 // DefaultRegistry returns a new Registry configured from the environment. The
-// key is read from $HOME/.ollama/id_ed25519, MaxStreams is set to the
-// value of OLLAMA_REGISTRY_MAXSTREAMS, and ReadTimeout is set to 30 seconds.
+// key is read from $HOME/.psyllama/id_ed25519, MaxStreams is set to the
+// value of PSYLLAMA_REGISTRY_MAXSTREAMS, and ReadTimeout is set to 30 seconds.
 //
 // It returns an error if any configuration in the environment is invalid.
 func DefaultRegistry() (*Registry, error) {
@@ -269,7 +269,7 @@ func DefaultRegistry() (*Registry, error) {
 	if err != nil {
 		return nil, err
 	}
-	keyPEM, err := os.ReadFile(filepath.Join(home, ".ollama/id_ed25519"))
+	keyPEM, err := os.ReadFile(filepath.Join(home, ".psyllama/id_ed25519"))
 	if err != nil && errors.Is(err, fs.ErrNotExist) {
 		return nil, err
 	}
@@ -281,12 +281,12 @@ func DefaultRegistry() (*Registry, error) {
 	if err != nil {
 		return nil, err
 	}
-	maxStreams := os.Getenv("OLLAMA_REGISTRY_MAXSTREAMS")
+	maxStreams := os.Getenv("PSYLLAMA_REGISTRY_MAXSTREAMS")
 	if maxStreams != "" {
 		var err error
 		rc.MaxStreams, err = strconv.Atoi(maxStreams)
 		if err != nil {
-			return nil, fmt.Errorf("invalid OLLAMA_REGISTRY_MAXSTREAMS: %w", err)
+			return nil, fmt.Errorf("invalid PSYLLAMA_REGISTRY_MAXSTREAMS: %w", err)
 		}
 	}
 	return &rc, nil

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/api"
 	"github.com/stretchr/testify/assert"
 )
 

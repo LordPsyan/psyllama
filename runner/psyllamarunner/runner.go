@@ -1,4 +1,4 @@
-package ollamarunner
+package psyllamarunner
 
 import (
 	"bytes"
@@ -26,20 +26,20 @@ import (
 	"golang.org/x/image/bmp"
 	"golang.org/x/sync/semaphore"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/fs/ggml"
-	"github.com/ollama/ollama/llm"
-	"github.com/ollama/ollama/logutil"
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/ml/nn/pooling"
-	"github.com/ollama/ollama/model"
-	"github.com/ollama/ollama/model/input"
-	"github.com/ollama/ollama/runner/common"
-	"github.com/ollama/ollama/sample"
-	"github.com/ollama/ollama/tokenizer"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/envconfig"
+	"github.com/LordPsyan/psyllama/fs/ggml"
+	"github.com/LordPsyan/psyllama/llm"
+	"github.com/LordPsyan/psyllama/logutil"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/ml/nn/pooling"
+	"github.com/LordPsyan/psyllama/model"
+	"github.com/LordPsyan/psyllama/model/input"
+	"github.com/LordPsyan/psyllama/runner/common"
+	"github.com/LordPsyan/psyllama/sample"
+	"github.com/LordPsyan/psyllama/tokenizer"
 
-	_ "github.com/ollama/ollama/model/models"
+	_ "github.com/LordPsyan/psyllama/model/models"
 )
 
 // response contains a piece of generated text along with optional logprobs

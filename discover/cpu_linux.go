@@ -14,7 +14,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ollama/ollama/format"
+	"github.com/LordPsyan/psyllama/format"
 )
 
 func GetCPUMem() (memInfo, error) {

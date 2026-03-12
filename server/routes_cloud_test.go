@@ -14,15 +14,15 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ollama/ollama/api"
-	internalcloud "github.com/ollama/ollama/internal/cloud"
-	"github.com/ollama/ollama/middleware"
+	"github.com/LordPsyan/psyllama/api"
+	internalcloud "github.com/LordPsyan/psyllama/internal/cloud"
+	"github.com/LordPsyan/psyllama/middleware"
 )
 
 func TestStatusHandler(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	setTestHome(t, t.TempDir())
-	t.Setenv("OLLAMA_NO_CLOUD", "1")
+	t.Setenv("PSYLLAMA_NO_CLOUD", "1")
 
 	s := Server{}
 	w := createRequest(t, s.StatusHandler, nil)
@@ -46,7 +46,7 @@ func TestStatusHandler(t *testing.T) {
 func TestCloudDisabledBlocksRemoteOperations(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	setTestHome(t, t.TempDir())
-	t.Setenv("OLLAMA_NO_CLOUD", "1")
+	t.Setenv("PSYLLAMA_NO_CLOUD", "1")
 
 	s := Server{}
 
@@ -429,7 +429,7 @@ func TestExplicitCloudPassthroughAPIAndV1(t *testing.T) {
 		}
 
 		if strings.Contains(capture.body, `"options"`) {
-			t.Fatalf("expected no converted Ollama options in upstream body, got %q", capture.body)
+			t.Fatalf("expected no converted Psyllama options in upstream body, got %q", capture.body)
 		}
 
 		if got := capture.header.Get("X-Test-Header"); got != "v1-header" {
@@ -485,7 +485,7 @@ func TestExplicitCloudPassthroughAPIAndV1(t *testing.T) {
 		}
 
 		if strings.Contains(capture.body, `"options"`) {
-			t.Fatalf("expected no converted Ollama options in upstream body, got %q", capture.body)
+			t.Fatalf("expected no converted Psyllama options in upstream body, got %q", capture.body)
 		}
 
 		if got := capture.header.Get("X-Test-Header"); got != "v1-legacy-header" {
@@ -540,7 +540,7 @@ func TestExplicitCloudPassthroughAPIAndV1(t *testing.T) {
 		}
 
 		if strings.Contains(capture.body, `"options"`) {
-			t.Fatalf("expected no converted Ollama options in upstream body, got %q", capture.body)
+			t.Fatalf("expected no converted Psyllama options in upstream body, got %q", capture.body)
 		}
 	})
 
@@ -591,7 +591,7 @@ func TestExplicitCloudPassthroughAPIAndV1(t *testing.T) {
 		}
 
 		if strings.Contains(capture.body, `"options"`) {
-			t.Fatalf("expected no converted Ollama options in upstream body, got %q", capture.body)
+			t.Fatalf("expected no converted Psyllama options in upstream body, got %q", capture.body)
 		}
 	})
 
@@ -644,12 +644,12 @@ func TestExplicitCloudPassthroughAPIAndV1(t *testing.T) {
 		}
 
 		if !strings.Contains(capture.body, `"num_predict":10`) {
-			t.Fatalf("expected converted ollama options in upstream body, got %q", capture.body)
+			t.Fatalf("expected converted psyllama options in upstream body, got %q", capture.body)
 		}
 	})
 
 	t.Run("v1 model retrieve bypasses conversion", func(t *testing.T) {
-		upstream, capture := newUpstream(t, `{"id":"kimi-k2.5:cloud","object":"model","created":1,"owned_by":"ollama"}`)
+		upstream, capture := newUpstream(t, `{"id":"kimi-k2.5:cloud","object":"model","created":1,"owned_by":"psyllama"}`)
 		defer upstream.Close()
 
 		original := cloudProxyBaseURL
@@ -695,7 +695,7 @@ func TestExplicitCloudPassthroughAPIAndV1(t *testing.T) {
 	})
 
 	t.Run("v1 model retrieve normalizes legacy cloud suffix", func(t *testing.T) {
-		upstream, capture := newUpstream(t, `{"id":"kimi-k2.5:latest","object":"model","created":1,"owned_by":"ollama"}`)
+		upstream, capture := newUpstream(t, `{"id":"kimi-k2.5:latest","object":"model","created":1,"owned_by":"psyllama"}`)
 		defer upstream.Close()
 
 		original := cloudProxyBaseURL
@@ -735,7 +735,7 @@ func TestExplicitCloudPassthroughAPIAndV1(t *testing.T) {
 func TestCloudDisabledBlocksExplicitCloudPassthrough(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	setTestHome(t, t.TempDir())
-	t.Setenv("OLLAMA_NO_CLOUD", "1")
+	t.Setenv("PSYLLAMA_NO_CLOUD", "1")
 
 	s := &Server{}
 	router, err := s.GenerateRoutes(nil)
@@ -975,7 +975,7 @@ func TestCloudPassthroughSigningFailureReturnsUnauthorized(t *testing.T) {
 		return errors.New("ssh: no key found")
 	}
 	cloudProxySigninURL = func() (string, error) {
-		return "https://ollama.com/signin/example", nil
+		return "https://psyllama.com/signin/example", nil
 	}
 	t.Cleanup(func() {
 		cloudProxySignRequest = origSignRequest
@@ -1018,7 +1018,7 @@ func TestCloudPassthroughSigningFailureReturnsUnauthorized(t *testing.T) {
 		t.Fatalf("unexpected error message: %v", got["error"])
 	}
 
-	if got["signin_url"] != "https://ollama.com/signin/example" {
+	if got["signin_url"] != "https://psyllama.com/signin/example" {
 		t.Fatalf("unexpected signin_url: %v", got["signin_url"])
 	}
 }

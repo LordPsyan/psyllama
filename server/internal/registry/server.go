@@ -1,10 +1,9 @@
-// Package registry implements an http.Handler for handling local Ollama API
+// Package registry implements an http.Handler for handling local Psyllama API
 // model management requests. See [Local] for details.
 package registry
 
 import (
 	"cmp"
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,22 +11,21 @@ import (
 	"log/slog"
 	"net/http"
 	"slices"
-	"strings"
 	"sync"
 	"time"
 
-	"github.com/ollama/ollama/server/internal/cache/blob"
-	"github.com/ollama/ollama/server/internal/client/ollama"
-	"github.com/ollama/ollama/server/internal/internal/backoff"
+	"github.com/LordPsyan/psyllama/server/internal/cache/blob"
+	"github.com/LordPsyan/psyllama/server/internal/client/psyllama"
+	"github.com/LordPsyan/psyllama/server/internal/internal/backoff"
 )
 
-// Local implements an http.Handler for handling local Ollama API model
+// Local implements an http.Handler for handling local Psyllama API model
 // management requests, such as pushing, pulling, and deleting models.
 //
 // It can be arranged for all unknown requests to be passed through to a
 // fallback handler, if one is provided.
 type Local struct {
-	Client *ollama.Registry // required
+	Client *psyllama.Registry // required
 	Logger *slog.Logger     // required
 
 	// Fallback, if set, is used to handle requests that are not handled by
@@ -39,8 +37,8 @@ type Local struct {
 	Prune func() error // optional
 }
 
-// serverError is like ollama.Error, but with a Status field for the HTTP
-// response code. We want to avoid adding that field to ollama.Error because it
+// serverError is like psyllama.Error, but with a Status field for the HTTP
+// response code. We want to avoid adding that field to psyllama.Error because it
 // would always be 0 to clients (we don't want to leak the status code in
 // errors), and so it would be confusing to have a field that is always 0.
 type serverError struct {
@@ -134,7 +132,7 @@ func (s *Local) serveHTTP(rec *statusCodeRecorder, r *http.Request) {
 		var e *serverError
 		switch {
 		case errors.As(err, &e):
-		case errors.Is(err, ollama.ErrNameInvalid):
+		case errors.Is(err, psyllama.ErrNameInvalid):
 			e = &serverError{400, "bad_request", err.Error()}
 		default:
 			e = errInternalError
@@ -269,7 +267,7 @@ func (s *Local) handlePull(w http.ResponseWriter, r *http.Request) error {
 	enc := json.NewEncoder(w)
 	if !p.stream() {
 		if err := s.Client.Pull(r.Context(), p.model()); err != nil {
-			if errors.Is(err, ollama.ErrModelNotFound) {
+			if errors.Is(err, psyllama.ErrModelNotFound) {
 				return errModelNotFound
 			}
 			return err
@@ -298,9 +296,9 @@ func (s *Local) handlePull(w http.ResponseWriter, r *http.Request) error {
 		flushProgress() // flush initial state
 		t.Reset(100 * time.Millisecond)
 	})
-	ctx := ollama.WithTrace(r.Context(), &ollama.Trace{
-		Update: func(l *ollama.Layer, n int64, err error) {
-			if err != nil && !errors.Is(err, ollama.ErrCached) {
+	ctx := psyllama.WithTrace(r.Context(), &psyllama.Trace{
+		Update: func(l *psyllama.Layer, n int64, err error) {
+			if err != nil && !errors.Is(err, psyllama.ErrCached) {
 				s.Logger.Error("pulling", "model", p.model(), "error", err)
 				return
 			}
@@ -354,7 +352,7 @@ func (s *Local) handlePull(w http.ResponseWriter, r *http.Request) error {
 		case err := <-done:
 			flushProgress()
 			if err != nil {
-				if errors.Is(err, ollama.ErrModelNotFound) {
+				if errors.Is(err, psyllama.ErrModelNotFound) {
 					return &serverError{
 						Status:  404,
 						Code:    "not_found",
@@ -403,15 +401,9 @@ func canRetry(err error) bool {
 	if err == nil {
 		return false
 	}
-	var oe *ollama.Error
+	var oe *psyllama.Error
 	if errors.As(err, &oe) {
 		return oe.Temporary()
 	}
-	s := err.Error()
-	return cmp.Or(
-		errors.Is(err, context.DeadlineExceeded),
-		strings.Contains(s, "unreachable"),
-		strings.Contains(s, "no route to host"),
-		strings.Contains(s, "connection reset by peer"),
-	)
+	return false
 }

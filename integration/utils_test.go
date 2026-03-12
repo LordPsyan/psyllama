@@ -24,8 +24,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/format"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/format"
 )
 
 var (
@@ -37,7 +37,7 @@ var (
 	started = time.Now()
 
 	// Note: add newer models at the top of the list to test them first
-	ollamaEngineChatModels = []string{
+	psyllamaEngineChatModels = []string{
 		"lfm2.5-thinking",
 		"ministral-3",
 		"qwen3-coder:30b",
@@ -301,7 +301,7 @@ var (
 func init() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	slog.SetDefault(logger)
-	custom := os.Getenv("OLLAMA_TEST_DEFAULT_MODEL")
+	custom := os.Getenv("PSYLLAMA_TEST_DEFAULT_MODEL")
 	if custom != "" {
 		slog.Info("setting default test model to " + custom)
 		smol = custom
@@ -325,11 +325,11 @@ func FindPort() string {
 
 func GetTestEndpoint() (*api.Client, string) {
 	defaultPort := "11434"
-	ollamaHost := os.Getenv("OLLAMA_HOST")
+	psyllamaHost := os.Getenv("PSYLLAMA_HOST")
 
-	scheme, hostport, ok := strings.Cut(ollamaHost, "://")
+	scheme, hostport, ok := strings.Cut(psyllamaHost, "://")
 	if !ok {
-		scheme, hostport = "http", ollamaHost
+		scheme, hostport = "http", psyllamaHost
 	}
 
 	// trim trailing slashes
@@ -345,7 +345,7 @@ func GetTestEndpoint() (*api.Client, string) {
 		}
 	}
 
-	if os.Getenv("OLLAMA_TEST_EXISTING") == "" && runtime.GOOS != "windows" && port == defaultPort {
+	if os.Getenv("PSYLLAMA_TEST_EXISTING") == "" && runtime.GOOS != "windows" && port == defaultPort {
 		port = FindPort()
 	}
 
@@ -368,9 +368,9 @@ var (
 	serverCmd   *exec.Cmd
 )
 
-func startServer(t *testing.T, ctx context.Context, ollamaHost string) error {
+func startServer(t *testing.T, ctx context.Context, psyllamaHost string) error {
 	// Make sure the server has been built
-	CLIName, err := filepath.Abs("../ollama")
+	CLIName, err := filepath.Abs("../psyllama")
 	if err != nil {
 		return fmt.Errorf("failed to get absolute path: %w", err)
 	}
@@ -390,16 +390,16 @@ func startServer(t *testing.T, ctx context.Context, ollamaHost string) error {
 	serverDone = make(chan int)
 	serverLog.Reset()
 
-	if tmp := os.Getenv("OLLAMA_HOST"); tmp != ollamaHost {
-		slog.Info("setting env", "OLLAMA_HOST", ollamaHost)
-		t.Setenv("OLLAMA_HOST", ollamaHost)
+	if tmp := os.Getenv("PSYLLAMA_HOST"); tmp != psyllamaHost {
+		slog.Info("setting env", "PSYLLAMA_HOST", psyllamaHost)
+		t.Setenv("PSYLLAMA_HOST", psyllamaHost)
 	}
 
 	serverCmd = exec.Command(CLIName, "serve")
 	serverCmd.Stderr = &serverLog
 	serverCmd.Stdout = &serverLog
 	go func() {
-		slog.Info("starting server", "url", ollamaHost)
+		slog.Info("starting server", "url", psyllamaHost)
 		if err := serverCmd.Run(); err != nil {
 			// "signal: killed" expected during normal shutdown
 			if !strings.Contains(err.Error(), "signal") {
@@ -477,7 +477,7 @@ var serverProcMutex sync.Mutex
 func InitServerConnection(ctx context.Context, t *testing.T) (*api.Client, string, func()) {
 	client, testEndpoint := GetTestEndpoint()
 	cleanup := func() {}
-	if os.Getenv("OLLAMA_TEST_EXISTING") == "" && runtime.GOOS != "windows" {
+	if os.Getenv("PSYLLAMA_TEST_EXISTING") == "" && runtime.GOOS != "windows" {
 		var err error
 		err = startServer(t, ctx, testEndpoint)
 		if err != nil {
@@ -741,7 +741,7 @@ func ChatRequests() ([]api.ChatRequest, [][]string) {
 
 func skipUnderMinVRAM(t *testing.T, gb uint64) {
 	// TODO use info API in the future
-	if s := os.Getenv("OLLAMA_MAX_VRAM"); s != "" {
+	if s := os.Getenv("PSYLLAMA_MAX_VRAM"); s != "" {
 		maxVram, err := strconv.ParseUint(s, 10, 64)
 		if err != nil {
 			t.Fatal(err)

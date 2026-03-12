@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/api"
 )
 
 const (
@@ -1346,9 +1346,9 @@ func TestConvertMessage_WebSearchToolResultErrorStillCreatesToolMessage(t *testi
 	}
 }
 
-func TestConvertOllamaToAnthropicResults(t *testing.T) {
-	ollamaResp := &OllamaWebSearchResponse{
-		Results: []OllamaWebSearchResult{
+func TestConvertPsyllamaToAnthropicResults(t *testing.T) {
+	psyllamaResp := &PsyllamaWebSearchResponse{
+		Results: []PsyllamaWebSearchResult{
 			{
 				Title:   "Test Title",
 				URL:     "https://example.com",
@@ -1362,7 +1362,7 @@ func TestConvertOllamaToAnthropicResults(t *testing.T) {
 		},
 	}
 
-	results := ConvertOllamaToAnthropicResults(ollamaResp)
+	results := ConvertPsyllamaToAnthropicResults(psyllamaResp)
 
 	if len(results) != 2 {
 		t.Fatalf("expected 2 results, got %d", len(results))

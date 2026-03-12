@@ -16,10 +16,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/auth"
-	internalcloud "github.com/ollama/ollama/internal/cloud"
-	"github.com/ollama/ollama/logutil"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/auth"
+	internalcloud "github.com/LordPsyan/psyllama/internal/cloud"
+	"github.com/LordPsyan/psyllama/logutil"
 )
 
 // Error types matching Anthropic API
@@ -269,7 +269,7 @@ type StreamErrorEvent struct {
 	Error Error  `json:"error"`
 }
 
-// FromMessagesRequest converts an Anthropic MessagesRequest to an Ollama api.ChatRequest
+// FromMessagesRequest converts an Anthropic MessagesRequest to an Psyllama api.ChatRequest
 func FromMessagesRequest(r MessagesRequest) (*api.ChatRequest, error) {
 	logutil.Trace("anthropic: converting request", "req", TraceMessagesRequest(r))
 
@@ -338,7 +338,7 @@ func FromMessagesRequest(r MessagesRequest) (*api.ChatRequest, error) {
 	}
 
 	for _, t := range r.Tools {
-		// Anthropic built-in web_search maps to Ollama function name "web_search".
+		// Anthropic built-in web_search maps to Psyllama function name "web_search".
 		// If a user-defined tool also uses that name in the same request, drop the
 		// user-defined one to avoid ambiguous tool-call routing.
 		if hasBuiltinWebSearch && !strings.HasPrefix(t.Type, "web_search") && t.Name == "web_search" {
@@ -372,7 +372,7 @@ func FromMessagesRequest(r MessagesRequest) (*api.ChatRequest, error) {
 	return convertedRequest, nil
 }
 
-// convertMessage converts an Anthropic MessageParam to Ollama api.Message(s)
+// convertMessage converts an Anthropic MessageParam to Psyllama api.Message(s)
 func convertMessage(msg MessageParam) ([]api.Message, error) {
 	var messages []api.Message
 	role := strings.ToLower(msg.Role)
@@ -613,7 +613,7 @@ func formatWebSearchToolResultContent(content any) string {
 	}
 }
 
-// convertTool converts an Anthropic Tool to an Ollama api.Tool, returning true if it's a server tool
+// convertTool converts an Anthropic Tool to an Psyllama api.Tool, returning true if it's a server tool
 func convertTool(t Tool) (api.Tool, bool, error) {
 	if strings.HasPrefix(t.Type, "web_search") {
 		props := api.NewToolPropertiesMap()
@@ -653,7 +653,7 @@ func convertTool(t Tool) (api.Tool, bool, error) {
 	}, false, nil
 }
 
-// ToMessagesResponse converts an Ollama api.ChatResponse to an Anthropic MessagesResponse
+// ToMessagesResponse converts an Psyllama api.ChatResponse to an Anthropic MessagesResponse
 func ToMessagesResponse(id string, r api.ChatResponse) MessagesResponse {
 	var content []ContentBlock
 
@@ -696,7 +696,7 @@ func ToMessagesResponse(id string, r api.ChatResponse) MessagesResponse {
 	}
 }
 
-// mapStopReason converts Ollama done_reason to Anthropic stop_reason
+// mapStopReason converts Psyllama done_reason to Anthropic stop_reason
 func mapStopReason(reason string, hasToolCalls bool) string {
 	if hasToolCalls {
 		return "tool_use"
@@ -715,7 +715,7 @@ func mapStopReason(reason string, hasToolCalls bool) string {
 	}
 }
 
-// StreamConverter manages state for converting Ollama streaming responses to Anthropic format
+// StreamConverter manages state for converting Psyllama streaming responses to Anthropic format
 type StreamConverter struct {
 	ID                   string
 	Model                string
@@ -746,7 +746,7 @@ type StreamEvent struct {
 	Data  any
 }
 
-// Process converts an Ollama ChatResponse to Anthropic streaming events
+// Process converts an Psyllama ChatResponse to Anthropic streaming events
 func (c *StreamConverter) Process(r api.ChatResponse) []StreamEvent {
 	var events []StreamEvent
 
@@ -1099,27 +1099,27 @@ func countContentBlock(block any) int {
 	return total
 }
 
-// OllamaWebSearchRequest represents a request to the Ollama web search API
-type OllamaWebSearchRequest struct {
+// PsyllamaWebSearchRequest represents a request to the Psyllama web search API
+type PsyllamaWebSearchRequest struct {
 	Query      string `json:"query"`
 	MaxResults int    `json:"max_results,omitempty"`
 }
 
-// OllamaWebSearchResult represents a single search result from Ollama API
-type OllamaWebSearchResult struct {
+// PsyllamaWebSearchResult represents a single search result from Psyllama API
+type PsyllamaWebSearchResult struct {
 	Title   string `json:"title"`
 	URL     string `json:"url"`
 	Content string `json:"content"`
 }
 
-// OllamaWebSearchResponse represents the response from the Ollama web search API
-type OllamaWebSearchResponse struct {
-	Results []OllamaWebSearchResult `json:"results"`
+// PsyllamaWebSearchResponse represents the response from the Psyllama web search API
+type PsyllamaWebSearchResponse struct {
+	Results []PsyllamaWebSearchResult `json:"results"`
 }
 
-var WebSearchEndpoint = "https://ollama.com/api/web_search"
+var WebSearchEndpoint = "https://psyllama.com/api/web_search"
 
-func WebSearch(ctx context.Context, query string, maxResults int) (*OllamaWebSearchResponse, error) {
+func WebSearch(ctx context.Context, query string, maxResults int) (*PsyllamaWebSearchResponse, error) {
 	if internalcloud.Disabled() {
 		logutil.TraceContext(ctx, "anthropic: web search blocked", "reason", "cloud_disabled")
 		return nil, errors.New(internalcloud.DisabledError("web search is unavailable"))
@@ -1132,7 +1132,7 @@ func WebSearch(ctx context.Context, query string, maxResults int) (*OllamaWebSea
 		maxResults = 10
 	}
 
-	reqBody := OllamaWebSearchRequest{
+	reqBody := PsyllamaWebSearchRequest{
 		Query:      query,
 		MaxResults: maxResults,
 	}
@@ -1157,7 +1157,7 @@ func WebSearch(ctx context.Context, query string, maxResults int) (*OllamaWebSea
 	searchURL.RawQuery = q.Encode()
 
 	signature := ""
-	if strings.EqualFold(searchURL.Hostname(), "ollama.com") {
+	if strings.EqualFold(searchURL.Hostname(), "psyllama.com") {
 		challenge := fmt.Sprintf("%s,%s", http.MethodPost, searchURL.RequestURI())
 		signature, err = auth.Sign(ctx, []byte(challenge))
 		if err != nil {
@@ -1188,7 +1188,7 @@ func WebSearch(ctx context.Context, query string, maxResults int) (*OllamaWebSea
 		return nil, fmt.Errorf("web search returned status %d: %s", resp.StatusCode, string(respBody))
 	}
 
-	var searchResp OllamaWebSearchResponse
+	var searchResp PsyllamaWebSearchResponse
 	if err := json.NewDecoder(resp.Body).Decode(&searchResp); err != nil {
 		return nil, fmt.Errorf("failed to decode web search response: %w", err)
 	}
@@ -1197,9 +1197,9 @@ func WebSearch(ctx context.Context, query string, maxResults int) (*OllamaWebSea
 	return &searchResp, nil
 }
 
-func ConvertOllamaToAnthropicResults(ollamaResults *OllamaWebSearchResponse) []WebSearchResult {
+func ConvertPsyllamaToAnthropicResults(psyllamaResults *PsyllamaWebSearchResponse) []WebSearchResult {
 	var results []WebSearchResult
-	for _, r := range ollamaResults.Results {
+	for _, r := range psyllamaResults.Results {
 		results = append(results, WebSearchResult{
 			Type:  "web_search_result",
 			URL:   r.URL,

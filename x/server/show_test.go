@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ollama/ollama/manifest"
+	"github.com/LordPsyan/psyllama/manifest"
 )
 
 func TestBuildModelInfo(t *testing.T) {
@@ -523,9 +523,9 @@ func TestParseSafetensorsHeader_Errors(t *testing.T) {
 }
 
 func TestGetTensorInfoFromManifest(t *testing.T) {
-	// Create a temp directory for blobs and set OLLAMA_MODELS
+	// Create a temp directory for blobs and set PSYLLAMA_MODELS
 	tempDir := t.TempDir()
-	t.Setenv("OLLAMA_MODELS", tempDir)
+	t.Setenv("PSYLLAMA_MODELS", tempDir)
 
 	blobDir := filepath.Join(tempDir, "blobs")
 	if err := os.MkdirAll(blobDir, 0o755); err != nil {
@@ -594,7 +594,7 @@ func TestGetTensorInfoFromManifest(t *testing.T) {
 
 	// Add a non-tensor layer (should be skipped)
 	layers = append(layers, manifest.Layer{
-		MediaType: "application/vnd.ollama.image.json",
+		MediaType: "application/vnd.psyllama.image.json",
 		Digest:    "sha256:0000000000000000000000000000000000000000000000000000000000000000",
 		Size:      100,
 		Name:      "config.json",
@@ -633,9 +633,9 @@ func TestGetTensorInfoFromManifest(t *testing.T) {
 }
 
 func TestGetTensorInfoFromManifest_Quantized(t *testing.T) {
-	// Create a temp directory for blobs and set OLLAMA_MODELS
+	// Create a temp directory for blobs and set PSYLLAMA_MODELS
 	tempDir := t.TempDir()
-	t.Setenv("OLLAMA_MODELS", tempDir)
+	t.Setenv("PSYLLAMA_MODELS", tempDir)
 
 	blobDir := filepath.Join(tempDir, "blobs")
 	if err := os.MkdirAll(blobDir, 0o755); err != nil {
@@ -715,9 +715,9 @@ func TestGetTensorInfoFromManifest_Quantized(t *testing.T) {
 }
 
 func TestGetParameterCountFromManifest(t *testing.T) {
-	// Create a temp directory for blobs and set OLLAMA_MODELS
+	// Create a temp directory for blobs and set PSYLLAMA_MODELS
 	tempDir := t.TempDir()
-	t.Setenv("OLLAMA_MODELS", tempDir)
+	t.Setenv("PSYLLAMA_MODELS", tempDir)
 
 	blobDir := filepath.Join(tempDir, "blobs")
 	if err := os.MkdirAll(blobDir, 0o755); err != nil {
@@ -813,9 +813,9 @@ func TestGetParameterCountFromManifest(t *testing.T) {
 }
 
 func TestGetParameterCountFromManifest_MixedQuantizedPacked(t *testing.T) {
-	// Create a temp directory for blobs and set OLLAMA_MODELS
+	// Create a temp directory for blobs and set PSYLLAMA_MODELS
 	tempDir := t.TempDir()
-	t.Setenv("OLLAMA_MODELS", tempDir)
+	t.Setenv("PSYLLAMA_MODELS", tempDir)
 
 	blobDir := filepath.Join(tempDir, "blobs")
 	if err := os.MkdirAll(blobDir, 0o755); err != nil {
@@ -1074,9 +1074,9 @@ func TestParseSafetensorsAllHeaders(t *testing.T) {
 }
 
 func TestGetTensorInfoFromManifest_Packed(t *testing.T) {
-	// Create a temp directory for blobs and set OLLAMA_MODELS
+	// Create a temp directory for blobs and set PSYLLAMA_MODELS
 	tempDir := t.TempDir()
-	t.Setenv("OLLAMA_MODELS", tempDir)
+	t.Setenv("PSYLLAMA_MODELS", tempDir)
 
 	blobDir := filepath.Join(tempDir, "blobs")
 	if err := os.MkdirAll(blobDir, 0o755); err != nil {

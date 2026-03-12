@@ -3,8 +3,8 @@ package nemotronh
 import (
 	"errors"
 
-	"github.com/ollama/ollama/kvcache"
-	"github.com/ollama/ollama/ml"
+	"github.com/LordPsyan/psyllama/kvcache"
+	"github.com/LordPsyan/psyllama/ml"
 )
 
 // ErrUnsupportedBatchLayout is returned when the batch layout is incompatible

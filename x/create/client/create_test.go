@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ollama/ollama/manifest"
-	"github.com/ollama/ollama/parser"
+	"github.com/LordPsyan/psyllama/manifest"
+	"github.com/LordPsyan/psyllama/parser"
 )
 
 func TestModelfileConfig(t *testing.T) {
@@ -115,13 +115,13 @@ func TestModelfileConfig_PartialFields(t *testing.T) {
 	}
 }
 
-func TestMinOllamaVersion(t *testing.T) {
+func TestMinPsyllamaVersion(t *testing.T) {
 	// Verify the minimum version constant is set
-	if MinOllamaVersion == "" {
-		t.Error("MinOllamaVersion should not be empty")
+	if MinPsyllamaVersion == "" {
+		t.Error("MinPsyllamaVersion should not be empty")
 	}
-	if MinOllamaVersion != "0.14.0" {
-		t.Errorf("MinOllamaVersion = %q, want %q", MinOllamaVersion, "0.14.0")
+	if MinPsyllamaVersion != "0.14.0" {
+		t.Errorf("MinPsyllamaVersion = %q, want %q", MinPsyllamaVersion, "0.14.0")
 	}
 }
 
@@ -300,7 +300,7 @@ func TestQuantizeSupported(t *testing.T) {
 }
 
 func TestCreateModelfileLayersIncludesParameters(t *testing.T) {
-	t.Setenv("OLLAMA_MODELS", t.TempDir())
+	t.Setenv("PSYLLAMA_MODELS", t.TempDir())
 
 	layers, err := createModelfileLayers(&ModelfileConfig{
 		Parameters: map[string]any{
@@ -316,8 +316,8 @@ func TestCreateModelfileLayersIncludesParameters(t *testing.T) {
 		t.Fatalf("len(layers) = %d, want 1", len(layers))
 	}
 
-	if layers[0].MediaType != "application/vnd.ollama.image.params" {
-		t.Fatalf("MediaType = %q, want %q", layers[0].MediaType, "application/vnd.ollama.image.params")
+	if layers[0].MediaType != "application/vnd.psyllama.image.params" {
+		t.Fatalf("MediaType = %q, want %q", layers[0].MediaType, "application/vnd.psyllama.image.params")
 	}
 
 	blobPath, err := manifest.BlobsPath(layers[0].Digest)

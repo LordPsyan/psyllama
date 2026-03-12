@@ -4,10 +4,10 @@ import (
 	"math"
 	"slices"
 
-	"github.com/ollama/ollama/fs"
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/ml/nn"
-	"github.com/ollama/ollama/ml/nn/rope"
+	"github.com/LordPsyan/psyllama/fs"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/ml/nn"
+	"github.com/LordPsyan/psyllama/ml/nn/rope"
 )
 
 func blockDiagonalMask(ctx ml.Context, seqLength int, bounds []int) ml.Tensor {

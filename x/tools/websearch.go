@@ -13,20 +13,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/auth"
-	internalcloud "github.com/ollama/ollama/internal/cloud"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/auth"
+	internalcloud "github.com/LordPsyan/psyllama/internal/cloud"
 )
 
 const (
-	webSearchAPI     = "https://ollama.com/api/web_search"
+	webSearchAPI     = "https://psyllama.com/api/web_search"
 	webSearchTimeout = 15 * time.Second
 )
 
 // ErrWebSearchAuthRequired is returned when web search requires authentication
 var ErrWebSearchAuthRequired = errors.New("web search requires authentication")
 
-// WebSearchTool implements web search using Ollama's hosted API.
+// WebSearchTool implements web search using Psyllama's hosted API.
 type WebSearchTool struct{}
 
 // Name returns the tool name.
@@ -76,7 +76,7 @@ type webSearchResult struct {
 }
 
 // Execute performs the web search.
-// Uses Ollama key signing for authentication - this makes requests via ollama.com API.
+// Uses Psyllama key signing for authentication - this makes requests via psyllama.com API.
 func (w *WebSearchTool) Execute(args map[string]any) (string, error) {
 	if internalcloud.Disabled() {
 		return "", errors.New(internalcloud.DisabledError("web search is unavailable"))
@@ -108,8 +108,8 @@ func (w *WebSearchTool) Execute(args map[string]any) (string, error) {
 	q.Add("ts", strconv.FormatInt(time.Now().Unix(), 10))
 	searchURL.RawQuery = q.Encode()
 
-	// Sign the request using Ollama key (~/.ollama/id_ed25519)
-	// This authenticates with ollama.com using the local signing key
+	// Sign the request using Psyllama key (~/.psyllama/id_ed25519)
+	// This authenticates with psyllama.com using the local signing key
 	ctx := context.Background()
 	data := fmt.Appendf(nil, "%s,%s", http.MethodPost, searchURL.RequestURI())
 	signature, err := auth.Sign(ctx, data)

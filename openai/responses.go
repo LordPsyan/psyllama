@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/api"
 )
 
 // ResponsesContent is a discriminated union for input content types.

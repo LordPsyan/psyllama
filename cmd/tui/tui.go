@@ -9,10 +9,10 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/cmd/config"
-	"github.com/ollama/ollama/internal/modelref"
-	"github.com/ollama/ollama/version"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/cmd/config"
+	"github.com/LordPsyan/psyllama/internal/modelref"
+	"github.com/LordPsyan/psyllama/version"
 )
 
 var (
@@ -605,7 +605,7 @@ func (m model) View() string {
 		return m.renderModal()
 	}
 
-	s := selectorTitleStyle.Render("Ollama "+versionStyle.Render(version.Version)) + "\n\n"
+	s := selectorTitleStyle.Render("Psyllama "+versionStyle.Render(version.Version)) + "\n\n"
 
 	for i, item := range m.items {
 		cursor := ""

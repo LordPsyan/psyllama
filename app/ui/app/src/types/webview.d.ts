@@ -25,8 +25,8 @@ declare global {
     drag?: () => void;
     doubleClick?: () => void;
     menu: (items: MenuItem[]) => Promise<string | null>;
-    OLLAMA_TOOLS?: boolean;
-    OLLAMA_WEBSEARCH?: boolean;
+    PSYLLAMA_TOOLS?: boolean;
+    PSYLLAMA_WEBSEARCH?: boolean;
   }
 
   namespace JSX {

@@ -4,8 +4,8 @@ import (
 	"log/slog"
 	"math"
 
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/model/input"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/model/input"
 )
 
 // TODO(jmorganca): Add byte-serialized host-RAM checkpoints to reduce GPU

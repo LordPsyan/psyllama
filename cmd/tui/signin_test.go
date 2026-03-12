@@ -18,7 +18,7 @@ func TestRenderSignIn_ContainsModelName(t *testing.T) {
 }
 
 func TestRenderSignIn_ContainsURL(t *testing.T) {
-	url := "https://ollama.com/connect?key=abc123"
+	url := "https://psyllama.com/connect?key=abc123"
 	got := renderSignIn("test:cloud", url, 0, 120)
 	if !strings.Contains(got, url) {
 		t.Errorf("should contain URL %q", url)
@@ -26,7 +26,7 @@ func TestRenderSignIn_ContainsURL(t *testing.T) {
 }
 
 func TestRenderSignIn_OSC8Hyperlink(t *testing.T) {
-	url := "https://ollama.com/connect?key=abc123"
+	url := "https://psyllama.com/connect?key=abc123"
 	got := renderSignIn("test:cloud", url, 0, 120)
 
 	// Should contain OSC 8 open sequence with the URL

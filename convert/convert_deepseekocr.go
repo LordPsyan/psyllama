@@ -3,7 +3,7 @@ package convert
 import (
 	"fmt"
 
-	"github.com/ollama/ollama/fs/ggml"
+	"github.com/LordPsyan/psyllama/fs/ggml"
 )
 
 type deepseekocr struct {

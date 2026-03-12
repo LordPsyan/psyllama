@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/api"
 )
 
 const (
@@ -45,7 +45,7 @@ type Qwen35Renderer struct {
 }
 
 func (r *Qwen35Renderer) renderContent(content api.Message, imageOffset int) (string, int) {
-	// This assumes all images are at the front of the message - same assumption as ollama/ollama/runner.go
+	// This assumes all images are at the front of the message - same assumption as psyllama/psyllama/runner.go
 	var subSb strings.Builder
 	for range content.Images {
 		if r.useImgTags {

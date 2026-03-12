@@ -21,15 +21,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/llm"
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/x/imagegen/manifest"
+	"github.com/LordPsyan/psyllama/envconfig"
+	"github.com/LordPsyan/psyllama/llm"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/x/imagegen/manifest"
 )
 
 // Server wraps an MLX runner subprocess to implement llm.LlamaServer.
 //
-// This implementation is compatible with Ollama's scheduler and can be loaded/unloaded
+// This implementation is compatible with Psyllama's scheduler and can be loaded/unloaded
 // like any other model. It is used for image generation models.
 type Server struct {
 	mu          sync.Mutex
@@ -71,15 +71,15 @@ func NewServer(modelName string) (*Server, error) {
 		exe = eval
 	}
 
-	// Spawn subprocess: ollama runner --imagegen-engine --model <path> --port <port>
+	// Spawn subprocess: psyllama runner --imagegen-engine --model <path> --port <port>
 	cmd := exec.Command(exe, "runner", "--imagegen-engine", "--model", modelName, "--port", strconv.Itoa(port))
 	cmd.Env = os.Environ()
 
 	// On Linux, set LD_LIBRARY_PATH to include MLX library directories
 	if runtime.GOOS == "linux" {
-		// Build library paths: start with LibOllamaPath, then add any mlx_* subdirectories
-		libraryPaths := []string{ml.LibOllamaPath}
-		if mlxDirs, err := filepath.Glob(filepath.Join(ml.LibOllamaPath, "mlx_*")); err == nil {
+		// Build library paths: start with LibPsyllamaPath, then add any mlx_* subdirectories
+		libraryPaths := []string{ml.LibPsyllamaPath}
+		if mlxDirs, err := filepath.Glob(filepath.Join(ml.LibPsyllamaPath, "mlx_*")); err == nil {
 			libraryPaths = append(libraryPaths, mlxDirs...)
 		}
 

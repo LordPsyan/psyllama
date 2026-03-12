@@ -3,9 +3,9 @@ package qwen3next
 import (
 	"testing"
 
-	"github.com/ollama/ollama/ml/backend/ggml"
-	"github.com/ollama/ollama/model/input"
-	"github.com/ollama/ollama/model/models/qwen3vl"
+	"github.com/LordPsyan/psyllama/ml/backend/ggml"
+	"github.com/LordPsyan/psyllama/model/input"
+	"github.com/LordPsyan/psyllama/model/models/qwen3vl"
 )
 
 type fakeTensor struct {

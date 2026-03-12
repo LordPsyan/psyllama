@@ -15,9 +15,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/ollama/ollama/server/internal/cache/blob"
-	"github.com/ollama/ollama/server/internal/client/ollama"
-	"github.com/ollama/ollama/server/internal/testutil"
+	"github.com/LordPsyan/psyllama/server/internal/cache/blob"
+	"github.com/LordPsyan/psyllama/server/internal/client/psyllama"
+	"github.com/LordPsyan/psyllama/server/internal/testutil"
 	"golang.org/x/tools/txtar"
 
 	_ "embed"
@@ -63,7 +63,7 @@ func newTestServer(t *testing.T, upstreamRegistry http.HandlerFunc) *Local {
 		client = &http.Client{Transport: tr}
 	}
 
-	rc := &ollama.Registry{
+	rc := &psyllama.Registry{
 		Cache:      c,
 		HTTPClient: client,
 		Mask:       "example.com/library/_:latest",
@@ -78,8 +78,8 @@ func newTestServer(t *testing.T, upstreamRegistry http.HandlerFunc) *Local {
 
 func (s *Local) send(t *testing.T, method, path, body string) *httptest.ResponseRecorder {
 	t.Helper()
-	ctx := ollama.WithTrace(t.Context(), &ollama.Trace{
-		Update: func(l *ollama.Layer, n int64, err error) {
+	ctx := psyllama.WithTrace(t.Context(), &psyllama.Trace{
+		Update: func(l *psyllama.Layer, n int64, err error) {
 			t.Logf("update: %s %d %v", l.Digest, n, err)
 		},
 	})
@@ -287,8 +287,8 @@ func checkErrorResponse(t *testing.T, got *httptest.ResponseRecorder, status int
 		errorf("Code = %d; want %d", got.Code, status)
 	}
 
-	// unmarshal the error as *ollama.Error (proving *serverError is an *ollama.Error)
-	var e *ollama.Error
+	// unmarshal the error as *psyllama.Error (proving *serverError is an *psyllama.Error)
+	var e *psyllama.Error
 	if err := json.Unmarshal(got.Body.Bytes(), &e); err != nil {
 		errorf("unmarshal error: %v", err)
 		t.FailNow()

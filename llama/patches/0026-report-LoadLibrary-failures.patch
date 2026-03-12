@@ -1,5 +1,5 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Daniel Hiltgen <daniel@ollama.com>
+From: Daniel Hiltgen <daniel@psyllama.com>
 Date: Fri, 17 Oct 2025 14:17:00 -0700
 Subject: [PATCH] report LoadLibrary failures
 

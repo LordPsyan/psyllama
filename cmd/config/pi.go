@@ -11,9 +11,9 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/types/model"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/envconfig"
+	"github.com/LordPsyan/psyllama/types/model"
 )
 
 // Pi implements Runner and Editor for Pi (Pi Coding Agent) integration
@@ -85,16 +85,16 @@ func (p *Pi) Edit(models []string) error {
 		providers = make(map[string]any)
 	}
 
-	ollama, ok := providers["ollama"].(map[string]any)
+	psyllama, ok := providers["psyllama"].(map[string]any)
 	if !ok {
-		ollama = map[string]any{
+		psyllama = map[string]any{
 			"baseUrl": envconfig.Host().String() + "/v1",
 			"api":     "openai-completions",
-			"apiKey":  "ollama",
+			"apiKey":  "psyllama",
 		}
 	}
 
-	existingModels, ok := ollama["models"].([]any)
+	existingModels, ok := psyllama["models"].([]any)
 	if !ok {
 		existingModels = make([]any, 0)
 	}
@@ -107,15 +107,15 @@ func (p *Pi) Edit(models []string) error {
 
 	// Build new models list:
 	// 1. Keep user-managed models (no _launch marker) - untouched
-	// 2. Keep ollama-managed models (_launch marker) that are still selected,
+	// 2. Keep psyllama-managed models (_launch marker) that are still selected,
 	//    except stale cloud entries that should be rebuilt below
-	// 3. Add new ollama-managed models
+	// 3. Add new psyllama-managed models
 	var newModels []any
 	for _, m := range existingModels {
 		if modelObj, ok := m.(map[string]any); ok {
 			if id, ok := modelObj["id"].(string); ok {
 				// User-managed model (no _launch marker) - always preserve
-				if !isPiOllamaModel(modelObj) {
+				if !isPiPsyllamaModel(modelObj) {
 					newModels = append(newModels, m)
 				} else if selectedSet[id] {
 					// Rebuild stale managed cloud entries so createConfig refreshes
@@ -141,8 +141,8 @@ func (p *Pi) Edit(models []string) error {
 		}
 	}
 
-	ollama["models"] = newModels
-	providers["ollama"] = ollama
+	psyllama["models"] = newModels
+	providers["psyllama"] = psyllama
 	config["providers"] = providers
 
 	configData, err := json.MarshalIndent(config, "", "  ")
@@ -160,7 +160,7 @@ func (p *Pi) Edit(models []string) error {
 		_ = json.Unmarshal(data, &settings)
 	}
 
-	settings["defaultProvider"] = "ollama"
+	settings["defaultProvider"] = "psyllama"
 	settings["defaultModel"] = models[0]
 
 	settingsData, err := json.MarshalIndent(settings, "", "  ")
@@ -183,8 +183,8 @@ func (p *Pi) Models() []string {
 	}
 
 	providers, _ := config["providers"].(map[string]any)
-	ollama, _ := providers["ollama"].(map[string]any)
-	models, _ := ollama["models"].([]any)
+	psyllama, _ := providers["psyllama"].(map[string]any)
+	models, _ := psyllama["models"].([]any)
 
 	var result []string
 	for _, m := range models {
@@ -198,8 +198,8 @@ func (p *Pi) Models() []string {
 	return result
 }
 
-// isPiOllamaModel reports whether a model config entry is managed by ollama launch
-func isPiOllamaModel(cfg map[string]any) bool {
+// isPiPsyllamaModel reports whether a model config entry is managed by psyllama launch
+func isPiPsyllamaModel(cfg map[string]any) bool {
 	if v, ok := cfg["_launch"].(bool); ok && v {
 		return true
 	}

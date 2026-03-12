@@ -21,13 +21,13 @@ import (
 
 	"golang.org/x/sync/semaphore"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/llama"
-	"github.com/ollama/ollama/llm"
-	"github.com/ollama/ollama/logutil"
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/runner/common"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/envconfig"
+	"github.com/LordPsyan/psyllama/llama"
+	"github.com/LordPsyan/psyllama/llm"
+	"github.com/LordPsyan/psyllama/logutil"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/runner/common"
 )
 
 // response contains a piece of generated text along with optional logprobs
@@ -873,7 +873,7 @@ func (s *Server) loadModel(
 	s.ready.Done()
 }
 
-// load is the handler called by the Ollama server to process different
+// load is the handler called by the Psyllama server to process different
 // load operations
 func (s *Server) load(w http.ResponseWriter, r *http.Request) {
 	s.loadMu.Lock()

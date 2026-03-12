@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/api"
 )
 
 const (

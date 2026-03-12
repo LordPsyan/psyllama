@@ -53,7 +53,7 @@ const (
 )
 
 // ParseFileType parses the provided GGUF file type
-// Only Ollama supported types are considered valid
+// Only Psyllama supported types are considered valid
 func ParseFileType(s string) (FileType, error) {
 	switch s {
 	case "F32":
@@ -203,26 +203,26 @@ const (
 	TensorTypeQ5_K
 	TensorTypeQ6_K
 	TensorTypeQ8_K
-	tensorTypeIQ2_XXS // not supported by ollama
-	tensorTypeIQ2_XS  // not supported by ollama
-	tensorTypeIQ3_XXS // not supported by ollama
-	tensorTypeIQ1_S   // not supported by ollama
-	tensorTypeIQ4_NL  // not supported by ollama
-	tensorTypeIQ3_S   // not supported by ollama
-	tensorTypeIQ2_S   // not supported by ollama
-	tensorTypeIQ4_XS  // not supported by ollama
+	tensorTypeIQ2_XXS // not supported by psyllama
+	tensorTypeIQ2_XS  // not supported by psyllama
+	tensorTypeIQ3_XXS // not supported by psyllama
+	tensorTypeIQ1_S   // not supported by psyllama
+	tensorTypeIQ4_NL  // not supported by psyllama
+	tensorTypeIQ3_S   // not supported by psyllama
+	tensorTypeIQ2_S   // not supported by psyllama
+	tensorTypeIQ4_XS  // not supported by psyllama
 	TensorTypeI8
 	TensorTypeI16
 	TensorTypeI32
 	TensorTypeI64
 	TensorTypeF64
-	tensorTypeIQ1_M // not supported by ollama
+	tensorTypeIQ1_M // not supported by psyllama
 	TensorTypeBF16
 	tensorTypeQ4_0_4_4   // unused by GGML
 	tensorTypeQ4_0_4_8   // unused by GGML
 	tensorTypeQ4_0_8_8   // unused by GGML
-	tensorTypeTQ1_0      // not supported by ollama
-	tensorTypeTQ2_0      // not supported by ollama
+	tensorTypeTQ1_0      // not supported by psyllama
+	tensorTypeTQ2_0      // not supported by psyllama
 	tensorTypeIQ4_NL_4_4 // unused by GGML
 	tensorTypeIQ4_NL_4_8 // unused by GGML
 	tensorTypeIQ4_NL_8_8 // unused by GGML
@@ -230,7 +230,7 @@ const (
 )
 
 // ParseTensorType parses the provided GGUF tensor type
-// Only Ollama supported types are considered valid
+// Only Psyllama supported types are considered valid
 func ParseTensorType(s string) (TensorType, error) {
 	switch s {
 	case "F32":

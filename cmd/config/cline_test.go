@@ -48,17 +48,17 @@ func TestClineEdit(t *testing.T) {
 		}
 
 		config := readConfig()
-		if config["actModeApiProvider"] != "ollama" {
-			t.Errorf("actModeApiProvider = %v, want ollama", config["actModeApiProvider"])
+		if config["actModeApiProvider"] != "psyllama" {
+			t.Errorf("actModeApiProvider = %v, want psyllama", config["actModeApiProvider"])
 		}
-		if config["actModeOllamaModelId"] != "kimi-k2.5:cloud" {
-			t.Errorf("actModeOllamaModelId = %v, want kimi-k2.5:cloud", config["actModeOllamaModelId"])
+		if config["actModePsyllamaModelId"] != "kimi-k2.5:cloud" {
+			t.Errorf("actModePsyllamaModelId = %v, want kimi-k2.5:cloud", config["actModePsyllamaModelId"])
 		}
-		if config["planModeApiProvider"] != "ollama" {
-			t.Errorf("planModeApiProvider = %v, want ollama", config["planModeApiProvider"])
+		if config["planModeApiProvider"] != "psyllama" {
+			t.Errorf("planModeApiProvider = %v, want psyllama", config["planModeApiProvider"])
 		}
-		if config["planModeOllamaModelId"] != "kimi-k2.5:cloud" {
-			t.Errorf("planModeOllamaModelId = %v, want kimi-k2.5:cloud", config["planModeOllamaModelId"])
+		if config["planModePsyllamaModelId"] != "kimi-k2.5:cloud" {
+			t.Errorf("planModePsyllamaModelId = %v, want kimi-k2.5:cloud", config["planModePsyllamaModelId"])
 		}
 		if config["welcomeViewCompleted"] != true {
 			t.Errorf("welcomeViewCompleted = %v, want true", config["welcomeViewCompleted"])
@@ -85,8 +85,8 @@ func TestClineEdit(t *testing.T) {
 		if config["customSetting"] != "keep-me" {
 			t.Errorf("customSetting was not preserved")
 		}
-		if config["actModeOllamaModelId"] != "glm-5:cloud" {
-			t.Errorf("actModeOllamaModelId = %v, want glm-5:cloud", config["actModeOllamaModelId"])
+		if config["actModePsyllamaModelId"] != "glm-5:cloud" {
+			t.Errorf("actModePsyllamaModelId = %v, want glm-5:cloud", config["actModePsyllamaModelId"])
 		}
 	})
 
@@ -101,11 +101,11 @@ func TestClineEdit(t *testing.T) {
 		}
 
 		config := readConfig()
-		if config["actModeOllamaModelId"] != "glm-5:cloud" {
-			t.Errorf("actModeOllamaModelId = %v, want glm-5:cloud", config["actModeOllamaModelId"])
+		if config["actModePsyllamaModelId"] != "glm-5:cloud" {
+			t.Errorf("actModePsyllamaModelId = %v, want glm-5:cloud", config["actModePsyllamaModelId"])
 		}
-		if config["planModeOllamaModelId"] != "glm-5:cloud" {
-			t.Errorf("planModeOllamaModelId = %v, want glm-5:cloud", config["planModeOllamaModelId"])
+		if config["planModePsyllamaModelId"] != "glm-5:cloud" {
+			t.Errorf("planModePsyllamaModelId = %v, want glm-5:cloud", config["planModePsyllamaModelId"])
 		}
 	})
 
@@ -129,8 +129,8 @@ func TestClineEdit(t *testing.T) {
 		}
 
 		config := readConfig()
-		if config["actModeOllamaModelId"] != "kimi-k2.5:cloud" {
-			t.Errorf("actModeOllamaModelId = %v, want kimi-k2.5:cloud (first model)", config["actModeOllamaModelId"])
+		if config["actModePsyllamaModelId"] != "kimi-k2.5:cloud" {
+			t.Errorf("actModePsyllamaModelId = %v, want kimi-k2.5:cloud (first model)", config["actModePsyllamaModelId"])
 		}
 	})
 }
@@ -149,11 +149,11 @@ func TestClineModels(t *testing.T) {
 		}
 	})
 
-	t.Run("returns nil when provider is not ollama", func(t *testing.T) {
+	t.Run("returns nil when provider is not psyllama", func(t *testing.T) {
 		os.MkdirAll(configDir, 0o755)
 		config := map[string]any{
 			"actModeApiProvider":   "anthropic",
-			"actModeOllamaModelId": "some-model",
+			"actModePsyllamaModelId": "some-model",
 		}
 		data, _ := json.Marshal(config)
 		os.WriteFile(configPath, data, 0o644)
@@ -163,11 +163,11 @@ func TestClineModels(t *testing.T) {
 		}
 	})
 
-	t.Run("returns model when ollama is configured", func(t *testing.T) {
+	t.Run("returns model when psyllama is configured", func(t *testing.T) {
 		os.MkdirAll(configDir, 0o755)
 		config := map[string]any{
-			"actModeApiProvider":   "ollama",
-			"actModeOllamaModelId": "kimi-k2.5:cloud",
+			"actModeApiProvider":   "psyllama",
+			"actModePsyllamaModelId": "kimi-k2.5:cloud",
 		}
 		data, _ := json.Marshal(config)
 		os.WriteFile(configPath, data, 0o644)

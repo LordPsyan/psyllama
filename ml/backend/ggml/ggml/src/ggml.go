@@ -36,7 +36,7 @@ import (
 	"sync"
 	"unsafe"
 
-	_ "github.com/ollama/ollama/ml/backend/ggml/ggml/src/ggml-cpu"
+	_ "github.com/LordPsyan/psyllama/ml/backend/ggml/ggml/src/ggml-cpu"
 )
 
 func init() {
@@ -63,15 +63,15 @@ var OnceLoad = sync.OnceFunc(func() {
 	case "darwin":
 		value = filepath.Dir(exe)
 	case "windows":
-		value = filepath.Join(filepath.Dir(exe), "lib", "ollama")
+		value = filepath.Join(filepath.Dir(exe), "lib", "psyllama")
 	default:
-		value = filepath.Join(filepath.Dir(exe), "..", "lib", "ollama")
+		value = filepath.Join(filepath.Dir(exe), "..", "lib", "psyllama")
 	}
 
 	// Avoid potentially loading incompatible GGML libraries
-	paths, ok := os.LookupEnv("OLLAMA_LIBRARY_PATH")
+	paths, ok := os.LookupEnv("PSYLLAMA_LIBRARY_PATH")
 	if !ok {
-		slog.Debug("OLLAMA_LIBRARY_PATH not set, falling back to default", "search", value)
+		slog.Debug("PSYLLAMA_LIBRARY_PATH not set, falling back to default", "search", value)
 		paths = value
 	}
 
@@ -84,8 +84,8 @@ var OnceLoad = sync.OnceFunc(func() {
 			continue
 		}
 
-		if abspath != filepath.Dir(exe) && !strings.Contains(abspath, filepath.FromSlash("lib/ollama")) {
-			slog.Debug("skipping path which is not part of ollama", "path", abspath)
+		if abspath != filepath.Dir(exe) && !strings.Contains(abspath, filepath.FromSlash("lib/psyllama")) {
+			slog.Debug("skipping path which is not part of psyllama", "path", abspath)
 			continue
 		}
 

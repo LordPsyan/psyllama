@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/ollama/ollama/logutil"
-	"github.com/ollama/ollama/x/mlxrunner/cache"
-	"github.com/ollama/ollama/x/mlxrunner/mlx"
-	"github.com/ollama/ollama/x/mlxrunner/model/base"
+	"github.com/LordPsyan/psyllama/logutil"
+	"github.com/LordPsyan/psyllama/x/mlxrunner/cache"
+	"github.com/LordPsyan/psyllama/x/mlxrunner/mlx"
+	"github.com/LordPsyan/psyllama/x/mlxrunner/model/base"
 )
 
 type kvCache struct {

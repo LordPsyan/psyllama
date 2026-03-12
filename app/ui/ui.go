@@ -1,6 +1,6 @@
 //go:build windows || darwin
 
-// package ui implements a chat interface for Ollama
+// package ui implements a chat interface for Psyllama
 package ui
 
 import (
@@ -22,31 +22,31 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/app/server"
-	"github.com/ollama/ollama/app/store"
-	"github.com/ollama/ollama/app/tools"
-	"github.com/ollama/ollama/app/types/not"
-	"github.com/ollama/ollama/app/ui/responses"
-	"github.com/ollama/ollama/app/updater"
-	"github.com/ollama/ollama/app/version"
-	ollamaAuth "github.com/ollama/ollama/auth"
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/types/model"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/app/server"
+	"github.com/LordPsyan/psyllama/app/store"
+	"github.com/LordPsyan/psyllama/app/tools"
+	"github.com/LordPsyan/psyllama/app/types/not"
+	"github.com/LordPsyan/psyllama/app/ui/responses"
+	"github.com/LordPsyan/psyllama/app/updater"
+	"github.com/LordPsyan/psyllama/app/version"
+	psyllamaAuth "github.com/LordPsyan/psyllama/auth"
+	"github.com/LordPsyan/psyllama/envconfig"
+	"github.com/LordPsyan/psyllama/types/model"
 	_ "github.com/tkrajina/typescriptify-golang-structs/typescriptify"
 )
 
-//go:generate tscriptify -package=github.com/ollama/ollama/app/ui/responses -target=./app/codegen/gotypes.gen.ts responses/types.go
+//go:generate tscriptify -package=github.com/LordPsyan/psyllama/app/ui/responses -target=./app/codegen/gotypes.gen.ts responses/types.go
 //go:generate npm --prefix ./app run build
 
-var CORS = envconfig.Bool("OLLAMA_CORS")
+var CORS = envconfig.Bool("PSYLLAMA_CORS")
 
-// OllamaDotCom returns the URL for ollama.com, allowing override via environment variable
-var OllamaDotCom = func() string {
-	if url := os.Getenv("OLLAMA_DOT_COM_URL"); url != "" {
+// PsyllamaDotCom returns the URL for psyllama.com, allowing override via environment variable
+var PsyllamaDotCom = func() string {
+	if url := os.Getenv("PSYLLAMA_DOT_COM_URL"); url != "" {
 		return url
 	}
-	return "https://ollama.com"
+	return "https://psyllama.com"
 }()
 
 type statusRecorder struct {
@@ -120,8 +120,8 @@ func (s *Server) log() *slog.Logger {
 	return s.Logger
 }
 
-// ollamaProxy creates a reverse proxy handler to the Ollama server
-func (s *Server) ollamaProxy() http.Handler {
+// psyllamaProxy creates a reverse proxy handler to the Psyllama server
+func (s *Server) psyllamaProxy() http.Handler {
 	var (
 		proxy   http.Handler
 		proxyMu sync.Mutex
@@ -138,7 +138,7 @@ func (s *Server) ollamaProxy() http.Handler {
 				var err error
 				for i := range 2 {
 					if i > 0 {
-						s.log().Warn("ollama server not ready, retrying", "attempt", i+1)
+						s.log().Warn("psyllama server not ready, retrying", "attempt", i+1)
 						time.Sleep(1 * time.Second)
 					}
 
@@ -150,13 +150,13 @@ func (s *Server) ollamaProxy() http.Handler {
 
 				if err != nil {
 					proxyMu.Unlock()
-					s.log().Error("ollama server not ready after retries", "error", err)
-					http.Error(w, "Ollama server is not ready", http.StatusServiceUnavailable)
+					s.log().Error("psyllama server not ready after retries", "error", err)
+					http.Error(w, "Psyllama server is not ready", http.StatusServiceUnavailable)
 					return
 				}
 
 				target := envconfig.Host()
-				s.log().Info("configuring ollama proxy", "target", target.String())
+				s.log().Info("configuring psyllama proxy", "target", target.String())
 
 				newProxy := httputil.NewSingleHostReverseProxy(target)
 
@@ -292,15 +292,15 @@ func (s *Server) Handler() http.Handler {
 	mux.Handle("GET /api/v1/cloud", handle(s.getCloudSetting))
 	mux.Handle("POST /api/v1/cloud", handle(s.cloudSetting))
 
-	// Ollama proxy endpoints
-	ollamaProxy := s.ollamaProxy()
-	mux.Handle("GET /api/tags", ollamaProxy)
-	mux.Handle("POST /api/show", ollamaProxy)
-	mux.Handle("GET /api/version", ollamaProxy)
-	mux.Handle("GET /api/status", ollamaProxy)
-	mux.Handle("HEAD /api/version", ollamaProxy)
-	mux.Handle("POST /api/me", ollamaProxy)
-	mux.Handle("POST /api/signout", ollamaProxy)
+	// Psyllama proxy endpoints
+	psyllamaProxy := s.psyllamaProxy()
+	mux.Handle("GET /api/tags", psyllamaProxy)
+	mux.Handle("POST /api/show", psyllamaProxy)
+	mux.Handle("GET /api/version", psyllamaProxy)
+	mux.Handle("GET /api/status", psyllamaProxy)
+	mux.Handle("HEAD /api/version", psyllamaProxy)
+	mux.Handle("POST /api/me", psyllamaProxy)
+	mux.Handle("POST /api/signout", psyllamaProxy)
 
 	// React app - catch all non-API routes and serve the React app
 	mux.Handle("GET /", s.appHandler())
@@ -349,17 +349,17 @@ func (s *Server) httpClient() *http.Client {
 	}
 }
 
-// doSelfSigned sends a self-signed request to the ollama.com API
+// doSelfSigned sends a self-signed request to the psyllama.com API
 func (s *Server) doSelfSigned(ctx context.Context, method, path string) (*http.Response, error) {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	// Form the string to sign: METHOD,PATH?ts=TIMESTAMP
 	signString := fmt.Sprintf("%s,%s?ts=%s", method, path, timestamp)
-	signature, err := ollamaAuth.Sign(ctx, []byte(signString))
+	signature, err := psyllamaAuth.Sign(ctx, []byte(signString))
 	if err != nil {
 		return nil, fmt.Errorf("failed to sign request: %w", err)
 	}
 
-	endpoint := fmt.Sprintf("%s%s?ts=%s", OllamaDotCom, path, timestamp)
+	endpoint := fmt.Sprintf("%s%s?ts=%s", PsyllamaDotCom, path, timestamp)
 	req, err := http.NewRequestWithContext(ctx, method, endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
@@ -369,11 +369,11 @@ func (s *Server) doSelfSigned(ctx context.Context, method, path string) (*http.R
 	return s.httpClient().Do(req)
 }
 
-// UserData fetches user data from ollama.com API for the current ollama key
+// UserData fetches user data from psyllama.com API for the current psyllama key
 func (s *Server) UserData(ctx context.Context) (*api.UserResponse, error) {
 	resp, err := s.doSelfSigned(ctx, http.MethodPost, "/api/me")
 	if err != nil {
-		return nil, fmt.Errorf("failed to call ollama.com/api/me: %w", err)
+		return nil, fmt.Errorf("failed to call psyllama.com/api/me: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -386,7 +386,7 @@ func (s *Server) UserData(ctx context.Context) (*api.UserResponse, error) {
 		return nil, fmt.Errorf("failed to parse user response: %w", err)
 	}
 
-	user.AvatarURL = fmt.Sprintf("%s/%s", OllamaDotCom, user.AvatarURL)
+	user.AvatarURL = fmt.Sprintf("%s/%s", PsyllamaDotCom, user.AvatarURL)
 
 	storeUser := store.User{
 		Name:  user.Name,
@@ -400,7 +400,7 @@ func (s *Server) UserData(ctx context.Context) (*api.UserResponse, error) {
 	return &user, nil
 }
 
-// WaitForServer waits for the Ollama server to be ready
+// WaitForServer waits for the Psyllama server to be ready
 func WaitForServer(ctx context.Context, timeout time.Duration) error {
 	deadline := time.Now().Add(timeout)
 	for time.Now().Before(deadline) {
@@ -409,12 +409,12 @@ func WaitForServer(ctx context.Context, timeout time.Duration) error {
 			return err
 		}
 		if _, err := c.Version(ctx); err == nil {
-			slog.Debug("ollama server is ready")
+			slog.Debug("psyllama server is ready")
 			return nil
 		}
 		time.Sleep(10 * time.Millisecond)
 	}
-	return errors.New("timeout waiting for Ollama server to be ready")
+	return errors.New("timeout waiting for Psyllama server to be ready")
 }
 
 func (s *Server) createChat(w http.ResponseWriter, r *http.Request) error {
@@ -444,7 +444,7 @@ func (s *Server) listChats(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// checkModelUpstream makes a HEAD request to the Ollama registry to get the upstream digest and push time
+// checkModelUpstream makes a HEAD request to the Psyllama registry to get the upstream digest and push time
 func (s *Server) checkModelUpstream(ctx context.Context, modelName string, timeout time.Duration) (string, int64, error) {
 	// Create a context with timeout for the registry check
 	checkCtx, cancel := context.WithTimeout(ctx, timeout)
@@ -463,8 +463,8 @@ func (s *Server) checkModelUpstream(ctx context.Context, modelName string, timeo
 		name = "library/" + name
 	}
 
-	// Check the model in the Ollama registry using HEAD request
-	url := OllamaDotCom + "/v2/" + name + "/manifests/" + tag
+	// Check the model in the Psyllama registry using HEAD request
+	url := PsyllamaDotCom + "/v2/" + name + "/manifests/" + tag
 	req, err := http.NewRequestWithContext(checkCtx, "HEAD", url, nil)
 	if err != nil {
 		return "", 0, err
@@ -483,13 +483,13 @@ func (s *Server) checkModelUpstream(ctx context.Context, modelName string, timeo
 		return "", 0, fmt.Errorf("registry returned status %d", resp.StatusCode)
 	}
 
-	digest := resp.Header.Get("ollama-content-digest")
+	digest := resp.Header.Get("psyllama-content-digest")
 	if digest == "" {
 		return "", 0, fmt.Errorf("no digest header found")
 	}
 
 	var pushTime int64
-	if pushTimeStr := resp.Header.Get("ollama-push-time"); pushTimeStr != "" {
+	if pushTimeStr := resp.Header.Get("psyllama-push-time"); pushTimeStr != "" {
 		if pt, err := strconv.ParseInt(pushTimeStr, 10, 64); err == nil {
 			pushTime = pt
 		}
@@ -1587,14 +1587,14 @@ func userAgent() string {
 	version := buildinfo.Main.Version
 	if version == "(devel)" {
 		// When using `go run .` the version is "(devel)". This is seen
-		// as an invalid version by ollama.com and so it defaults to
+		// as an invalid version by psyllama.com and so it defaults to
 		// "needs upgrade" for some requests, such as pulls. These
 		// checks can be skipped by using the special version "v0.0.0",
 		// so we set it to that here.
 		version = "v0.0.0"
 	}
 
-	return fmt.Sprintf("ollama/%s (%s %s) app/%s Go/%s",
+	return fmt.Sprintf("psyllama/%s (%s %s) app/%s Go/%s",
 		version,
 		runtime.GOARCH,
 		runtime.GOOS,
@@ -1603,8 +1603,8 @@ func userAgent() string {
 	)
 }
 
-// convertToOllamaTool converts a tool schema from our tools package format to Ollama API format
-func convertToOllamaTool(toolSchema map[string]any) api.Tool {
+// convertToPsyllamaTool converts a tool schema from our tools package format to Psyllama API format
+func convertToPsyllamaTool(toolSchema map[string]any) api.Tool {
 	tool := api.Tool{
 		Type: "function",
 		Function: api.ToolFunction{
@@ -1761,7 +1761,7 @@ func (s *Server) buildChatRequest(chat *store.Chat, model string, think any, ava
 	if len(availableTools) > 0 {
 		tools := make(api.Tools, len(availableTools))
 		for i, toolSchema := range availableTools {
-			tools[i] = convertToOllamaTool(toolSchema)
+			tools[i] = convertToPsyllamaTool(toolSchema)
 		}
 		req.Tools = tools
 	}

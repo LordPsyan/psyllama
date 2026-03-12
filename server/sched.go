@@ -12,17 +12,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/discover"
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/format"
-	"github.com/ollama/ollama/fs/ggml"
-	"github.com/ollama/ollama/llm"
-	"github.com/ollama/ollama/logutil"
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/types/model"
-	"github.com/ollama/ollama/x/imagegen"
-	"github.com/ollama/ollama/x/mlxrunner"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/discover"
+	"github.com/LordPsyan/psyllama/envconfig"
+	"github.com/LordPsyan/psyllama/format"
+	"github.com/LordPsyan/psyllama/fs/ggml"
+	"github.com/LordPsyan/psyllama/llm"
+	"github.com/LordPsyan/psyllama/logutil"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/types/model"
+	"github.com/LordPsyan/psyllama/x/imagegen"
+	"github.com/LordPsyan/psyllama/x/mlxrunner"
 )
 
 type LlmRequest struct {
@@ -217,7 +217,7 @@ func (s *Scheduler) processPending(ctx context.Context) {
 						} else {
 							maxRunners = uint(defaultModelsPerGPU * max(len(gpus), 1))
 						}
-						slog.Debug("updating default concurrency", "OLLAMA_MAX_LOADED_MODELS", maxRunners, "gpu_count", len(gpus))
+						slog.Debug("updating default concurrency", "PSYLLAMA_MAX_LOADED_MODELS", maxRunners, "gpu_count", len(gpus))
 					}
 
 					// Check for image generation models - all use MLX runner
@@ -444,7 +444,7 @@ func (s *Scheduler) load(req *LlmRequest, f *ggml.GGML, systemInfo ml.SystemInfo
 	}
 
 	// Some architectures are not safe with num_parallel > 1.
-	// ref: https://github.com/ollama/ollama/issues/4165
+	// ref: https://github.com/LordPsyan/psyllama/issues/4165
 	if slices.Contains([]string{"mllama", "qwen3vl", "qwen3vlmoe", "qwen35", "qwen35moe", "qwen3next", "lfm2", "lfm2moe", "nemotron_h", "nemotron_h_moe"}, req.model.Config.ModelFamily) && numParallel != 1 {
 		numParallel = 1
 		slog.Warn("model architecture does not currently support parallel requests", "architecture", req.model.Config.ModelFamily)
@@ -466,7 +466,7 @@ func (s *Scheduler) load(req *LlmRequest, f *ggml.GGML, systemInfo ml.SystemInfo
 			// show a generalized compatibility error until there is a better way to
 			// check for model compatibility
 			if errors.Is(err, ggml.ErrUnsupportedFormat) || strings.Contains(err.Error(), "failed to load model") {
-				err = fmt.Errorf("%v: this model may be incompatible with your version of Ollama. If you previously pulled this model, try updating it by running `ollama pull %s`", err, req.model.ShortName)
+				err = fmt.Errorf("%v: this model may be incompatible with your version of Psyllama. If you previously pulled this model, try updating it by running `psyllama pull %s`", err, req.model.ShortName)
 			}
 			slog.Info("NewLlamaServer failed", "model", req.model.ModelPath, "error", err)
 			req.errCh <- err

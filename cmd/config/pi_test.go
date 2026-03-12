@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/types/model"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/types/model"
 )
 
 func TestPiIntegration(t *testing.T) {
@@ -67,7 +67,7 @@ func TestPiPaths(t *testing.T) {
 }
 
 func TestPiEdit(t *testing.T) {
-	// Mock Ollama server for createConfig calls during Edit
+	// Mock Psyllama server for createConfig calls during Edit
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/api/show" {
 			fmt.Fprintf(w, `{"capabilities":[],"model_info":{}}`)
@@ -76,7 +76,7 @@ func TestPiEdit(t *testing.T) {
 		w.WriteHeader(http.StatusNotFound)
 	}))
 	defer srv.Close()
-	t.Setenv("OLLAMA_HOST", srv.URL)
+	t.Setenv("PSYLLAMA_HOST", srv.URL)
 
 	pi := &Pi{}
 	tmpDir := t.TempDir()
@@ -117,34 +117,34 @@ func TestPiEdit(t *testing.T) {
 			t.Error("Config missing providers")
 		}
 
-		ollama, ok := providers["ollama"].(map[string]any)
+		psyllama, ok := providers["psyllama"].(map[string]any)
 		if !ok {
-			t.Error("Providers missing ollama")
+			t.Error("Providers missing psyllama")
 		}
 
-		modelsArray, ok := ollama["models"].([]any)
+		modelsArray, ok := psyllama["models"].([]any)
 		if !ok || len(modelsArray) != 2 {
 			t.Errorf("Expected 2 models, got %v", modelsArray)
 		}
 
-		if ollama["baseUrl"] == nil {
+		if psyllama["baseUrl"] == nil {
 			t.Error("Missing baseUrl")
 		}
-		if ollama["api"] != "openai-completions" {
-			t.Errorf("Expected api=openai-completions, got %v", ollama["api"])
+		if psyllama["api"] != "openai-completions" {
+			t.Errorf("Expected api=openai-completions, got %v", psyllama["api"])
 		}
-		if ollama["apiKey"] != "ollama" {
-			t.Errorf("Expected apiKey=ollama, got %v", ollama["apiKey"])
+		if psyllama["apiKey"] != "psyllama" {
+			t.Errorf("Expected apiKey=psyllama, got %v", psyllama["apiKey"])
 		}
 	})
 
-	t.Run("updates existing config preserving ollama provider settings", func(t *testing.T) {
+	t.Run("updates existing config preserving psyllama provider settings", func(t *testing.T) {
 		cleanup()
 		os.MkdirAll(configDir, 0o755)
 
 		existingConfig := `{
 			"providers": {
-				"ollama": {
+				"psyllama": {
 					"baseUrl": "http://custom:8080/v1",
 					"api": "custom-api",
 					"apiKey": "custom-key",
@@ -165,19 +165,19 @@ func TestPiEdit(t *testing.T) {
 
 		cfg := readConfig()
 		providers := cfg["providers"].(map[string]any)
-		ollama := providers["ollama"].(map[string]any)
+		psyllama := providers["psyllama"].(map[string]any)
 
-		if ollama["baseUrl"] != "http://custom:8080/v1" {
-			t.Errorf("Custom baseUrl not preserved, got %v", ollama["baseUrl"])
+		if psyllama["baseUrl"] != "http://custom:8080/v1" {
+			t.Errorf("Custom baseUrl not preserved, got %v", psyllama["baseUrl"])
 		}
-		if ollama["api"] != "custom-api" {
-			t.Errorf("Custom api not preserved, got %v", ollama["api"])
+		if psyllama["api"] != "custom-api" {
+			t.Errorf("Custom api not preserved, got %v", psyllama["api"])
 		}
-		if ollama["apiKey"] != "custom-key" {
-			t.Errorf("Custom apiKey not preserved, got %v", ollama["apiKey"])
+		if psyllama["apiKey"] != "custom-key" {
+			t.Errorf("Custom apiKey not preserved, got %v", psyllama["apiKey"])
 		}
 
-		modelsArray := ollama["models"].([]any)
+		modelsArray := psyllama["models"].([]any)
 		if len(modelsArray) != 1 {
 			t.Errorf("Expected 1 model after update, got %d", len(modelsArray))
 		} else {
@@ -198,10 +198,10 @@ func TestPiEdit(t *testing.T) {
 
 		existingConfig := `{
 			"providers": {
-				"ollama": {
+				"psyllama": {
 					"baseUrl": "http://localhost:11434/v1",
 					"api": "openai-completions",
-					"apiKey": "ollama",
+					"apiKey": "psyllama",
 					"models": [
 						{"id": "glm-5:cloud", "_launch": true, "legacyField": "stale"}
 					]
@@ -218,8 +218,8 @@ func TestPiEdit(t *testing.T) {
 
 		cfg := readConfig()
 		providers := cfg["providers"].(map[string]any)
-		ollama := providers["ollama"].(map[string]any)
-		modelsArray := ollama["models"].([]any)
+		psyllama := providers["psyllama"].(map[string]any)
+		modelsArray := psyllama["models"].([]any)
 		modelEntry := modelsArray[0].(map[string]any)
 
 		if modelEntry["contextWindow"] != float64(202_752) {
@@ -241,10 +241,10 @@ func TestPiEdit(t *testing.T) {
 		// Old models must have _launch marker to be managed by us
 		existingConfig := `{
 			"providers": {
-				"ollama": {
+				"psyllama": {
 					"baseUrl": "http://localhost:11434/v1",
 					"api": "openai-completions",
-					"apiKey": "ollama",
+					"apiKey": "psyllama",
 					"models": [
 						{"id": "old-model-1", "_launch": true},
 						{"id": "old-model-2", "_launch": true}
@@ -263,8 +263,8 @@ func TestPiEdit(t *testing.T) {
 
 		cfg := readConfig()
 		providers := cfg["providers"].(map[string]any)
-		ollama := providers["ollama"].(map[string]any)
-		modelsArray := ollama["models"].([]any)
+		psyllama := providers["psyllama"].(map[string]any)
+		modelsArray := psyllama["models"].([]any)
 
 		if len(modelsArray) != 2 {
 			t.Errorf("Expected 2 models, got %d", len(modelsArray))
@@ -292,10 +292,10 @@ func TestPiEdit(t *testing.T) {
 		// Models must have _launch marker to be managed
 		existingConfig := `{
 			"providers": {
-				"ollama": {
+				"psyllama": {
 					"baseUrl": "http://localhost:11434/v1",
 					"api": "openai-completions",
-					"apiKey": "ollama",
+					"apiKey": "psyllama",
 					"models": [
 						{"id": "keep-model", "_launch": true},
 						{"id": "remove-model", "_launch": true}
@@ -314,8 +314,8 @@ func TestPiEdit(t *testing.T) {
 
 		cfg := readConfig()
 		providers := cfg["providers"].(map[string]any)
-		ollama := providers["ollama"].(map[string]any)
-		modelsArray := ollama["models"].([]any)
+		psyllama := providers["psyllama"].(map[string]any)
+		modelsArray := psyllama["models"].([]any)
 
 		if len(modelsArray) != 2 {
 			t.Errorf("Expected 2 models, got %d", len(modelsArray))
@@ -360,8 +360,8 @@ func TestPiEdit(t *testing.T) {
 		}
 
 		providers := cfg["providers"].(map[string]any)
-		ollama := providers["ollama"].(map[string]any)
-		modelsArray := ollama["models"].([]any)
+		psyllama := providers["psyllama"].(map[string]any)
+		modelsArray := psyllama["models"].([]any)
 
 		if len(modelsArray) != 1 {
 			t.Errorf("Expected 1 model, got %d", len(modelsArray))
@@ -373,17 +373,17 @@ func TestPiEdit(t *testing.T) {
 		cleanup()
 		os.MkdirAll(configDir, 0o755)
 
-		// User has manually configured models in ollama provider (no _launch marker)
+		// User has manually configured models in psyllama provider (no _launch marker)
 		existingConfig := `{
 			"providers": {
-				"ollama": {
+				"psyllama": {
 					"baseUrl": "http://localhost:11434/v1",
 					"api": "openai-completions",
-					"apiKey": "ollama",
+					"apiKey": "psyllama",
 					"models": [
 						{"id": "user-model-1"},
 						{"id": "user-model-2", "customField": "preserved"},
-						{"id": "ollama-managed", "_launch": true}
+						{"id": "psyllama-managed", "_launch": true}
 					]
 				}
 			}
@@ -392,18 +392,18 @@ func TestPiEdit(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		// Add a new ollama-managed model
-		newModels := []string{"new-ollama-model"}
+		// Add a new psyllama-managed model
+		newModels := []string{"new-psyllama-model"}
 		if err := pi.Edit(newModels); err != nil {
 			t.Fatalf("Edit() error = %v", err)
 		}
 
 		cfg := readConfig()
 		providers := cfg["providers"].(map[string]any)
-		ollama := providers["ollama"].(map[string]any)
-		modelsArray := ollama["models"].([]any)
+		psyllama := providers["psyllama"].(map[string]any)
+		modelsArray := psyllama["models"].([]any)
 
-		// Should have: new-ollama-model (managed) + 2 user models (preserved)
+		// Should have: new-psyllama-model (managed) + 2 user models (preserved)
 		if len(modelsArray) != 3 {
 			t.Errorf("Expected 3 models (1 new managed + 2 preserved user models), got %d", len(modelsArray))
 		}
@@ -416,10 +416,10 @@ func TestPiEdit(t *testing.T) {
 		}
 
 		// Verify new model has _launch marker
-		if m, ok := modelIDs["new-ollama-model"]; !ok {
-			t.Errorf("new-ollama-model should be present")
+		if m, ok := modelIDs["new-psyllama-model"]; !ok {
+			t.Errorf("new-psyllama-model should be present")
 		} else if m["_launch"] != true {
-			t.Errorf("new-ollama-model should have _launch marker")
+			t.Errorf("new-psyllama-model should have _launch marker")
 		}
 
 		// Verify user models are preserved
@@ -432,9 +432,9 @@ func TestPiEdit(t *testing.T) {
 			t.Errorf("user-model-2 customField should be preserved")
 		}
 
-		// Verify old ollama-managed model is removed (not in new list)
-		if _, ok := modelIDs["ollama-managed"]; ok {
-			t.Errorf("ollama-managed should be removed (old ollama model not in new selection)")
+		// Verify old psyllama-managed model is removed (not in new list)
+		if _, ok := modelIDs["psyllama-managed"]; ok {
+			t.Errorf("psyllama-managed should be removed (old psyllama model not in new selection)")
 		}
 	})
 
@@ -469,9 +469,9 @@ func TestPiEdit(t *testing.T) {
 			t.Fatalf("Failed to parse settings: %v", err)
 		}
 
-		// Verify defaultProvider is set to ollama
-		if settings["defaultProvider"] != "ollama" {
-			t.Errorf("defaultProvider = %v, want ollama", settings["defaultProvider"])
+		// Verify defaultProvider is set to psyllama
+		if settings["defaultProvider"] != "psyllama" {
+			t.Errorf("defaultProvider = %v, want psyllama", settings["defaultProvider"])
 		}
 
 		// Verify defaultModel is set to first model
@@ -508,8 +508,8 @@ func TestPiEdit(t *testing.T) {
 			t.Fatalf("Failed to parse settings: %v", err)
 		}
 
-		if settings["defaultProvider"] != "ollama" {
-			t.Errorf("defaultProvider = %v, want ollama", settings["defaultProvider"])
+		if settings["defaultProvider"] != "psyllama" {
+			t.Errorf("defaultProvider = %v, want psyllama", settings["defaultProvider"])
 		}
 		if settings["defaultModel"] != "qwen3:8b" {
 			t.Errorf("defaultModel = %v, want qwen3:8b", settings["defaultModel"])
@@ -541,8 +541,8 @@ func TestPiEdit(t *testing.T) {
 			t.Fatalf("settings.json should be valid after Edit, got parse error: %v", err)
 		}
 
-		if settings["defaultProvider"] != "ollama" {
-			t.Errorf("defaultProvider = %v, want ollama", settings["defaultProvider"])
+		if settings["defaultProvider"] != "psyllama" {
+			t.Errorf("defaultProvider = %v, want psyllama", settings["defaultProvider"])
 		}
 		if settings["defaultModel"] != "test-model" {
 			t.Errorf("defaultModel = %v, want test-model", settings["defaultModel"])
@@ -573,7 +573,7 @@ func TestPiModels(t *testing.T) {
 		}
 		config := `{
 			"providers": {
-				"ollama": {
+				"psyllama": {
 					"models": [
 						{"id": "llama3.2"},
 						{"id": "qwen3:8b"}
@@ -605,7 +605,7 @@ func TestPiModels(t *testing.T) {
 		}
 		config := `{
 			"providers": {
-				"ollama": {
+				"psyllama": {
 					"models": [
 						{"id": "z-model"},
 						{"id": "a-model"},
@@ -635,7 +635,7 @@ func TestPiModels(t *testing.T) {
 		}
 		config := `{
 			"providers": {
-				"ollama": {}
+				"psyllama": {}
 			}
 		}`
 		configPath := filepath.Join(configDir, "models.json")
@@ -669,7 +669,7 @@ func TestPiModels(t *testing.T) {
 	})
 }
 
-func TestIsPiOllamaModel(t *testing.T) {
+func TestIsPiPsyllamaModel(t *testing.T) {
 	tests := []struct {
 		name string
 		cfg  map[string]any
@@ -684,8 +684,8 @@ func TestIsPiOllamaModel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := isPiOllamaModel(tt.cfg); got != tt.want {
-				t.Errorf("isPiOllamaModel(%v) = %v, want %v", tt.cfg, got, tt.want)
+			if got := isPiPsyllamaModel(tt.cfg); got != tt.want {
+				t.Errorf("isPiPsyllamaModel(%v) = %v, want %v", tt.cfg, got, tt.want)
 			}
 		})
 	}

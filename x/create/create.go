@@ -11,8 +11,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/x/imagegen/safetensors"
+	"github.com/LordPsyan/psyllama/envconfig"
+	"github.com/LordPsyan/psyllama/x/imagegen/safetensors"
 )
 
 // ModelConfig represents the config blob stored with a model.
@@ -49,7 +49,7 @@ func defaultBlobDir() string {
 
 // resolveManifestPath converts a model name to a manifest file path.
 func resolveManifestPath(modelName string) string {
-	host := "registry.ollama.ai"
+	host := "registry.psyllama.ai"
 	namespace := "library"
 	name := modelName
 	tag := "latest"
@@ -153,7 +153,7 @@ func GetModelArchitecture(modelName string) (string, error) {
 
 	// Find the config.json layer
 	for _, layer := range manifest.Layers {
-		if layer.Name == "config.json" && layer.MediaType == "application/vnd.ollama.image.json" {
+		if layer.Name == "config.json" && layer.MediaType == "application/vnd.psyllama.image.json" {
 			blobName := strings.Replace(layer.Digest, ":", "-", 1)
 			blobPath := filepath.Join(defaultBlobDir(), blobName)
 
@@ -578,7 +578,7 @@ func CreateSafetensorsModel(modelName, modelDir, quantize string, createLayer La
 			return fmt.Errorf("failed to open %s: %w", cfgPath, err)
 		}
 
-		layer, err := createLayer(f, "application/vnd.ollama.image.json", cfgPath)
+		layer, err := createLayer(f, "application/vnd.psyllama.image.json", cfgPath)
 		f.Close()
 		if err != nil {
 			return fmt.Errorf("failed to create layer for %s: %w", cfgPath, err)

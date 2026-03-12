@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/format"
-	"github.com/ollama/ollama/ml"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/format"
+	"github.com/LordPsyan/psyllama/ml"
 	"golang.org/x/sync/semaphore"
 )
 
@@ -183,7 +183,7 @@ func TestLLMServerFitGPU(t *testing.T) {
 			systemInfo.FreeMemory = 512 * format.MebiByte
 			systemInfo.FreeSwap = 256 * format.MebiByte
 
-			s := &ollamaServer{
+			s := &psyllamaServer{
 				llmServer: llmServer{
 					totalLayers: uint64(len(tt.layers)),
 					options: api.Options{

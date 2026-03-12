@@ -1,3 +1,3 @@
 package cpu
 
-import _ "github.com/ollama/ollama/ml/backend/ggml/ggml/src/ggml-cpu/arch/x86"
+import _ "github.com/LordPsyan/psyllama/ml/backend/ggml/ggml/src/ggml-cpu/arch/x86"

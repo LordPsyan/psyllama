@@ -7,12 +7,12 @@ import (
 	"math"
 	"strings"
 
-	"github.com/ollama/ollama/x/mlxrunner/cache"
-	"github.com/ollama/ollama/x/mlxrunner/mlx"
-	"github.com/ollama/ollama/x/mlxrunner/model"
-	"github.com/ollama/ollama/x/mlxrunner/model/base"
-	"github.com/ollama/ollama/x/models/nn"
-	"github.com/ollama/ollama/x/tokenizer"
+	"github.com/LordPsyan/psyllama/x/mlxrunner/cache"
+	"github.com/LordPsyan/psyllama/x/mlxrunner/mlx"
+	"github.com/LordPsyan/psyllama/x/mlxrunner/model"
+	"github.com/LordPsyan/psyllama/x/mlxrunner/model/base"
+	"github.com/LordPsyan/psyllama/x/models/nn"
+	"github.com/LordPsyan/psyllama/x/tokenizer"
 )
 
 func init() {

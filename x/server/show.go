@@ -10,9 +10,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/manifest"
-	"github.com/ollama/ollama/types/model"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/manifest"
+	"github.com/LordPsyan/psyllama/types/model"
 )
 
 // modelConfig represents the HuggingFace config.json structure
@@ -76,7 +76,7 @@ func buildModelInfo(config modelConfig, totalTensorBytes, tensorCount int64) map
 	// Determine architecture
 	arch := config.ModelType
 	if arch == "" && len(config.Architectures) > 0 {
-		// Convert HuggingFace architecture name to Ollama format
+		// Convert HuggingFace architecture name to Psyllama format
 		// e.g., "Gemma3ForCausalLM" -> "gemma3"
 		hfArch := config.Architectures[0]
 		arch = strings.ToLower(hfArch)

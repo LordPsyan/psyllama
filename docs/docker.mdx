@@ -1,7 +1,7 @@
 ## CPU only
 
 ```shell
-docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
+docker run -d -v psyllama:/root/.psyllama -p 11434:11434 --name psyllama psyllama/psyllama
 ```
 
 ## Nvidia GPU
@@ -52,28 +52,28 @@ sudo systemctl restart docker
 ### Start the container
 
 ```shell
-docker run -d --gpus=all -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
+docker run -d --gpus=all -v psyllama:/root/.psyllama -p 11434:11434 --name psyllama psyllama/psyllama
 ```
 
 <Note>
-  If you're running on an NVIDIA JetPack system, Ollama can't automatically discover the correct JetPack version.
+  If you're running on an NVIDIA JetPack system, Psyllama can't automatically discover the correct JetPack version.
   Pass the environment variable `JETSON_JETPACK=5` or `JETSON_JETPACK=6` to the container to select version 5 or 6.
 </Note>
 
 ## AMD GPU
 
-To run Ollama using Docker with AMD GPUs, use the `rocm` tag and the following command:
+To run Psyllama using Docker with AMD GPUs, use the `rocm` tag and the following command:
 
 ```shell
-docker run -d --device /dev/kfd --device /dev/dri -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama:rocm
+docker run -d --device /dev/kfd --device /dev/dri -v psyllama:/root/.psyllama -p 11434:11434 --name psyllama psyllama/psyllama:rocm
 ```
 
 ## Vulkan Support
 
-Vulkan is bundled into the `ollama/ollama` image.  
+Vulkan is bundled into the `psyllama/psyllama` image.  
 
 ```shell
-docker run -d --device /dev/kfd --device /dev/dri -v ollama:/root/.ollama -p 11434:11434 -e OLLAMA_VULKAN=1 --name ollama ollama/ollama
+docker run -d --device /dev/kfd --device /dev/dri -v psyllama:/root/.psyllama -p 11434:11434 -e PSYLLAMA_VULKAN=1 --name psyllama psyllama/psyllama
 ```
 
 
@@ -82,10 +82,10 @@ docker run -d --device /dev/kfd --device /dev/dri -v ollama:/root/.ollama -p 114
 Now you can run a model:
 
 ```shell
-docker exec -it ollama ollama run llama3.2
+docker exec -it psyllama psyllama run llama3.2
 ```
 
 ## Try different models
 
-More models can be found on the [Ollama library](https://ollama.com/library).
+More models can be found on the [Psyllama library](https://psyllama.com/library).
 

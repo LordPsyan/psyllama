@@ -49,7 +49,7 @@ func TestOpenCodeEdit(t *testing.T) {
 			t.Fatal(err)
 		}
 		assertOpenCodeModelExists(t, configPath, "llama3.2")
-		assertOpenCodeRecentModel(t, statePath, 0, "ollama", "llama3.2")
+		assertOpenCodeRecentModel(t, statePath, 0, "psyllama", "llama3.2")
 	})
 
 	t.Run("preserve other providers", func(t *testing.T) {
@@ -72,7 +72,7 @@ func TestOpenCodeEdit(t *testing.T) {
 	t.Run("preserve other models", func(t *testing.T) {
 		cleanup()
 		os.MkdirAll(configDir, 0o755)
-		os.WriteFile(configPath, []byte(`{"provider":{"ollama":{"models":{"mistral":{"name":"Mistral"}}}}}`), 0o644)
+		os.WriteFile(configPath, []byte(`{"provider":{"psyllama":{"models":{"mistral":{"name":"Mistral"}}}}}`), 0o644)
 		if err := o.Edit([]string{"llama3.2"}); err != nil {
 			t.Fatal(err)
 		}
@@ -112,7 +112,7 @@ func TestOpenCodeEdit(t *testing.T) {
 		if err := o.Edit([]string{"llama3.2"}); err != nil {
 			t.Fatal(err)
 		}
-		assertOpenCodeRecentModel(t, statePath, 0, "ollama", "llama3.2")
+		assertOpenCodeRecentModel(t, statePath, 0, "psyllama", "llama3.2")
 		assertOpenCodeRecentModel(t, statePath, 1, "anthropic", "claude")
 	})
 
@@ -137,7 +137,7 @@ func TestOpenCodeEdit(t *testing.T) {
 	t.Run("model state - deduplicate on re-add", func(t *testing.T) {
 		cleanup()
 		os.MkdirAll(stateDir, 0o755)
-		os.WriteFile(statePath, []byte(`{"recent":[{"providerID":"ollama","modelID":"llama3.2"},{"providerID":"anthropic","modelID":"claude"}],"favorite":[],"variant":{}}`), 0o644)
+		os.WriteFile(statePath, []byte(`{"recent":[{"providerID":"psyllama","modelID":"llama3.2"},{"providerID":"anthropic","modelID":"claude"}],"favorite":[],"variant":{}}`), 0o644)
 		if err := o.Edit([]string{"llama3.2"}); err != nil {
 			t.Fatal(err)
 		}
@@ -148,7 +148,7 @@ func TestOpenCodeEdit(t *testing.T) {
 		if len(recent) != 2 {
 			t.Errorf("expected 2 recent entries, got %d", len(recent))
 		}
-		assertOpenCodeRecentModel(t, statePath, 0, "ollama", "llama3.2")
+		assertOpenCodeRecentModel(t, statePath, 0, "psyllama", "llama3.2")
 	})
 
 	t.Run("remove model", func(t *testing.T) {
@@ -175,8 +175,8 @@ func TestOpenCodeEdit(t *testing.T) {
 		var cfg map[string]any
 		json.Unmarshal(data, &cfg)
 		provider := cfg["provider"].(map[string]any)
-		ollama := provider["ollama"].(map[string]any)
-		models := ollama["models"].(map[string]any)
+		psyllama := provider["psyllama"].(map[string]any)
+		models := psyllama["models"].(map[string]any)
 		entry := models["llama3.2"].(map[string]any)
 		entry["_myPref"] = "custom-value"
 		entry["_myNum"] = 42
@@ -191,8 +191,8 @@ func TestOpenCodeEdit(t *testing.T) {
 		data, _ = os.ReadFile(configPath)
 		json.Unmarshal(data, &cfg)
 		provider = cfg["provider"].(map[string]any)
-		ollama = provider["ollama"].(map[string]any)
-		models = ollama["models"].(map[string]any)
+		psyllama = provider["psyllama"].(map[string]any)
+		models = psyllama["models"].(map[string]any)
 		entry = models["llama3.2"].(map[string]any)
 
 		if entry["_myPref"] != "custom-value" {
@@ -206,11 +206,11 @@ func TestOpenCodeEdit(t *testing.T) {
 		}
 	})
 
-	t.Run("migrate legacy [Ollama] suffix entries", func(t *testing.T) {
+	t.Run("migrate legacy [Psyllama] suffix entries", func(t *testing.T) {
 		cleanup()
-		// Write a config with a legacy entry (has [Ollama] suffix but no _launch marker)
+		// Write a config with a legacy entry (has [Psyllama] suffix but no _launch marker)
 		os.MkdirAll(configDir, 0o755)
-		os.WriteFile(configPath, []byte(`{"provider":{"ollama":{"models":{"llama3.2":{"name":"llama3.2 [Ollama]"}}}}}`), 0o644)
+		os.WriteFile(configPath, []byte(`{"provider":{"psyllama":{"models":{"llama3.2":{"name":"llama3.2 [Psyllama]"}}}}}`), 0o644)
 
 		if err := o.Edit([]string{"llama3.2"}); err != nil {
 			t.Fatal(err)
@@ -220,24 +220,24 @@ func TestOpenCodeEdit(t *testing.T) {
 		var cfg map[string]any
 		json.Unmarshal(data, &cfg)
 		provider := cfg["provider"].(map[string]any)
-		ollama := provider["ollama"].(map[string]any)
-		models := ollama["models"].(map[string]any)
+		psyllama := provider["psyllama"].(map[string]any)
+		models := psyllama["models"].(map[string]any)
 		entry := models["llama3.2"].(map[string]any)
 
 		// _launch marker should be added
 		if v, ok := entry["_launch"].(bool); !ok || !v {
 			t.Errorf("_launch marker not added during migration: got %v", entry["_launch"])
 		}
-		// [Ollama] suffix should be stripped
+		// [Psyllama] suffix should be stripped
 		if name, ok := entry["name"].(string); !ok || name != "llama3.2" {
 			t.Errorf("name suffix not stripped: got %q", entry["name"])
 		}
 	})
 
-	t.Run("migrate Ollama (local) provider name", func(t *testing.T) {
+	t.Run("migrate Psyllama (local) provider name", func(t *testing.T) {
 		cleanup()
 		os.MkdirAll(configDir, 0o755)
-		os.WriteFile(configPath, []byte(`{"provider":{"ollama":{"name":"Ollama (local)","npm":"@ai-sdk/openai-compatible","options":{"baseURL":"http://localhost:11434/v1"}}}}`), 0o644)
+		os.WriteFile(configPath, []byte(`{"provider":{"psyllama":{"name":"Psyllama (local)","npm":"@ai-sdk/openai-compatible","options":{"baseURL":"http://localhost:11434/v1"}}}}`), 0o644)
 
 		if err := o.Edit([]string{"llama3.2"}); err != nil {
 			t.Fatal(err)
@@ -247,16 +247,16 @@ func TestOpenCodeEdit(t *testing.T) {
 		var cfg map[string]any
 		json.Unmarshal(data, &cfg)
 		provider := cfg["provider"].(map[string]any)
-		ollama := provider["ollama"].(map[string]any)
-		if ollama["name"] != "Ollama" {
-			t.Errorf("provider name not migrated: got %q, want %q", ollama["name"], "Ollama")
+		psyllama := provider["psyllama"].(map[string]any)
+		if psyllama["name"] != "Psyllama" {
+			t.Errorf("provider name not migrated: got %q, want %q", psyllama["name"], "Psyllama")
 		}
 	})
 
 	t.Run("preserve custom provider name", func(t *testing.T) {
 		cleanup()
 		os.MkdirAll(configDir, 0o755)
-		os.WriteFile(configPath, []byte(`{"provider":{"ollama":{"name":"My Custom Ollama","npm":"@ai-sdk/openai-compatible","options":{"baseURL":"http://localhost:11434/v1"}}}}`), 0o644)
+		os.WriteFile(configPath, []byte(`{"provider":{"psyllama":{"name":"My Custom Psyllama","npm":"@ai-sdk/openai-compatible","options":{"baseURL":"http://localhost:11434/v1"}}}}`), 0o644)
 
 		if err := o.Edit([]string{"llama3.2"}); err != nil {
 			t.Fatal(err)
@@ -266,17 +266,17 @@ func TestOpenCodeEdit(t *testing.T) {
 		var cfg map[string]any
 		json.Unmarshal(data, &cfg)
 		provider := cfg["provider"].(map[string]any)
-		ollama := provider["ollama"].(map[string]any)
-		if ollama["name"] != "My Custom Ollama" {
-			t.Errorf("custom provider name was changed: got %q, want %q", ollama["name"], "My Custom Ollama")
+		psyllama := provider["psyllama"].(map[string]any)
+		if psyllama["name"] != "My Custom Psyllama" {
+			t.Errorf("custom provider name was changed: got %q, want %q", psyllama["name"], "My Custom Psyllama")
 		}
 	})
 
-	t.Run("remove model preserves non-ollama models", func(t *testing.T) {
+	t.Run("remove model preserves non-psyllama models", func(t *testing.T) {
 		cleanup()
 		os.MkdirAll(configDir, 0o755)
-		// Add a non-Ollama model manually
-		os.WriteFile(configPath, []byte(`{"provider":{"ollama":{"models":{"external":{"name":"External Model"}}}}}`), 0o644)
+		// Add a non-Psyllama model manually
+		os.WriteFile(configPath, []byte(`{"provider":{"psyllama":{"models":{"external":{"name":"External Model"}}}}}`), 0o644)
 
 		o.Edit([]string{"llama3.2"})
 		assertOpenCodeModelExists(t, configPath, "llama3.2")
@@ -298,11 +298,11 @@ func assertOpenCodeModelExists(t *testing.T, path, model string) {
 	if !ok {
 		t.Fatal("provider not found")
 	}
-	ollama, ok := provider["ollama"].(map[string]any)
+	psyllama, ok := provider["psyllama"].(map[string]any)
 	if !ok {
-		t.Fatal("ollama provider not found")
+		t.Fatal("psyllama provider not found")
 	}
-	models, ok := ollama["models"].(map[string]any)
+	models, ok := psyllama["models"].(map[string]any)
 	if !ok {
 		t.Fatal("models not found")
 	}
@@ -325,11 +325,11 @@ func assertOpenCodeModelNotExists(t *testing.T, path, model string) {
 	if !ok {
 		return // No provider means no model
 	}
-	ollama, ok := provider["ollama"].(map[string]any)
+	psyllama, ok := provider["psyllama"].(map[string]any)
 	if !ok {
-		return // No ollama means no model
+		return // No psyllama means no model
 	}
-	models, ok := ollama["models"].(map[string]any)
+	models, ok := psyllama["models"].(map[string]any)
 	if !ok {
 		return // No models means no model
 	}
@@ -443,8 +443,8 @@ func TestOpenCodeEdit_WrongTypeProvider(t *testing.T) {
 	if !ok {
 		t.Fatalf("provider should be map after setup, got %T", cfg["provider"])
 	}
-	if provider["ollama"] == nil {
-		t.Error("ollama provider should be created")
+	if provider["psyllama"] == nil {
+		t.Error("psyllama provider should be created")
 	}
 }
 
@@ -487,7 +487,7 @@ func TestOpenCodeEdit_EmptyModels(t *testing.T) {
 	configPath := filepath.Join(configDir, "opencode.json")
 
 	os.MkdirAll(configDir, 0o755)
-	originalContent := `{"provider":{"ollama":{"models":{"existing":{}}}}}`
+	originalContent := `{"provider":{"psyllama":{"models":{"existing":{}}}}}`
 	os.WriteFile(configPath, []byte(originalContent), 0o644)
 
 	// Empty models should be no-op
@@ -528,8 +528,8 @@ func TestOpenCodeEdit_SpecialCharsInModelName(t *testing.T) {
 
 	// Model should be accessible
 	provider, _ := cfg["provider"].(map[string]any)
-	ollama, _ := provider["ollama"].(map[string]any)
-	models, _ := ollama["models"].(map[string]any)
+	psyllama, _ := provider["psyllama"].(map[string]any)
+	models, _ := psyllama["models"].(map[string]any)
 
 	if models[specialModel] == nil {
 		t.Errorf("model with special chars not found in config")
@@ -545,8 +545,8 @@ func readOpenCodeModel(t *testing.T, configPath, model string) map[string]any {
 	var cfg map[string]any
 	json.Unmarshal(data, &cfg)
 	provider := cfg["provider"].(map[string]any)
-	ollama := provider["ollama"].(map[string]any)
-	models := ollama["models"].(map[string]any)
+	psyllama := provider["psyllama"].(map[string]any)
+	models := psyllama["models"].(map[string]any)
 	entry, ok := models[model].(map[string]any)
 	if !ok {
 		t.Fatalf("model %s not found in config", model)
@@ -583,7 +583,7 @@ func TestOpenCodeEdit_PreservesUserLimit(t *testing.T) {
 	os.MkdirAll(configDir, 0o755)
 	os.WriteFile(configPath, []byte(`{
 		"provider": {
-			"ollama": {
+			"psyllama": {
 				"models": {
 					"llama3.2": {
 						"name": "llama3.2",
@@ -629,7 +629,7 @@ func TestOpenCodeEdit_CloudModelLimitStructure(t *testing.T) {
 	os.MkdirAll(configDir, 0o755)
 	os.WriteFile(configPath, []byte(fmt.Sprintf(`{
 		"provider": {
-			"ollama": {
+			"psyllama": {
 				"models": {
 					"glm-4.7:cloud": {
 						"name": "glm-4.7:cloud",
@@ -672,14 +672,14 @@ func TestOpenCodeEdit_BackfillsCloudModelLimitOnExistingEntry(t *testing.T) {
 		w.WriteHeader(http.StatusNotFound)
 	}))
 	defer srv.Close()
-	t.Setenv("OLLAMA_HOST", srv.URL)
+	t.Setenv("PSYLLAMA_HOST", srv.URL)
 
 	configDir := filepath.Join(tmpDir, ".config", "opencode")
 	configPath := filepath.Join(configDir, "opencode.json")
 	os.MkdirAll(configDir, 0o755)
 	os.WriteFile(configPath, []byte(`{
 		"provider": {
-			"ollama": {
+			"psyllama": {
 				"models": {
 					"glm-5:cloud": {
 						"name": "glm-5:cloud",

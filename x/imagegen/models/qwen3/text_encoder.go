@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/ollama/ollama/x/imagegen/manifest"
-	"github.com/ollama/ollama/x/imagegen/mlx"
-	"github.com/ollama/ollama/x/imagegen/nn"
-	"github.com/ollama/ollama/x/imagegen/safetensors"
-	"github.com/ollama/ollama/x/imagegen/tokenizer"
+	"github.com/LordPsyan/psyllama/x/imagegen/manifest"
+	"github.com/LordPsyan/psyllama/x/imagegen/mlx"
+	"github.com/LordPsyan/psyllama/x/imagegen/nn"
+	"github.com/LordPsyan/psyllama/x/imagegen/safetensors"
+	"github.com/LordPsyan/psyllama/x/imagegen/tokenizer"
 )
 
 // Config holds Qwen3 text encoder configuration
@@ -178,7 +178,7 @@ type TextEncoder struct {
 	*Config
 }
 
-// Load loads the Qwen3 text encoder from ollama blob storage.
+// Load loads the Qwen3 text encoder from psyllama blob storage.
 func (m *TextEncoder) Load(modelManifest *manifest.ModelManifest, configPath string) error {
 	fmt.Print("  Loading text encoder... ")
 

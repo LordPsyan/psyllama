@@ -5,9 +5,9 @@ import (
 	"image"
 	"math"
 
-	"github.com/ollama/ollama/fs"
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/model/imageproc"
+	"github.com/LordPsyan/psyllama/fs"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/model/imageproc"
 )
 
 // ImageProcessor contains configuration for the Qwen 3 VL image processing

@@ -11,11 +11,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/fs/ggml"
-	"github.com/ollama/ollama/manifest"
-	"github.com/ollama/ollama/template"
-	"github.com/ollama/ollama/types/model"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/fs/ggml"
+	"github.com/LordPsyan/psyllama/manifest"
+	"github.com/LordPsyan/psyllama/template"
+	"github.com/LordPsyan/psyllama/types/model"
 )
 
 var intermediateBlobs map[string]string = make(map[string]string)
@@ -48,9 +48,9 @@ func parseFromModel(ctx context.Context, name model.Name, fn func(api.ProgressRe
 		}
 
 		switch layer.MediaType {
-		case "application/vnd.ollama.image.model",
-			"application/vnd.ollama.image.projector",
-			"application/vnd.ollama.image.adapter":
+		case "application/vnd.psyllama.image.model",
+			"application/vnd.psyllama.image.projector",
+			"application/vnd.psyllama.image.adapter":
 			blobpath, err := manifest.BlobsPath(layer.Digest)
 			if err != nil {
 				return nil, err
@@ -82,7 +82,7 @@ func detectChatTemplate(layers []*layerGGML) ([]*layerGGML, error) {
 			if t, err := template.Named(s); err != nil {
 				slog.Debug("template detection", "error", err, "template", s)
 			} else {
-				layer, err := manifest.NewLayer(t.Reader(), "application/vnd.ollama.image.template")
+				layer, err := manifest.NewLayer(t.Reader(), "application/vnd.psyllama.image.template")
 				if err != nil {
 					return nil, err
 				}
@@ -96,7 +96,7 @@ func detectChatTemplate(layers []*layerGGML) ([]*layerGGML, error) {
 						return nil, err
 					}
 
-					layer, err := manifest.NewLayer(&b, "application/vnd.ollama.image.params")
+					layer, err := manifest.NewLayer(&b, "application/vnd.psyllama.image.params")
 					if err != nil {
 						return nil, err
 					}

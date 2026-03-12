@@ -11,8 +11,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ollama/ollama/manifest"
-	"github.com/ollama/ollama/types/model"
+	"github.com/LordPsyan/psyllama/manifest"
+	"github.com/LordPsyan/psyllama/types/model"
 )
 
 const (
@@ -116,7 +116,7 @@ func (s *store) saveLocked() error {
 	}
 
 	// Read existing file into a generic map to preserve unknown fields
-	// (e.g. disable_ollama_cloud) that aliasStore doesn't own.
+	// (e.g. disable_psyllama_cloud) that aliasStore doesn't own.
 	existing := make(map[string]json.RawMessage)
 	if data, err := os.ReadFile(s.path); err == nil {
 		if err := json.Unmarshal(data, &existing); err != nil {
@@ -411,9 +411,9 @@ func localModelExists(name model.Name) (bool, error) {
 func serverConfigPath() string {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return filepath.Join(".ollama", serverConfigFilename)
+		return filepath.Join(".psyllama", serverConfigFilename)
 	}
-	return filepath.Join(home, ".ollama", serverConfigFilename)
+	return filepath.Join(home, ".psyllama", serverConfigFilename)
 }
 
 func (s *Server) aliasStore() (*store, error) {

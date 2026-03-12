@@ -1,4 +1,4 @@
-package ollamarunner
+package psyllamarunner
 
 import (
 	"errors"
@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/model/input"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/model/input"
 )
 
 func TestCountCommon(t *testing.T) {

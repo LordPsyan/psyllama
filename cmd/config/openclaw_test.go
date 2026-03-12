@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/api"
 )
 
 func TestOpenclawIntegration(t *testing.T) {
@@ -170,7 +170,7 @@ func TestOpenclawEdit(t *testing.T) {
 			t.Fatal(err)
 		}
 		assertOpenclawModelExists(t, configPath, "llama3.2")
-		assertOpenclawPrimaryModel(t, configPath, "ollama/llama3.2")
+		assertOpenclawPrimaryModel(t, configPath, "psyllama/llama3.2")
 	})
 
 	t.Run("multiple models - first is primary", func(t *testing.T) {
@@ -180,7 +180,7 @@ func TestOpenclawEdit(t *testing.T) {
 		}
 		assertOpenclawModelExists(t, configPath, "llama3.2")
 		assertOpenclawModelExists(t, configPath, "mistral")
-		assertOpenclawPrimaryModel(t, configPath, "ollama/llama3.2")
+		assertOpenclawPrimaryModel(t, configPath, "psyllama/llama3.2")
 	})
 
 	t.Run("preserve other providers", func(t *testing.T) {
@@ -228,8 +228,8 @@ func TestOpenclawEdit(t *testing.T) {
 		json.Unmarshal(data, &cfg)
 		models := cfg["models"].(map[string]any)
 		providers := models["providers"].(map[string]any)
-		ollama := providers["ollama"].(map[string]any)
-		modelList := ollama["models"].([]any)
+		psyllama := providers["psyllama"].(map[string]any)
+		modelList := psyllama["models"].([]any)
 		entry := modelList[0].(map[string]any)
 		entry["customField"] = "user-value"
 		configData, _ := json.MarshalIndent(cfg, "", "  ")
@@ -242,8 +242,8 @@ func TestOpenclawEdit(t *testing.T) {
 		json.Unmarshal(data, &cfg)
 		models = cfg["models"].(map[string]any)
 		providers = models["providers"].(map[string]any)
-		ollama = providers["ollama"].(map[string]any)
-		modelList = ollama["models"].([]any)
+		psyllama = providers["psyllama"].(map[string]any)
+		modelList = psyllama["models"].([]any)
 		entry = modelList[0].(map[string]any)
 		if entry["customField"] != "user-value" {
 			t.Error("custom field was lost")
@@ -312,11 +312,11 @@ func TestOpenclawModels(t *testing.T) {
 		}
 	})
 
-	t.Run("returns all ollama models", func(t *testing.T) {
+	t.Run("returns all psyllama models", func(t *testing.T) {
 		configDir := filepath.Join(tmpDir, ".openclaw")
 		os.MkdirAll(configDir, 0o755)
 		os.WriteFile(filepath.Join(configDir, "openclaw.json"), []byte(`{
-			"models":{"providers":{"ollama":{"models":[
+			"models":{"providers":{"psyllama":{"models":[
 				{"id":"llama3.2"},
 				{"id":"mistral"}
 			]}}}
@@ -337,8 +337,8 @@ func assertOpenclawModelExists(t *testing.T, path, model string) {
 	json.Unmarshal(data, &cfg)
 	models := cfg["models"].(map[string]any)
 	providers := models["providers"].(map[string]any)
-	ollama := providers["ollama"].(map[string]any)
-	modelList := ollama["models"].([]any)
+	psyllama := providers["psyllama"].(map[string]any)
+	modelList := psyllama["models"].([]any)
 	for _, m := range modelList {
 		if entry, ok := m.(map[string]any); ok {
 			if entry["id"] == model {
@@ -356,8 +356,8 @@ func assertOpenclawModelNotExists(t *testing.T, path, model string) {
 	json.Unmarshal(data, &cfg)
 	models, _ := cfg["models"].(map[string]any)
 	providers, _ := models["providers"].(map[string]any)
-	ollama, _ := providers["ollama"].(map[string]any)
-	modelList, _ := ollama["models"].([]any)
+	psyllama, _ := providers["psyllama"].(map[string]any)
+	modelList, _ := psyllama["models"].([]any)
 	for _, m := range modelList {
 		if entry, ok := m.(map[string]any); ok {
 			if entry["id"] == model {
@@ -440,10 +440,10 @@ func TestOpenclawModelsEdgeCases(t *testing.T) {
 		}
 	})
 
-	t.Run("wrong type at ollama level", func(t *testing.T) {
+	t.Run("wrong type at psyllama level", func(t *testing.T) {
 		cleanup()
 		os.MkdirAll(configDir, 0o755)
-		os.WriteFile(configPath, []byte(`{"models":{"providers":{"ollama":"string"}}}`), 0o644)
+		os.WriteFile(configPath, []byte(`{"models":{"providers":{"psyllama":"string"}}}`), 0o644)
 		if models := c.Models(); models != nil {
 			t.Errorf("expected nil, got %v", models)
 		}
@@ -452,7 +452,7 @@ func TestOpenclawModelsEdgeCases(t *testing.T) {
 	t.Run("model entry missing id", func(t *testing.T) {
 		cleanup()
 		os.MkdirAll(configDir, 0o755)
-		os.WriteFile(configPath, []byte(`{"models":{"providers":{"ollama":{"models":[{"name":"test"}]}}}}`), 0o644)
+		os.WriteFile(configPath, []byte(`{"models":{"providers":{"psyllama":{"models":[{"name":"test"}]}}}}`), 0o644)
 		if len(c.Models()) != 0 {
 			t.Error("expected empty for missing id")
 		}
@@ -461,7 +461,7 @@ func TestOpenclawModelsEdgeCases(t *testing.T) {
 	t.Run("model id is not string", func(t *testing.T) {
 		cleanup()
 		os.MkdirAll(configDir, 0o755)
-		os.WriteFile(configPath, []byte(`{"models":{"providers":{"ollama":{"models":[{"id":123}]}}}}`), 0o644)
+		os.WriteFile(configPath, []byte(`{"models":{"providers":{"psyllama":{"models":[{"id":123}]}}}}`), 0o644)
 		if len(c.Models()) != 0 {
 			t.Error("expected empty for non-string id")
 		}
@@ -483,8 +483,8 @@ func TestOpenclawEditSchemaFields(t *testing.T) {
 	json.Unmarshal(data, &cfg)
 	models := cfg["models"].(map[string]any)
 	providers := models["providers"].(map[string]any)
-	ollama := providers["ollama"].(map[string]any)
-	modelList := ollama["models"].([]any)
+	psyllama := providers["psyllama"].(map[string]any)
+	modelList := psyllama["models"].([]any)
 	entry := modelList[0].(map[string]any)
 
 	// Verify base schema fields (always set regardless of API availability)
@@ -519,7 +519,7 @@ func TestOpenclawEditModelNames(t *testing.T) {
 			t.Fatal(err)
 		}
 		assertOpenclawModelExists(t, configPath, "llama3.2:70b")
-		assertOpenclawPrimaryModel(t, configPath, "ollama/llama3.2:70b")
+		assertOpenclawPrimaryModel(t, configPath, "psyllama/llama3.2:70b")
 	})
 
 	t.Run("model with slash", func(t *testing.T) {
@@ -528,7 +528,7 @@ func TestOpenclawEditModelNames(t *testing.T) {
 			t.Fatal(err)
 		}
 		assertOpenclawModelExists(t, configPath, "library/model:tag")
-		assertOpenclawPrimaryModel(t, configPath, "ollama/library/model:tag")
+		assertOpenclawPrimaryModel(t, configPath, "psyllama/library/model:tag")
 	})
 
 	t.Run("model with hyphen", func(t *testing.T) {
@@ -588,7 +588,7 @@ const testOpenclawFixture = `{
   "models": {
     "providers": {
       "anthropic": {"apiKey": "xxx"},
-      "ollama": {
+      "psyllama": {
         "baseUrl": "http://127.0.0.1:11434",
         "models": [{"id": "old-model", "customField": "preserved"}]
       }
@@ -704,7 +704,7 @@ func TestOpenclawEdit_BackupCreated(t *testing.T) {
 	setTestHome(t, tmpDir)
 	configDir := filepath.Join(tmpDir, ".openclaw")
 	configPath := filepath.Join(configDir, "openclaw.json")
-	backupDir := filepath.Join(os.TempDir(), "ollama-backups")
+	backupDir := backupDir()
 
 	os.MkdirAll(configDir, 0o755)
 	uniqueMarker := fmt.Sprintf("test-marker-%d", os.Getpid())
@@ -794,7 +794,7 @@ func TestOpenclawLegacyPaths(t *testing.T) {
 		legacyDir := filepath.Join(tmpDir, ".clawdbot")
 		os.MkdirAll(legacyDir, 0o755)
 		os.WriteFile(filepath.Join(legacyDir, "clawdbot.json"), []byte(`{
-			"models":{"providers":{"ollama":{"models":[{"id":"llama3.2"}]}}}
+			"models":{"providers":{"psyllama":{"models":[{"id":"llama3.2"}]}}}
 		}`), 0o644)
 
 		models := c.Models()
@@ -811,10 +811,10 @@ func TestOpenclawLegacyPaths(t *testing.T) {
 		os.MkdirAll(newDir, 0o755)
 		os.MkdirAll(legacyDir, 0o755)
 		os.WriteFile(filepath.Join(newDir, "openclaw.json"), []byte(`{
-			"models":{"providers":{"ollama":{"models":[{"id":"new-model"}]}}}
+			"models":{"providers":{"psyllama":{"models":[{"id":"new-model"}]}}}
 		}`), 0o644)
 		os.WriteFile(filepath.Join(legacyDir, "clawdbot.json"), []byte(`{
-			"models":{"providers":{"ollama":{"models":[{"id":"legacy-model"}]}}}
+			"models":{"providers":{"psyllama":{"models":[{"id":"legacy-model"}]}}}
 		}`), 0o644)
 
 		models := c.Models()
@@ -1155,15 +1155,15 @@ func TestPrintOpenclawReady(t *testing.T) {
 		r, w, _ := os.Pipe()
 		os.Stderr = w
 
-		printOpenclawReady("openclaw", "ollama", defaultGatewayPort, false)
+		printOpenclawReady("openclaw", "psyllama", defaultGatewayPort, false)
 
 		w.Close()
 		os.Stderr = old
 		buf.ReadFrom(r)
 
 		output := buf.String()
-		if !strings.Contains(output, "#token=ollama") {
-			t.Errorf("expected #token=ollama in output, got:\n%s", output)
+		if !strings.Contains(output, "#token=psyllama") {
+			t.Errorf("expected #token=psyllama in output, got:\n%s", output)
 		}
 	})
 
@@ -1191,7 +1191,7 @@ func TestPrintOpenclawReady(t *testing.T) {
 		r, w, _ := os.Pipe()
 		os.Stderr = w
 
-		printOpenclawReady("openclaw", "ollama", defaultGatewayPort, true)
+		printOpenclawReady("openclaw", "psyllama", defaultGatewayPort, true)
 
 		w.Close()
 		os.Stderr = old
@@ -1211,7 +1211,7 @@ func TestPrintOpenclawReady(t *testing.T) {
 		r, w, _ := os.Pipe()
 		os.Stderr = w
 
-		printOpenclawReady("openclaw", "ollama", defaultGatewayPort, false)
+		printOpenclawReady("openclaw", "psyllama", defaultGatewayPort, false)
 
 		w.Close()
 		os.Stderr = old
@@ -1537,7 +1537,7 @@ func TestIntegrationOnboarded(t *testing.T) {
 	t.Run("returns true after integrationOnboarded", func(t *testing.T) {
 		tmpDir := t.TempDir()
 		setTestHome(t, tmpDir)
-		os.MkdirAll(filepath.Join(tmpDir, ".ollama"), 0o755)
+		os.MkdirAll(filepath.Join(tmpDir, ".psyllama"), 0o755)
 
 		if err := integrationOnboarded("openclaw"); err != nil {
 			t.Fatal(err)
@@ -1551,7 +1551,7 @@ func TestIntegrationOnboarded(t *testing.T) {
 	t.Run("is case insensitive", func(t *testing.T) {
 		tmpDir := t.TempDir()
 		setTestHome(t, tmpDir)
-		os.MkdirAll(filepath.Join(tmpDir, ".ollama"), 0o755)
+		os.MkdirAll(filepath.Join(tmpDir, ".psyllama"), 0o755)
 
 		if err := integrationOnboarded("OpenClaw"); err != nil {
 			t.Fatal(err)
@@ -1565,7 +1565,7 @@ func TestIntegrationOnboarded(t *testing.T) {
 	t.Run("preserves existing integration data", func(t *testing.T) {
 		tmpDir := t.TempDir()
 		setTestHome(t, tmpDir)
-		os.MkdirAll(filepath.Join(tmpDir, ".ollama"), 0o755)
+		os.MkdirAll(filepath.Join(tmpDir, ".psyllama"), 0o755)
 
 		if err := SaveIntegration("openclaw", []string{"llama3.2", "mistral"}); err != nil {
 			t.Fatal(err)

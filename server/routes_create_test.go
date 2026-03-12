@@ -21,19 +21,19 @@ import (
 	gocmp "github.com/google/go-cmp/cmp"
 	gocmpopts "github.com/google/go-cmp/cmp/cmpopts"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/convert"
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/fs/ggml"
-	"github.com/ollama/ollama/manifest"
-	"github.com/ollama/ollama/types/model"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/convert"
+	"github.com/LordPsyan/psyllama/envconfig"
+	"github.com/LordPsyan/psyllama/fs/ggml"
+	"github.com/LordPsyan/psyllama/manifest"
+	"github.com/LordPsyan/psyllama/types/model"
 )
 
 var stream bool = false
 
 func createBinFile(t *testing.T, kv map[string]any, ti []*ggml.Tensor) (string, string) {
 	t.Helper()
-	t.Setenv("OLLAMA_MODELS", cmp.Or(os.Getenv("OLLAMA_MODELS"), t.TempDir()))
+	t.Setenv("PSYLLAMA_MODELS", cmp.Or(os.Getenv("PSYLLAMA_MODELS"), t.TempDir()))
 
 	modelDir := envconfig.Models()
 
@@ -83,8 +83,8 @@ func (t *responseRecorder) CloseNotify() <-chan bool {
 
 func createRequest(t *testing.T, fn func(*gin.Context), body any) *httptest.ResponseRecorder {
 	t.Helper()
-	// if OLLAMA_MODELS is not set, set it to the temp directory
-	t.Setenv("OLLAMA_MODELS", cmp.Or(os.Getenv("OLLAMA_MODELS"), t.TempDir()))
+	// if PSYLLAMA_MODELS is not set, set it to the temp directory
+	t.Setenv("PSYLLAMA_MODELS", cmp.Or(os.Getenv("PSYLLAMA_MODELS"), t.TempDir()))
 
 	w := NewRecorder()
 	c, _ := gin.CreateTestContext(w)
@@ -119,7 +119,7 @@ func TestCreateFromBin(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	p := t.TempDir()
-	t.Setenv("OLLAMA_MODELS", p)
+	t.Setenv("PSYLLAMA_MODELS", p)
 
 	var s Server
 
@@ -137,7 +137,7 @@ func TestCreateFromBin(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -181,7 +181,7 @@ func TestCreateFromModel(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	p := t.TempDir()
-	t.Setenv("OLLAMA_MODELS", p)
+	t.Setenv("PSYLLAMA_MODELS", p)
 	var s Server
 
 	_, digest := createBinFile(t, nil, nil)
@@ -197,7 +197,7 @@ func TestCreateFromModel(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
 	})
 
 	w = createRequest(t, s.CreateHandler, api.CreateRequest{
@@ -211,8 +211,8 @@ func TestCreateFromModel(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test2", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test2", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -225,7 +225,7 @@ func TestCreateFromModelInheritsRendererParser(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	p := t.TempDir()
-	t.Setenv("OLLAMA_MODELS", p)
+	t.Setenv("PSYLLAMA_MODELS", p)
 	var s Server
 
 	const (
@@ -291,7 +291,7 @@ func TestCreateRemovesLayers(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	p := t.TempDir()
-	t.Setenv("OLLAMA_MODELS", p)
+	t.Setenv("PSYLLAMA_MODELS", p)
 	var s Server
 
 	_, digest := createBinFile(t, nil, nil)
@@ -307,7 +307,7 @@ func TestCreateRemovesLayers(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -328,7 +328,7 @@ func TestCreateRemovesLayers(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -342,7 +342,7 @@ func TestCreateUnsetsSystem(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	p := t.TempDir()
-	t.Setenv("OLLAMA_MODELS", p)
+	t.Setenv("PSYLLAMA_MODELS", p)
 	var s Server
 
 	_, digest := createBinFile(t, nil, nil)
@@ -358,7 +358,7 @@ func TestCreateUnsetsSystem(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -379,7 +379,7 @@ func TestCreateUnsetsSystem(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -392,7 +392,7 @@ func TestCreateMergeParameters(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	p := t.TempDir()
-	t.Setenv("OLLAMA_MODELS", p)
+	t.Setenv("PSYLLAMA_MODELS", p)
 	var s Server
 
 	_, digest := createBinFile(t, nil, nil)
@@ -412,7 +412,7 @@ func TestCreateMergeParameters(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -437,8 +437,8 @@ func TestCreateMergeParameters(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test2", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test2", "latest"),
 	})
 
 	// Display contents of each blob in the directory
@@ -496,8 +496,8 @@ func TestCreateMergeParameters(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test2", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test2", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -527,7 +527,7 @@ func TestCreateReplacesMessages(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	p := t.TempDir()
-	t.Setenv("OLLAMA_MODELS", p)
+	t.Setenv("PSYLLAMA_MODELS", p)
 	var s Server
 
 	_, digest := createBinFile(t, nil, nil)
@@ -556,7 +556,7 @@ func TestCreateReplacesMessages(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -590,8 +590,8 @@ func TestCreateReplacesMessages(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test2", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test2", "latest"),
 	})
 
 	// Old layers will not have been pruned
@@ -634,7 +634,7 @@ func TestCreateTemplateSystem(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	p := t.TempDir()
-	t.Setenv("OLLAMA_MODELS", p)
+	t.Setenv("PSYLLAMA_MODELS", p)
 	var s Server
 
 	_, digest := createBinFile(t, nil, nil)
@@ -651,7 +651,7 @@ func TestCreateTemplateSystem(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -730,7 +730,7 @@ func TestCreateAndShowRemoteModel(t *testing.T) {
 	w := createRequest(t, s.CreateHandler, api.CreateRequest{
 		Model:      "test",
 		From:       "bob",
-		RemoteHost: "https://ollama.com",
+		RemoteHost: "https://psyllama.com",
 		Info: map[string]any{
 			"capabilities":       []string{"completion", "tools", "thinking"},
 			"model_family":       "gptoss",
@@ -822,8 +822,8 @@ func TestCreateFromCloudSourceSuffix(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if resp.RemoteHost != "https://ollama.com:443" {
-		t.Fatalf("expected remote host https://ollama.com:443, got %q", resp.RemoteHost)
+	if resp.RemoteHost != "https://psyllama.com:443" {
+		t.Fatalf("expected remote host https://psyllama.com:443, got %q", resp.RemoteHost)
 	}
 
 	if resp.RemoteModel != "gpt-oss:20b" {
@@ -835,7 +835,7 @@ func TestCreateLicenses(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	p := t.TempDir()
-	t.Setenv("OLLAMA_MODELS", p)
+	t.Setenv("PSYLLAMA_MODELS", p)
 	var s Server
 
 	_, digest := createBinFile(t, nil, nil)
@@ -851,7 +851,7 @@ func TestCreateLicenses(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -884,7 +884,7 @@ func TestCreateDetectTemplate(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	p := t.TempDir()
-	t.Setenv("OLLAMA_MODELS", p)
+	t.Setenv("PSYLLAMA_MODELS", p)
 	var s Server
 
 	t.Run("matched", func(t *testing.T) {
@@ -966,7 +966,7 @@ func TestDetectModelTypeFromFiles(t *testing.T) {
 
 	t.Run("unsupported file type", func(t *testing.T) {
 		p := t.TempDir()
-		t.Setenv("OLLAMA_MODELS", p)
+		t.Setenv("PSYLLAMA_MODELS", p)
 
 		data := []byte("12345678")
 		digest := fmt.Sprintf("sha256:%x", sha256.Sum256(data))
@@ -996,7 +996,7 @@ func TestDetectModelTypeFromFiles(t *testing.T) {
 
 	t.Run("file with less than 4 bytes", func(t *testing.T) {
 		p := t.TempDir()
-		t.Setenv("OLLAMA_MODELS", p)
+		t.Setenv("PSYLLAMA_MODELS", p)
 
 		data := []byte("123")
 		digest := fmt.Sprintf("sha256:%x", sha256.Sum256(data))

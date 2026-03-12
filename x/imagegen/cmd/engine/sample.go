@@ -1,6 +1,6 @@
 package main
 
-import "github.com/ollama/ollama/x/imagegen/mlx"
+import "github.com/LordPsyan/psyllama/x/imagegen/mlx"
 
 // sampleTopK samples from top-k logits using global random state
 func sampleTopK(scaledLogits *mlx.Array, k int) *mlx.Array {

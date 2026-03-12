@@ -14,9 +14,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/format"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/envconfig"
+	"github.com/LordPsyan/psyllama/format"
 )
 
 // Send multiple requests in parallel (concurrently) to a single model and ensure responses are expected
@@ -67,7 +67,7 @@ func TestConcurrentChat(t *testing.T) {
 // Stress the scheduler and attempt to load more models than will fit to cause thrashing
 // This test will always load at least 2 models even on CPU based systems
 func TestMultiModelStress(t *testing.T) {
-	s := os.Getenv("OLLAMA_MAX_VRAM")
+	s := os.Getenv("PSYLLAMA_MAX_VRAM")
 	if s == "" {
 		s = "0"
 	}
@@ -77,7 +77,7 @@ func TestMultiModelStress(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// All models compatible with ollama-engine
+	// All models compatible with psyllama-engine
 	smallModels := []string{
 		"llama3.2:1b",
 		"qwen3:0.6b",
@@ -158,7 +158,7 @@ chooseModels:
 	}
 	if targetLoadCount == len(chosenModels) {
 		// TODO consider retrying the medium models
-		slog.Warn("all models being used without exceeding VRAM, set OLLAMA_MAX_VRAM so test can pick larger models")
+		slog.Warn("all models being used without exceeding VRAM, set PSYLLAMA_MAX_VRAM so test can pick larger models")
 	}
 
 	r := rand.New(rand.NewSource(0))

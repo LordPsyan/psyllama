@@ -13,20 +13,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/auth"
-	internalcloud "github.com/ollama/ollama/internal/cloud"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/auth"
+	internalcloud "github.com/LordPsyan/psyllama/internal/cloud"
 )
 
 const (
-	webFetchAPI     = "https://ollama.com/api/web_fetch"
+	webFetchAPI     = "https://psyllama.com/api/web_fetch"
 	webFetchTimeout = 30 * time.Second
 )
 
 // ErrWebFetchAuthRequired is returned when web fetch requires authentication
 var ErrWebFetchAuthRequired = errors.New("web fetch requires authentication")
 
-// WebFetchTool implements web page fetching using Ollama's hosted API.
+// WebFetchTool implements web page fetching using Psyllama's hosted API.
 type WebFetchTool struct{}
 
 // Name returns the tool name.
@@ -70,7 +70,7 @@ type webFetchResponse struct {
 }
 
 // Execute fetches content from a web page.
-// Uses Ollama key signing for authentication - this makes requests via ollama.com API.
+// Uses Psyllama key signing for authentication - this makes requests via psyllama.com API.
 func (w *WebFetchTool) Execute(args map[string]any) (string, error) {
 	if internalcloud.Disabled() {
 		return "", errors.New(internalcloud.DisabledError("web fetch is unavailable"))
@@ -106,7 +106,7 @@ func (w *WebFetchTool) Execute(args map[string]any) (string, error) {
 	q.Add("ts", strconv.FormatInt(time.Now().Unix(), 10))
 	fetchURL.RawQuery = q.Encode()
 
-	// Sign the request using Ollama key (~/.ollama/id_ed25519)
+	// Sign the request using Psyllama key (~/.psyllama/id_ed25519)
 	ctx := context.Background()
 	data := fmt.Appendf(nil, "%s,%s", http.MethodPost, fetchURL.RequestURI())
 	signature, err := auth.Sign(ctx, data)

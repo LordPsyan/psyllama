@@ -20,17 +20,17 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/fs/gguf"
-	"github.com/ollama/ollama/manifest"
-	"github.com/ollama/ollama/model/parsers"
-	"github.com/ollama/ollama/parser"
-	"github.com/ollama/ollama/template"
-	"github.com/ollama/ollama/thinking"
-	"github.com/ollama/ollama/types/model"
-	"github.com/ollama/ollama/version"
-	"github.com/ollama/ollama/x/imagegen/transfer"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/envconfig"
+	"github.com/LordPsyan/psyllama/fs/gguf"
+	"github.com/LordPsyan/psyllama/manifest"
+	"github.com/LordPsyan/psyllama/model/parsers"
+	"github.com/LordPsyan/psyllama/parser"
+	"github.com/LordPsyan/psyllama/template"
+	"github.com/LordPsyan/psyllama/thinking"
+	"github.com/LordPsyan/psyllama/types/model"
+	"github.com/LordPsyan/psyllama/version"
+	"github.com/LordPsyan/psyllama/x/imagegen/transfer"
 )
 
 var (
@@ -310,19 +310,19 @@ func GetModel(name string) (*Model, error) {
 		}
 
 		switch layer.MediaType {
-		case "application/vnd.ollama.image.model":
+		case "application/vnd.psyllama.image.model":
 			m.ModelPath = filename
 			m.ParentModel = layer.From
-		case "application/vnd.ollama.image.embed":
+		case "application/vnd.psyllama.image.embed":
 			// Deprecated in versions  > 0.1.2
 			// TODO: remove this warning in a future version
 			slog.Info("WARNING: model contains embeddings, but embeddings in modelfiles have been deprecated and will be ignored.")
-		case "application/vnd.ollama.image.adapter":
+		case "application/vnd.psyllama.image.adapter":
 			m.AdapterPaths = append(m.AdapterPaths, filename)
-		case "application/vnd.ollama.image.projector":
+		case "application/vnd.psyllama.image.projector":
 			m.ProjectorPaths = append(m.ProjectorPaths, filename)
-		case "application/vnd.ollama.image.prompt",
-			"application/vnd.ollama.image.template":
+		case "application/vnd.psyllama.image.prompt",
+			"application/vnd.psyllama.image.template":
 			bts, err := os.ReadFile(filename)
 			if err != nil {
 				return nil, err
@@ -332,14 +332,14 @@ func GetModel(name string) (*Model, error) {
 			if err != nil {
 				return nil, err
 			}
-		case "application/vnd.ollama.image.system":
+		case "application/vnd.psyllama.image.system":
 			bts, err := os.ReadFile(filename)
 			if err != nil {
 				return nil, err
 			}
 
 			m.System = string(bts)
-		case "application/vnd.ollama.image.params":
+		case "application/vnd.psyllama.image.params":
 			params, err := os.Open(filename)
 			if err != nil {
 				return nil, err
@@ -350,7 +350,7 @@ func GetModel(name string) (*Model, error) {
 			if err = json.NewDecoder(params).Decode(&m.Options); err != nil {
 				return nil, err
 			}
-		case "application/vnd.ollama.image.messages":
+		case "application/vnd.psyllama.image.messages":
 			msgs, err := os.Open(filename)
 			if err != nil {
 				return nil, err
@@ -360,7 +360,7 @@ func GetModel(name string) (*Model, error) {
 			if err = json.NewDecoder(msgs).Decode(&m.Messages); err != nil {
 				return nil, err
 			}
-		case "application/vnd.ollama.image.license":
+		case "application/vnd.psyllama.image.license":
 			bts, err := os.ReadFile(filename)
 			if err != nil {
 				return nil, err
@@ -927,7 +927,7 @@ func makeRequest(ctx context.Context, method string, requestURL *url.URL, header
 		}
 	}
 
-	req.Header.Set("User-Agent", fmt.Sprintf("ollama/%s (%s %s) Go/%s", version.Version, runtime.GOARCH, runtime.GOOS, runtime.Version()))
+	req.Header.Set("User-Agent", fmt.Sprintf("psyllama/%s (%s %s) Go/%s", version.Version, runtime.GOARCH, runtime.GOOS, runtime.Version()))
 
 	if s := req.Header.Get("Content-Length"); s != "" {
 		contentLength, err := strconv.ParseInt(s, 10, 64)

@@ -8,13 +8,13 @@ import (
 	"image"
 	"math"
 
-	"github.com/ollama/ollama/fs"
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/ml/nn"
-	"github.com/ollama/ollama/ml/nn/rope"
-	"github.com/ollama/ollama/model"
-	"github.com/ollama/ollama/model/input"
-	"github.com/ollama/ollama/tokenizer"
+	"github.com/LordPsyan/psyllama/fs"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/ml/nn"
+	"github.com/LordPsyan/psyllama/ml/nn/rope"
+	"github.com/LordPsyan/psyllama/model"
+	"github.com/LordPsyan/psyllama/model/input"
+	"github.com/LordPsyan/psyllama/tokenizer"
 )
 
 type Options struct {

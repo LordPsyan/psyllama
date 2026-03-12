@@ -17,15 +17,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/ollama/ollama/auth"
-	"github.com/ollama/ollama/envconfig"
-	internalcloud "github.com/ollama/ollama/internal/cloud"
+	"github.com/LordPsyan/psyllama/auth"
+	"github.com/LordPsyan/psyllama/envconfig"
+	internalcloud "github.com/LordPsyan/psyllama/internal/cloud"
 )
 
 const (
-	defaultCloudProxyBaseURL     = "https://ollama.com:443"
-	defaultCloudProxySigningHost = "ollama.com"
-	cloudProxyBaseURLEnv         = "OLLAMA_CLOUD_BASE_URL"
+	defaultCloudProxyBaseURL     = "https://psyllama.com:443"
+	defaultCloudProxySigningHost = "psyllama.com"
+	cloudProxyBaseURLEnv         = "PSYLLAMA_CLOUD_BASE_URL"
 	legacyCloudAnthropicKey      = "legacy_cloud_anthropic_web_search"
 )
 

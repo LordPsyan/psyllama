@@ -9,12 +9,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/manifest"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/manifest"
 )
 
 func TestConvertFromSafetensors(t *testing.T) {
-	t.Setenv("OLLAMA_MODELS", t.TempDir())
+	t.Setenv("PSYLLAMA_MODELS", t.TempDir())
 
 	// Helper function to create a new layer and return its digest
 	makeTemp := func(content string) string {
@@ -156,15 +156,15 @@ func TestRemoteURL(t *testing.T) {
 			hasError: false,
 		},
 		{
-			name:     "ollama.com special case",
-			input:    "ollama.com",
-			expected: "https://ollama.com:443",
+			name:     "psyllama.com special case",
+			input:    "psyllama.com",
+			expected: "https://psyllama.com:443",
 			hasError: false,
 		},
 		{
-			name:     "http ollama.com special case",
-			input:    "http://ollama.com",
-			expected: "https://ollama.com:443",
+			name:     "http psyllama.com special case",
+			input:    "http://psyllama.com",
+			expected: "https://psyllama.com:443",
 			hasError: false,
 		},
 		{
@@ -234,7 +234,7 @@ func TestRemoteURL_Idempotent(t *testing.T) {
 		"/foo/bar",
 		"example.com",
 		"https://example.com:8080/path",
-		"ollama.com",
+		"psyllama.com",
 		"http://localhost:11434",
 	}
 

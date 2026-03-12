@@ -34,7 +34,7 @@ func copyFile(src, dst string) error {
 }
 
 func backupDir() string {
-	return filepath.Join(os.TempDir(), "ollama-backups")
+	return filepath.Join(os.TempDir(), "psyllama-backups")
 }
 
 func backupToTmp(srcPath string) (string, error) {

@@ -9,7 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/ollama/ollama/envconfig"
+	"github.com/LordPsyan/psyllama/envconfig"
 )
 
 // Cline implements Runner and Editor for the Cline CLI integration
@@ -81,15 +81,15 @@ func (c *Cline) Edit(models []string) error {
 		}
 	}
 
-	// Set Ollama as the provider for both act and plan modes
+	// Set Psyllama as the provider for both act and plan modes
 	baseURL := envconfig.Host().String()
-	config["ollamaBaseUrl"] = baseURL
-	config["actModeApiProvider"] = "ollama"
-	config["actModeOllamaModelId"] = models[0]
-	config["actModeOllamaBaseUrl"] = baseURL
-	config["planModeApiProvider"] = "ollama"
-	config["planModeOllamaModelId"] = models[0]
-	config["planModeOllamaBaseUrl"] = baseURL
+	config["psyllamaBaseUrl"] = baseURL
+	config["actModeApiProvider"] = "psyllama"
+	config["actModePsyllamaModelId"] = models[0]
+	config["actModePsyllamaBaseUrl"] = baseURL
+	config["planModeApiProvider"] = "psyllama"
+	config["planModePsyllamaModelId"] = models[0]
+	config["planModePsyllamaBaseUrl"] = baseURL
 
 	config["welcomeViewCompleted"] = true
 
@@ -111,11 +111,11 @@ func (c *Cline) Models() []string {
 		return nil
 	}
 
-	if config["actModeApiProvider"] != "ollama" {
+	if config["actModeApiProvider"] != "psyllama" {
 		return nil
 	}
 
-	modelID, _ := config["actModeOllamaModelId"].(string)
+	modelID, _ := config["actModePsyllamaModelId"].(string)
 	if modelID == "" {
 		return nil
 	}

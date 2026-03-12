@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/ollama/ollama/x/imagegen/manifest"
-	"github.com/ollama/ollama/x/imagegen/mlx"
-	"github.com/ollama/ollama/x/imagegen/nn"
-	"github.com/ollama/ollama/x/imagegen/safetensors"
-	"github.com/ollama/ollama/x/imagegen/vae"
+	"github.com/LordPsyan/psyllama/x/imagegen/manifest"
+	"github.com/LordPsyan/psyllama/x/imagegen/mlx"
+	"github.com/LordPsyan/psyllama/x/imagegen/nn"
+	"github.com/LordPsyan/psyllama/x/imagegen/safetensors"
+	"github.com/LordPsyan/psyllama/x/imagegen/vae"
 )
 
 // VAEConfig holds AutoencoderKLFlux2 configuration
@@ -353,7 +353,7 @@ func (db *DownEncoderBlock2D) Forward(x *mlx.Array) *mlx.Array {
 	return x
 }
 
-// Load loads the Flux2 VAE from ollama blob storage.
+// Load loads the Flux2 VAE from psyllama blob storage.
 func (m *AutoencoderKLFlux2) Load(modelManifest *manifest.ModelManifest) error {
 	fmt.Print("  Loading VAE... ")
 

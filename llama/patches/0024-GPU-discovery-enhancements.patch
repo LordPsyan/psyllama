@@ -1,12 +1,12 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Daniel Hiltgen <daniel@ollama.com>
+From: Daniel Hiltgen <daniel@psyllama.com>
 Date: Tue, 26 Aug 2025 12:48:29 -0700
 Subject: [PATCH] GPU discovery enhancements
 
 Expose more information about the devices through backend props, and leverage
 management libraries for more accurate VRAM usage reporting if available.
 
-vulkan: get GPU ID (ollama v0.11.5)
+vulkan: get GPU ID (psyllama v0.11.5)
 
 Signed-off-by: Xiaodong Ye <xiaodong.ye@mthreads.com>
 

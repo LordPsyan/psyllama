@@ -13,8 +13,8 @@ import (
 	"slices"
 	"strings"
 
-	ofs "github.com/ollama/ollama/fs"
-	"github.com/ollama/ollama/fs/ggml"
+	ofs "github.com/LordPsyan/psyllama/fs"
+	"github.com/LordPsyan/psyllama/fs/ggml"
 )
 
 type ModelParameters struct {
@@ -365,7 +365,7 @@ func LoadModelMetadata(fsys fs.FS) (ModelKV, *Tokenizer, error) {
 	return conv, t, nil
 }
 
-// Convert writes an Ollama compatible model to the provided io.WriteSeeker based on configurations
+// Convert writes an Psyllama compatible model to the provided io.WriteSeeker based on configurations
 // and files it finds in the input path.
 // Supported input model formats include safetensors.
 // Supported input tokenizers files include tokenizer.json (preferred) and tokenizer.model.

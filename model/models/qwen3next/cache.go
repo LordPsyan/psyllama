@@ -3,8 +3,8 @@ package qwen3next
 import (
 	"math"
 
-	"github.com/ollama/ollama/kvcache"
-	"github.com/ollama/ollama/ml"
+	"github.com/LordPsyan/psyllama/kvcache"
+	"github.com/LordPsyan/psyllama/ml"
 )
 
 var (

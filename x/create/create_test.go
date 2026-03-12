@@ -217,7 +217,7 @@ func TestCreateSafetensorsModel(t *testing.T) {
 		layer := LayerInfo{
 			Digest:    "sha256:tensor_" + name,
 			Size:      int64(len(data)),
-			MediaType: "application/vnd.ollama.image.tensor",
+			MediaType: "application/vnd.psyllama.image.tensor",
 			Name:      name,
 		}
 		createdLayers = append(createdLayers, layer)
@@ -383,22 +383,22 @@ func TestResolveManifestPath(t *testing.T) {
 		{
 			name:      "simple model name",
 			modelName: "llama2",
-			wantParts: []string{"registry.ollama.ai", "library", "llama2", "latest"},
+			wantParts: []string{"registry.psyllama.ai", "library", "llama2", "latest"},
 		},
 		{
 			name:      "model name with tag",
 			modelName: "llama2:7b",
-			wantParts: []string{"registry.ollama.ai", "library", "llama2", "7b"},
+			wantParts: []string{"registry.psyllama.ai", "library", "llama2", "7b"},
 		},
 		{
 			name:      "model name with namespace",
 			modelName: "myuser/mymodel",
-			wantParts: []string{"registry.ollama.ai", "myuser", "mymodel", "latest"},
+			wantParts: []string{"registry.psyllama.ai", "myuser", "mymodel", "latest"},
 		},
 		{
 			name:      "model name with namespace and tag",
 			modelName: "myuser/mymodel:v1",
-			wantParts: []string{"registry.ollama.ai", "myuser", "mymodel", "v1"},
+			wantParts: []string{"registry.psyllama.ai", "myuser", "mymodel", "v1"},
 		},
 		{
 			name:      "fully qualified model name",
@@ -424,7 +424,7 @@ func TestLayerInfo(t *testing.T) {
 	layer := LayerInfo{
 		Digest:    "sha256:abc123",
 		Size:      1024,
-		MediaType: "application/vnd.ollama.image.tensor",
+		MediaType: "application/vnd.psyllama.image.tensor",
 		Name:      "model.weight",
 	}
 
@@ -434,8 +434,8 @@ func TestLayerInfo(t *testing.T) {
 	if layer.Size != 1024 {
 		t.Errorf("Size = %d, want %d", layer.Size, 1024)
 	}
-	if layer.MediaType != "application/vnd.ollama.image.tensor" {
-		t.Errorf("MediaType = %q, want %q", layer.MediaType, "application/vnd.ollama.image.tensor")
+	if layer.MediaType != "application/vnd.psyllama.image.tensor" {
+		t.Errorf("MediaType = %q, want %q", layer.MediaType, "application/vnd.psyllama.image.tensor")
 	}
 	if layer.Name != "model.weight" {
 		t.Errorf("Name = %q, want %q", layer.Name, "model.weight")
@@ -467,7 +467,7 @@ func TestManifest(t *testing.T) {
 		},
 		Layers: []ManifestLayer{
 			{
-				MediaType: "application/vnd.ollama.image.tensor",
+				MediaType: "application/vnd.psyllama.image.tensor",
 				Digest:    "sha256:layer1",
 				Size:      1000,
 				Name:      "weight.bin",

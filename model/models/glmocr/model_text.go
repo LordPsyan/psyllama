@@ -3,11 +3,11 @@ package glmocr
 import (
 	"math"
 
-	"github.com/ollama/ollama/fs"
-	"github.com/ollama/ollama/kvcache"
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/ml/nn"
-	"github.com/ollama/ollama/ml/nn/rope"
+	"github.com/LordPsyan/psyllama/fs"
+	"github.com/LordPsyan/psyllama/kvcache"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/ml/nn"
+	"github.com/LordPsyan/psyllama/ml/nn/rope"
 )
 
 type TextModelOptions struct {

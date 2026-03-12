@@ -43,7 +43,7 @@ func TestWriteWithBackup(t *testing.T) {
 		}
 	})
 
-	t.Run("creates backup in /tmp/ollama-backups", func(t *testing.T) {
+	t.Run("creates backup in /tmp/psyllama-backups", func(t *testing.T) {
 		path := filepath.Join(tmpDir, "backup.json")
 
 		os.WriteFile(path, []byte(`{"original": true}`), 0o644)
@@ -79,7 +79,7 @@ func TestWriteWithBackup(t *testing.T) {
 		}
 
 		if !foundBackup {
-			t.Error("backup file not created in /tmp/ollama-backups")
+			t.Error("backup file not created in /tmp/psyllama-backups")
 		}
 
 		current, _ := os.ReadFile(path)
@@ -179,6 +179,9 @@ func TestWriteWithBackup_FailsIfBackupFails(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("permission tests unreliable on Windows")
 	}
+	if os.Geteuid() == 0 {
+		t.Skip("permission-based backup failure test is unreliable when running as root")
+	}
 
 	tmpDir := t.TempDir()
 	path := filepath.Join(tmpDir, "config.json")
@@ -213,6 +216,9 @@ func TestWriteWithBackup_FailsIfBackupFails(t *testing.T) {
 func TestWriteWithBackup_PermissionDenied(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("permission tests unreliable on Windows")
+	}
+	if os.Geteuid() == 0 {
+		t.Skip("permission-based tests are unreliable when running as root")
 	}
 
 	tmpDir := t.TempDir()
@@ -373,6 +379,9 @@ func TestWriteWithBackup_EmptyData(t *testing.T) {
 func TestWriteWithBackup_FileUnreadableButDirWritable(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("permission tests unreliable on Windows")
+	}
+	if os.Geteuid() == 0 {
+		t.Skip("permission-based tests are unreliable when running as root")
 	}
 
 	tmpDir := t.TempDir()

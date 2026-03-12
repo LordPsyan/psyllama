@@ -1,7 +1,7 @@
 protect .rsync-filter
 protect *.go
 protect *-embed.*
-protect ollama-*
+protect psyllama-*
 hide /CMakeLists.txt
 hide /include/ggml-webgpu.h
 include /cmake/

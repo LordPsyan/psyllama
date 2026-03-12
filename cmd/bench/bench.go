@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/api"
 )
 
 type flagOptions struct {
@@ -143,7 +143,7 @@ func BenchmarkChat(fOpt flagOptions) error {
 
 	client, err := api.ClientFromEnvironment()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: Couldn't create ollama client: %v\n", err)
+		fmt.Fprintf(os.Stderr, "ERROR: Couldn't create psyllama client: %v\n", err)
 		return err
 	}
 

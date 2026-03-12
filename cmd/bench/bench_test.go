@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/api"
 )
 
 func createTestFlagOptions() flagOptions {
@@ -65,7 +65,7 @@ func captureOutput(f func()) string {
 	return buf.String()
 }
 
-func createMockOllamaServer(t *testing.T, responses []api.ChatResponse) *httptest.Server {
+func createMockPsyllamaServer(t *testing.T, responses []api.ChatResponse) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/api/chat" {
 			t.Errorf("Expected path /api/chat, got %s", r.URL.Path)
@@ -128,10 +128,10 @@ func TestBenchmarkChat_Success(t *testing.T) {
 		},
 	}
 
-	server := createMockOllamaServer(t, mockResponses)
+	server := createMockPsyllamaServer(t, mockResponses)
 	defer server.Close()
 
-	t.Setenv("OLLAMA_HOST", server.URL)
+	t.Setenv("PSYLLAMA_HOST", server.URL)
 
 	output := captureOutput(func() {
 		err := BenchmarkChat(fOpt)
@@ -159,7 +159,7 @@ func TestBenchmarkChat_ServerError(t *testing.T) {
 	}))
 	defer server.Close()
 
-	t.Setenv("OLLAMA_HOST", server.URL)
+	t.Setenv("PSYLLAMA_HOST", server.URL)
 
 	output := captureOutput(func() {
 		err := BenchmarkChat(fOpt)
@@ -204,7 +204,7 @@ func TestBenchmarkChat_Timeout(t *testing.T) {
 	}))
 	defer server.Close()
 
-	t.Setenv("OLLAMA_HOST", server.URL)
+	t.Setenv("PSYLLAMA_HOST", server.URL)
 
 	output := captureOutput(func() {
 		err := BenchmarkChat(fOpt)
@@ -232,10 +232,10 @@ func TestBenchmarkChat_NoMetrics(t *testing.T) {
 		},
 	}
 
-	server := createMockOllamaServer(t, mockResponses)
+	server := createMockPsyllamaServer(t, mockResponses)
 	defer server.Close()
 
-	t.Setenv("OLLAMA_HOST", server.URL)
+	t.Setenv("PSYLLAMA_HOST", server.URL)
 
 	output := captureOutput(func() {
 		err := BenchmarkChat(fOpt)
@@ -287,7 +287,7 @@ func TestBenchmarkChat_MultipleModels(t *testing.T) {
 	}))
 	defer server.Close()
 
-	t.Setenv("OLLAMA_HOST", server.URL)
+	t.Setenv("PSYLLAMA_HOST", server.URL)
 
 	output := captureOutput(func() {
 		err := BenchmarkChat(fOpt)
@@ -356,7 +356,7 @@ func TestBenchmarkChat_WithImage(t *testing.T) {
 	}))
 	defer server.Close()
 
-	t.Setenv("OLLAMA_HOST", server.URL)
+	t.Setenv("PSYLLAMA_HOST", server.URL)
 
 	output := captureOutput(func() {
 		err := BenchmarkChat(fOpt)

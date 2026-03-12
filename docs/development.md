@@ -5,19 +5,19 @@ Install prerequisites:
 - [Go](https://go.dev/doc/install)
 - C/C++ Compiler e.g. Clang on macOS, [TDM-GCC](https://github.com/jmeubank/tdm-gcc/releases/latest) (Windows amd64) or [llvm-mingw](https://github.com/mstorsjo/llvm-mingw) (Windows arm64), GCC/Clang on Linux.
 
-Then build and run Ollama from the root directory of the repository:
+Then build and run Psyllama from the root directory of the repository:
 
 ```shell
 go run . serve
 ```
 
 > [!NOTE]
-> Ollama includes native code compiled with CGO.  From time to time these data structures can change and CGO can get out of sync resulting in unexpected crashes.  You can force a full build of the native code by running `go clean -cache` first. 
+> Psyllama includes native code compiled with CGO.  From time to time these data structures can change and CGO can get out of sync resulting in unexpected crashes.  You can force a full build of the native code by running `go clean -cache` first. 
 
 
 ## macOS (Apple Silicon)
 
-macOS Apple Silicon supports Metal which is built-in to the Ollama binary. No additional steps are required.
+macOS Apple Silicon supports Metal which is built-in to the Psyllama binary. No additional steps are required.
 
 ## macOS (Intel)
 
@@ -32,7 +32,7 @@ cmake -B build
 cmake --build build
 ```
 
-Lastly, run Ollama:
+Lastly, run Psyllama:
 
 ```shell
 go run . serve
@@ -82,7 +82,7 @@ cmake --build build --config Release
 
 
 
-Lastly, run Ollama:
+Lastly, run Psyllama:
 
 ```shell
 go run . serve
@@ -119,7 +119,7 @@ cmake -B build
 cmake --build build
 ```
 
-Lastly, run Ollama:
+Lastly, run Psyllama:
 
 ```shell
 go run . serve
@@ -169,20 +169,20 @@ cmake --install build --component MLX --strip
 To build against a local checkout of MLX and/or MLX-C (useful for development), set environment variables before running CMake:
 
 ```shell
-export OLLAMA_MLX_SOURCE=/path/to/mlx
-export OLLAMA_MLX_C_SOURCE=/path/to/mlx-c
+export PSYLLAMA_MLX_SOURCE=/path/to/mlx
+export PSYLLAMA_MLX_C_SOURCE=/path/to/mlx-c
 ```
 
 For example, using the helper scripts with local mlx and mlx-c repos:
 ```shell
-OLLAMA_MLX_SOURCE=../mlx OLLAMA_MLX_C_SOURCE=../mlx-c ./scripts/build_linux.sh
+PSYLLAMA_MLX_SOURCE=../mlx PSYLLAMA_MLX_C_SOURCE=../mlx-c ./scripts/build_linux.sh
 
-OLLAMA_MLX_SOURCE=../mlx OLLAMA_MLX_C_SOURCE=../mlx-c ./scripts/build_darwin.sh
+PSYLLAMA_MLX_SOURCE=../mlx PSYLLAMA_MLX_C_SOURCE=../mlx-c ./scripts/build_darwin.sh
 ```
 
 ```powershell
-$env:OLLAMA_MLX_SOURCE="../mlx"
-$env:OLLAMA_MLX_C_SOURCE="../mlx-c"
+$env:PSYLLAMA_MLX_SOURCE="../mlx"
+$env:PSYLLAMA_MLX_C_SOURCE="../mlx-c"
 ./scripts/build_darwin.ps1
 ```
 
@@ -237,11 +237,11 @@ go test ./...
 
 ## Library detection
 
-Ollama looks for acceleration libraries in the following paths relative to the `ollama` executable:
+Psyllama looks for acceleration libraries in the following paths relative to the `psyllama` executable:
 
-* `./lib/ollama` (Windows)
-* `../lib/ollama` (Linux)
+* `./lib/psyllama` (Windows)
+* `../lib/psyllama` (Linux)
 * `.` (macOS)
-* `build/lib/ollama` (for development)
+* `build/lib/psyllama` (for development)
 
-If the libraries are not found, Ollama will not run with any acceleration libraries.
+If the libraries are not found, Psyllama will not run with any acceleration libraries.

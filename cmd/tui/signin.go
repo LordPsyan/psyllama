@@ -7,7 +7,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/ollama/ollama/cmd/config"
+	"github.com/LordPsyan/psyllama/cmd/config"
 )
 
 type signInModel struct {

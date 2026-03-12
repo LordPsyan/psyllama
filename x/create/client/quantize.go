@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/ollama/ollama/x/create"
-	"github.com/ollama/ollama/x/imagegen/mlx"
+	"github.com/LordPsyan/psyllama/x/create"
+	"github.com/LordPsyan/psyllama/x/imagegen/mlx"
 )
 
 // quantizeParams maps quantization type names to MLX quantize parameters.
@@ -200,7 +200,7 @@ func QuantizeSupported() bool {
 
 // ensureTempDir creates the temp directory for quantization if it doesn't exist
 func ensureTempDir() string {
-	tmpDir := filepath.Join(os.TempDir(), "ollama-quantize")
+	tmpDir := filepath.Join(os.TempDir(), "psyllama-quantize")
 	os.MkdirAll(tmpDir, 0755)
 	return tmpDir
 }

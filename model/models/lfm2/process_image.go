@@ -6,8 +6,8 @@ import (
 	"math"
 	"slices"
 
-	"github.com/ollama/ollama/fs"
-	"github.com/ollama/ollama/model/imageproc"
+	"github.com/LordPsyan/psyllama/fs"
+	"github.com/LordPsyan/psyllama/model/imageproc"
 )
 
 type ImageProcessor struct {

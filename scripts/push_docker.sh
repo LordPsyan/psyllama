@@ -3,7 +3,7 @@
 set -eu
 
 export VERSION=${VERSION:-0.0.0}
-export GOFLAGS="'-ldflags=-w -s \"-X=github.com/ollama/ollama/version.Version=$VERSION\" \"-X=github.com/ollama/ollama/server.mode=release\"'"
+export GOFLAGS="'-ldflags=-w -s \"-X=github.com/psyllama/psyllama/version.Version=$VERSION\" \"-X=github.com/psyllama/psyllama/server.mode=release\"'"
 
 docker build \
     --push \
@@ -11,5 +11,5 @@ docker build \
     --build-arg=VERSION \
     --build-arg=GOFLAGS \
     -f Dockerfile \
-    -t ollama/ollama -t ollama/ollama:$VERSION \
+    -t psyllama/psyllama -t psyllama/psyllama:$VERSION \
     .

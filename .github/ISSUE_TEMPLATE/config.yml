@@ -1,8 +1,8 @@
 blank_issues_enabled: true
 contact_links:
   - name: Help
-    url: https://discord.com/invite/ollama
-    about: Please join our Discord server for help using Ollama
+    url: https://discord.com/invite/psyllama
+    about: Please join our Discord server for help using Psyllama
   - name: Troubleshooting
-    url: https://github.com/ollama/ollama/blob/main/docs/faq.md#faq
+    url: https://github.com/psyllama/psyllama/blob/main/docs/faq.md#faq
     about: See the FAQ for common issues and solutions

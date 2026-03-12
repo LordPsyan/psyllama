@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/api"
 )
 
 type LFM2Renderer struct {

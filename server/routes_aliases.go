@@ -9,7 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/ollama/ollama/types/model"
+	"github.com/LordPsyan/psyllama/types/model"
 )
 
 type aliasListResponse struct {

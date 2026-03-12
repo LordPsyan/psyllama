@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(Ollama C CXX)
+project(Psyllama C CXX)
 
 # Handle cross-compilation on macOS: when CMAKE_OSX_ARCHITECTURES is set to a
 # single architecture different from the host, override CMAKE_SYSTEM_PROCESSOR
@@ -54,15 +54,15 @@ if(APPLE)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 endif()
 
-set(OLLAMA_BUILD_DIR ${CMAKE_BINARY_DIR}/lib/ollama)
-set(OLLAMA_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib/ollama/${OLLAMA_RUNNER_DIR})
+set(PSYLLAMA_BUILD_DIR ${CMAKE_BINARY_DIR}/lib/psyllama)
+set(PSYLLAMA_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib/psyllama/${PSYLLAMA_RUNNER_DIR})
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY         ${OLLAMA_BUILD_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG   ${OLLAMA_BUILD_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OLLAMA_BUILD_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY         ${OLLAMA_BUILD_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG   ${OLLAMA_BUILD_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${OLLAMA_BUILD_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY         ${PSYLLAMA_BUILD_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG   ${PSYLLAMA_BUILD_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PSYLLAMA_BUILD_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY         ${PSYLLAMA_BUILD_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG   ${PSYLLAMA_BUILD_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PSYLLAMA_BUILD_DIR})
 
 # Store ggml include paths for use with target_include_directories later.
 # We avoid global include_directories() to prevent polluting the include path
@@ -103,9 +103,9 @@ endforeach()
 install(TARGETS ggml-base ${CPU_VARIANTS}
     RUNTIME_DEPENDENCIES
         PRE_EXCLUDE_REGEXES ".*"
-    RUNTIME DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT CPU
-    LIBRARY DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT CPU
-    FRAMEWORK DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT CPU
+    RUNTIME DESTINATION ${PSYLLAMA_INSTALL_DIR} COMPONENT CPU
+    LIBRARY DESTINATION ${PSYLLAMA_INSTALL_DIR} COMPONENT CPU
+    FRAMEWORK DESTINATION ${PSYLLAMA_INSTALL_DIR} COMPONENT CPU
 )
 
 check_language(CUDA)
@@ -122,8 +122,8 @@ if(CMAKE_CUDA_COMPILER)
             DIRECTORIES ${CUDAToolkit_BIN_DIR} ${CUDAToolkit_BIN_DIR}/x64 ${CUDAToolkit_LIBRARY_DIR}
             PRE_INCLUDE_REGEXES cublas cublasLt cudart
             PRE_EXCLUDE_REGEXES ".*"
-        RUNTIME DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT CUDA
-        LIBRARY DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT CUDA
+        RUNTIME DESTINATION ${PSYLLAMA_INSTALL_DIR} COMPONENT CUDA
+        LIBRARY DESTINATION ${PSYLLAMA_INSTALL_DIR} COMPONENT CUDA
     )
 endif()
 
@@ -158,21 +158,21 @@ if(CMAKE_HIP_COMPILER)
 
         install(TARGETS ggml-hip
             RUNTIME_DEPENDENCY_SET rocm
-            RUNTIME DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT HIP
-            LIBRARY DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT HIP
+            RUNTIME DESTINATION ${PSYLLAMA_INSTALL_DIR} COMPONENT HIP
+            LIBRARY DESTINATION ${PSYLLAMA_INSTALL_DIR} COMPONENT HIP
         )
         install(RUNTIME_DEPENDENCY_SET rocm
                 DIRECTORIES ${HIP_BIN_INSTALL_DIR} ${HIP_LIB_INSTALL_DIR}
                 PRE_INCLUDE_REGEXES hipblas rocblas amdhip64 rocsolver amd_comgr hsa-runtime64 rocsparse tinfo rocprofiler-register roctx64 rocroller drm drm_amdgpu numa elf
                 PRE_EXCLUDE_REGEXES ".*"
                 POST_EXCLUDE_REGEXES "system32"
-            RUNTIME DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT HIP
-            LIBRARY DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT HIP
+            RUNTIME DESTINATION ${PSYLLAMA_INSTALL_DIR} COMPONENT HIP
+            LIBRARY DESTINATION ${PSYLLAMA_INSTALL_DIR} COMPONENT HIP
         )
 
         foreach(HIP_LIB_BIN_INSTALL_DIR IN ITEMS ${HIP_BIN_INSTALL_DIR} ${HIP_LIB_INSTALL_DIR})
             if(EXISTS ${HIP_LIB_BIN_INSTALL_DIR}/rocblas)
-                install(DIRECTORY ${HIP_LIB_BIN_INSTALL_DIR}/rocblas DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT HIP)
+                install(DIRECTORY ${HIP_LIB_BIN_INSTALL_DIR}/rocblas DESTINATION ${PSYLLAMA_INSTALL_DIR} COMPONENT HIP)
                 break()
             endif()
         endforeach()
@@ -188,8 +188,8 @@ if(NOT APPLE)
             RUNTIME_DEPENDENCIES
                 PRE_INCLUDE_REGEXES vulkan
                 PRE_EXCLUDE_REGEXES ".*"
-            RUNTIME DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT Vulkan
-            LIBRARY DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT Vulkan
+            RUNTIME DESTINATION ${PSYLLAMA_INSTALL_DIR} COMPONENT Vulkan
+            LIBRARY DESTINATION ${PSYLLAMA_INSTALL_DIR} COMPONENT Vulkan
         )
     endif()
 endif()
@@ -212,7 +212,7 @@ if(MLX_ENGINE)
         list(APPEND MLX_RUNTIME_DIRS ${CUDNN_BIN_SUBDIRS})
     endif()
     # Add build output directory and MLX dependency build directories
-    list(APPEND MLX_RUNTIME_DIRS ${OLLAMA_BUILD_DIR})
+    list(APPEND MLX_RUNTIME_DIRS ${PSYLLAMA_BUILD_DIR})
     # OpenBLAS DLL location (pre-built zip extracts into openblas-src/bin/)
     list(APPEND MLX_RUNTIME_DIRS ${CMAKE_BINARY_DIR}/_deps/openblas-src/bin)
     # NCCL: on Linux, if real NCCL is found, cmake bundles libnccl.so via the
@@ -233,37 +233,37 @@ if(MLX_ENGINE)
             DIRECTORIES ${MLX_RUNTIME_DIRS}
             PRE_INCLUDE_REGEXES ${MLX_INCLUDE_REGEXES}
             PRE_EXCLUDE_REGEXES ".*"
-        RUNTIME DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT MLX
-        LIBRARY DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT MLX
-        FRAMEWORK DESTINATION ${OLLAMA_INSTALL_DIR} COMPONENT MLX
+        RUNTIME DESTINATION ${PSYLLAMA_INSTALL_DIR} COMPONENT MLX
+        LIBRARY DESTINATION ${PSYLLAMA_INSTALL_DIR} COMPONENT MLX
+        FRAMEWORK DESTINATION ${PSYLLAMA_INSTALL_DIR} COMPONENT MLX
     )
 
     # Install the Metal library for macOS arm64 (must be colocated with the binary)
     # Metal backend is only built for arm64, not x86_64
     if(APPLE AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
         install(FILES ${CMAKE_BINARY_DIR}/_deps/mlx-build/mlx/backend/metal/kernels/mlx.metallib
-            DESTINATION ${OLLAMA_INSTALL_DIR}
+            DESTINATION ${PSYLLAMA_INSTALL_DIR}
             COMPONENT MLX)
     endif()
 
     # Install CCCL headers for NVRTC JIT compilation at runtime.
     # MLX's own install rules use the default component so they get skipped by
-    # --component MLX. Headers are installed alongside libmlx in OLLAMA_INSTALL_DIR.
+    # --component MLX. Headers are installed alongside libmlx in PSYLLAMA_INSTALL_DIR.
     # On Linux, MLX's jit_module.cpp resolves CCCL via
     # current_binary_dir().parent_path() / "include" / "cccl", so we create a
-    # symlink from lib/ollama/include -> ${OLLAMA_RUNNER_DIR}/include
+    # symlink from lib/psyllama/include -> ${PSYLLAMA_RUNNER_DIR}/include
     # This will need refinement if we add multiple CUDA versions for MLX in the future.
     if(EXISTS ${CMAKE_BINARY_DIR}/_deps/cccl-src/include/cuda)
         install(DIRECTORY ${CMAKE_BINARY_DIR}/_deps/cccl-src/include/cuda
-            DESTINATION ${OLLAMA_INSTALL_DIR}/include/cccl
+            DESTINATION ${PSYLLAMA_INSTALL_DIR}/include/cccl
             COMPONENT MLX)
         install(DIRECTORY ${CMAKE_BINARY_DIR}/_deps/cccl-src/include/nv
-            DESTINATION ${OLLAMA_INSTALL_DIR}/include/cccl
+            DESTINATION ${PSYLLAMA_INSTALL_DIR}/include/cccl
             COMPONENT MLX)
         if(NOT WIN32 AND NOT APPLE)
             install(CODE "
-                set(_link \"${CMAKE_INSTALL_PREFIX}/lib/ollama/include\")
-                set(_target \"${OLLAMA_RUNNER_DIR}/include\")
+                set(_link \"${CMAKE_INSTALL_PREFIX}/lib/psyllama/include\")
+                set(_target \"${PSYLLAMA_RUNNER_DIR}/include\")
                 if(NOT EXISTS \${_link})
                     execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink \${_target} \${_link})
                 endif()
@@ -276,8 +276,8 @@ if(MLX_ENGINE)
     # dlfcn-win32 is a known CMake target with its own install rules (which install
     # to the wrong destination). We must install it explicitly here.
     if(WIN32)
-        install(FILES ${OLLAMA_BUILD_DIR}/dl.dll
-            DESTINATION ${OLLAMA_INSTALL_DIR}
+        install(FILES ${PSYLLAMA_BUILD_DIR}/dl.dll
+            DESTINATION ${PSYLLAMA_INSTALL_DIR}
             COMPONENT MLX)
     endif()
 
@@ -294,7 +294,7 @@ if(MLX_ENGINE)
             "${CUDAToolkit_LIBRARY_DIR}/libcudnn.so*")
         if(MLX_CUDA_LIBS)
             install(FILES ${MLX_CUDA_LIBS}
-                DESTINATION ${OLLAMA_INSTALL_DIR}
+                DESTINATION ${PSYLLAMA_INSTALL_DIR}
                 COMPONENT MLX)
         endif()
     endif()

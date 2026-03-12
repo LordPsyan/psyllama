@@ -21,10 +21,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/llm"
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/x/imagegen"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/llm"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/x/imagegen"
 )
 
 // Client wraps an MLX runner subprocess to implement llm.LlamaServer for LLM models.
@@ -68,7 +68,7 @@ func NewClient(modelName string) (*Client, error) {
 		exe = eval
 	}
 
-	// Spawn subprocess: ollama runner --mlx-engine --model <name> --port <port>
+	// Spawn subprocess: psyllama runner --mlx-engine --model <name> --port <port>
 	cmd := exec.Command(exe, "runner", "--mlx-engine", "--model", modelName, "--port", strconv.Itoa(port))
 	cmd.Env = os.Environ()
 
@@ -83,8 +83,8 @@ func NewClient(modelName string) (*Client, error) {
 	}
 
 	if libPathEnvVar != "" {
-		libraryPaths := []string{ml.LibOllamaPath}
-		if mlxDirs, err := filepath.Glob(filepath.Join(ml.LibOllamaPath, "mlx_*")); err == nil {
+		libraryPaths := []string{ml.LibPsyllamaPath}
+		if mlxDirs, err := filepath.Glob(filepath.Join(ml.LibPsyllamaPath, "mlx_*")); err == nil {
 			libraryPaths = append(libraryPaths, mlxDirs...)
 		}
 

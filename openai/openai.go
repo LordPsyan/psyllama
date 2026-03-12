@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/types/model"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/types/model"
 )
 
 var finishReasonToolCalls = "tool_calls"
@@ -137,7 +137,7 @@ type ChatCompletionChunk struct {
 	Usage             *Usage        `json:"usage,omitempty"`
 }
 
-// TODO (https://github.com/ollama/ollama/issues/5259): support []string, []int and [][]int
+// TODO (https://github.com/LordPsyan/psyllama/issues/5259): support []string, []int and [][]int
 type CompletionRequest struct {
 	Model            string         `json:"model"`
 	Prompt           string         `json:"prompt"`
@@ -272,7 +272,7 @@ func ToChatCompletion(id string, r api.ChatResponse) ChatCompletion {
 		Object:            "chat.completion",
 		Created:           r.CreatedAt.Unix(),
 		Model:             r.Model,
-		SystemFingerprint: "fp_ollama",
+		SystemFingerprint: "fp_psyllama",
 		Choices: []Choice{{
 			Index:   0,
 			Message: Message{Role: r.Message.Role, Content: r.Message.Content, ToolCalls: toolCalls, Reasoning: r.Message.Thinking},
@@ -305,7 +305,7 @@ func ToChunk(id string, r api.ChatResponse, toolCallSent bool) ChatCompletionChu
 		Object:            "chat.completion.chunk",
 		Created:           time.Now().Unix(),
 		Model:             r.Model,
-		SystemFingerprint: "fp_ollama",
+		SystemFingerprint: "fp_psyllama",
 		Choices: []ChunkChoice{{
 			Index: 0,
 			Delta: Message{Role: "assistant", Content: r.Message.Content, ToolCalls: toolCalls, Reasoning: r.Message.Thinking},
@@ -339,7 +339,7 @@ func ToCompletion(id string, r api.GenerateResponse) Completion {
 		Object:            "text_completion",
 		Created:           r.CreatedAt.Unix(),
 		Model:             r.Model,
-		SystemFingerprint: "fp_ollama",
+		SystemFingerprint: "fp_psyllama",
 		Choices: []CompleteChunkChoice{{
 			Text:  r.Response,
 			Index: 0,
@@ -361,7 +361,7 @@ func ToCompleteChunk(id string, r api.GenerateResponse) CompletionChunk {
 		Object:            "text_completion",
 		Created:           time.Now().Unix(),
 		Model:             r.Model,
-		SystemFingerprint: "fp_ollama",
+		SystemFingerprint: "fp_psyllama",
 		Choices: []CompleteChunkChoice{{
 			Text:  r.Response,
 			Index: 0,
@@ -760,7 +760,7 @@ type ImageURLOrData struct {
 	B64JSON string `json:"b64_json,omitempty"`
 }
 
-// FromImageGenerationRequest converts an OpenAI image generation request to an Ollama GenerateRequest.
+// FromImageGenerationRequest converts an OpenAI image generation request to an Psyllama GenerateRequest.
 func FromImageGenerationRequest(r ImageGenerationRequest) api.GenerateRequest {
 	req := api.GenerateRequest{
 		Model:  r.Model,
@@ -783,7 +783,7 @@ func FromImageGenerationRequest(r ImageGenerationRequest) api.GenerateRequest {
 	return req
 }
 
-// ToImageGenerationResponse converts an Ollama GenerateResponse to an OpenAI ImageGenerationResponse.
+// ToImageGenerationResponse converts an Psyllama GenerateResponse to an OpenAI ImageGenerationResponse.
 func ToImageGenerationResponse(resp api.GenerateResponse) ImageGenerationResponse {
 	var data []ImageURLOrData
 	if resp.Image != "" {
@@ -804,7 +804,7 @@ type ImageEditRequest struct {
 	Seed   *int64 `json:"seed,omitempty"`
 }
 
-// FromImageEditRequest converts an OpenAI image edit request to an Ollama GenerateRequest.
+// FromImageEditRequest converts an OpenAI image edit request to an Psyllama GenerateRequest.
 func FromImageEditRequest(r ImageEditRequest) (api.GenerateRequest, error) {
 	req := api.GenerateRequest{
 		Model:  r.Model,

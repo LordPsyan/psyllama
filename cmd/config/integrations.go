@@ -12,10 +12,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ollama/ollama/api"
-	internalcloud "github.com/ollama/ollama/internal/cloud"
-	"github.com/ollama/ollama/internal/modelref"
-	"github.com/ollama/ollama/progress"
+	"github.com/LordPsyan/psyllama/api"
+	internalcloud "github.com/LordPsyan/psyllama/internal/cloud"
+	"github.com/LordPsyan/psyllama/internal/modelref"
+	"github.com/LordPsyan/psyllama/progress"
 	"github.com/spf13/cobra"
 )
 
@@ -317,7 +317,7 @@ func SelectModelWithSelector(ctx context.Context, selector SingleSelector) (stri
 	}
 
 	if len(items) == 0 {
-		return "", fmt.Errorf("no models available, run 'ollama pull <model>' first")
+		return "", fmt.Errorf("no models available, run 'psyllama pull <model>' first")
 	}
 
 	selected, err := selector("Select model to run:", items, "")
@@ -612,7 +612,7 @@ func listModels(ctx context.Context) ([]ModelItem, map[string]bool, map[string]b
 	}
 
 	if len(items) == 0 {
-		return nil, nil, nil, nil, fmt.Errorf("no models available, run 'ollama pull <model>' first")
+		return nil, nil, nil, nil, fmt.Errorf("no models available, run 'psyllama pull <model>' first")
 	}
 
 	return items, existingModels, cloudModels, client, nil
@@ -757,7 +757,7 @@ func LaunchIntegration(name string) error {
 	}
 
 	// No saved config - prompt user to run setup
-	return fmt.Errorf("%s is not configured. Run 'ollama launch %s' to set it up", r, name)
+	return fmt.Errorf("%s is not configured. Run 'psyllama launch %s' to set it up", r, name)
 }
 
 // LaunchIntegrationWithModel launches the named integration with the specified model.
@@ -873,10 +873,10 @@ func LaunchCmd(checkServerHeartbeat func(cmd *cobra.Command, args []string) erro
 
 	cmd := &cobra.Command{
 		Use:   "launch [INTEGRATION] [-- [EXTRA_ARGS...]]",
-		Short: "Launch the Ollama menu or an integration",
-		Long: `Launch the Ollama interactive menu, or directly launch a specific integration.
+		Short: "Launch the Psyllama menu or an integration",
+		Long: `Launch the Psyllama interactive menu, or directly launch a specific integration.
 
-Without arguments, this is equivalent to running 'ollama' directly.
+Without arguments, this is equivalent to running 'psyllama' directly.
 
 Supported integrations:
   claude    Claude Code
@@ -888,16 +888,16 @@ Supported integrations:
   pi        Pi
 
 Examples:
-  ollama launch
-  ollama launch claude
-  ollama launch claude --model <model>
-  ollama launch droid --config (does not auto-launch)
-  ollama launch codex -- -p myprofile (pass extra args to integration)
-  ollama launch codex -- --sandbox workspace-write`,
+  psyllama launch
+  psyllama launch claude
+  psyllama launch claude --model <model>
+  psyllama launch droid --config (does not auto-launch)
+  psyllama launch codex -- -p myprofile (pass extra args to integration)
+  psyllama launch codex -- --sandbox workspace-write`,
 		Args:    cobra.ArbitraryArgs,
 		PreRunE: checkServerHeartbeat,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// No args and no flags - show the full TUI (same as bare 'ollama')
+			// No args and no flags - show the full TUI (same as bare 'psyllama')
 			if len(args) == 0 && modelFlag == "" && !configFlag {
 				runTUI(cmd)
 				return nil
@@ -1123,7 +1123,7 @@ Examples:
 				if launch, _ := confirmPrompt(fmt.Sprintf("\nLaunch %s now?", r)); launch {
 					return runIntegration(name, models[0], passArgs)
 				}
-				fmt.Fprintf(os.Stderr, "Run 'ollama launch %s' to start with %s\n", strings.ToLower(name), models[0])
+				fmt.Fprintf(os.Stderr, "Run 'psyllama launch %s' to start with %s\n", strings.ToLower(name), models[0])
 				return nil
 			}
 

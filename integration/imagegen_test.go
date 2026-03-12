@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/api"
 )
 
 func TestImageGeneration(t *testing.T) {
@@ -62,7 +62,7 @@ func TestImageGeneration(t *testing.T) {
 					t.Skip("insufficient memory for image generation")
 				} else if strings.Contains(err.Error(), "error while loading shared libraries: libcuda.so.1") { // AMD GPU or CPU
 					t.Skip("CUDA GPU is not available")
-				} else if strings.Contains(err.Error(), "ollama-mlx: no such file or directory") {
+				} else if strings.Contains(err.Error(), "psyllama-mlx: no such file or directory") {
 					// most likely linux arm - not supported yet
 					t.Skip("unsupported architecture")
 				}
@@ -123,7 +123,7 @@ func TestImageGeneration(t *testing.T) {
 	}
 }
 
-// generateImage calls the Ollama API to generate an image and returns the base64 image data
+// generateImage calls the Psyllama API to generate an image and returns the base64 image data
 func generateImage(ctx context.Context, client *api.Client, model, prompt string) (string, error) {
 	var imageBase64 string
 

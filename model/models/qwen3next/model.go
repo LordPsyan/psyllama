@@ -8,14 +8,14 @@ import (
 	"math"
 	"slices"
 
-	"github.com/ollama/ollama/fs"
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/ml/nn"
-	"github.com/ollama/ollama/ml/nn/rope"
-	"github.com/ollama/ollama/model"
-	"github.com/ollama/ollama/model/input"
-	"github.com/ollama/ollama/model/models/qwen3vl"
-	"github.com/ollama/ollama/tokenizer"
+	"github.com/LordPsyan/psyllama/fs"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/ml/nn"
+	"github.com/LordPsyan/psyllama/ml/nn/rope"
+	"github.com/LordPsyan/psyllama/model"
+	"github.com/LordPsyan/psyllama/model/input"
+	"github.com/LordPsyan/psyllama/model/models/qwen3vl"
+	"github.com/LordPsyan/psyllama/tokenizer"
 )
 
 // Options contains model configuration

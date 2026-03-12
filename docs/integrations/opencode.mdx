@@ -14,18 +14,18 @@ curl -fsSL https://opencode.ai/install | bash
 
 <Note>OpenCode requires a larger context window. It is recommended to use a context window of at least 64k tokens. See [Context length](/context-length) for more information.</Note>
 
-## Usage with Ollama
+## Usage with Psyllama
 
 ### Quick setup
 
 ```bash
-ollama launch opencode
+psyllama launch opencode
 ```
 
 To configure without launching:
 
 ```shell
-ollama launch opencode --config
+psyllama launch opencode --config
 ```
 
 ### Manual setup
@@ -36,9 +36,9 @@ Add a configuration block to `~/.config/opencode/opencode.json`:
 {
   "$schema": "https://opencode.ai/config.json",
   "provider": {
-    "ollama": {
+    "psyllama": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama",
+      "name": "Psyllama",
       "options": {
         "baseURL": "http://localhost:11434/v1"
       },
@@ -62,9 +62,9 @@ Add the cloud configuration to `~/.config/opencode/opencode.json`:
 {
   "$schema": "https://opencode.ai/config.json",
   "provider": {
-    "ollama": {
+    "psyllama": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama",
+      "name": "Psyllama",
       "options": {
         "baseURL": "http://localhost:11434/v1"
       },
@@ -78,20 +78,20 @@ Add the cloud configuration to `~/.config/opencode/opencode.json`:
 }
 ```
 
-## Connecting to ollama.com
+## Connecting to psyllama.com
 
-1. Create an [API key](https://ollama.com/settings/keys) from ollama.com and export it as `OLLAMA_API_KEY`.
-2. Update `~/.config/opencode/opencode.json` to point to ollama.com:
+1. Create an [API key](https://psyllama.com/settings/keys) from psyllama.com and export it as `PSYLLAMA_API_KEY`.
+2. Update `~/.config/opencode/opencode.json` to point to psyllama.com:
 
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
   "provider": {
-    "ollama": {
+    "psyllama": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama Cloud",
+      "name": "Psyllama Cloud",
       "options": {
-        "baseURL": "https://ollama.com/v1"
+        "baseURL": "https://psyllama.com/v1"
       },
       "models": {
         "glm-4.7:cloud": {

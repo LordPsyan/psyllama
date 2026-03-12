@@ -13,8 +13,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 
-	"github.com/ollama/ollama/anthropic"
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/anthropic"
+	"github.com/LordPsyan/psyllama/api"
 )
 
 func captureAnthropicRequest(capturedRequest any) gin.HandlerFunc {
@@ -439,7 +439,7 @@ func TestAnthropicWriter_NonStreaming(t *testing.T) {
 	router := gin.New()
 	router.Use(AnthropicMessagesMiddleware())
 	router.POST("/v1/messages", func(c *gin.Context) {
-		// Simulate Ollama response
+		// Simulate Psyllama response
 		resp := api.ChatResponse{
 			Model: "test-model",
 			Message: api.Message{
@@ -945,7 +945,7 @@ func TestWebSearchToolPresent_ModelCallsIt_NonStreaming(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	enableCloudForTest(t)
 
-	// Create a mock Ollama server that responds to the followup /api/chat call
+	// Create a mock Psyllama server that responds to the followup /api/chat call
 	followupServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		resp := api.ChatResponse{
 			Model: "test-model",
@@ -961,13 +961,13 @@ func TestWebSearchToolPresent_ModelCallsIt_NonStreaming(t *testing.T) {
 	}))
 	defer followupServer.Close()
 
-	// Set OLLAMA_HOST to our mock server so the followup call goes there
-	t.Setenv("OLLAMA_HOST", followupServer.URL)
+	// Set PSYLLAMA_HOST to our mock server so the followup call goes there
+	t.Setenv("PSYLLAMA_HOST", followupServer.URL)
 
 	// Also mock the web search API
 	searchServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp := anthropic.OllamaWebSearchResponse{
-			Results: []anthropic.OllamaWebSearchResult{
+		resp := anthropic.PsyllamaWebSearchResponse{
+			Results: []anthropic.PsyllamaWebSearchResult{
 				{Title: "Test Result", URL: "https://example.com/result", Content: "Some content"},
 			},
 		}
@@ -1083,12 +1083,12 @@ func TestWebSearchToolPresent_ModelCallsIt_Streaming(t *testing.T) {
 		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer followupServer.Close()
-	t.Setenv("OLLAMA_HOST", followupServer.URL)
+	t.Setenv("PSYLLAMA_HOST", followupServer.URL)
 
 	// Mock web search API
 	searchServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp := anthropic.OllamaWebSearchResponse{
-			Results: []anthropic.OllamaWebSearchResult{
+		resp := anthropic.PsyllamaWebSearchResponse{
+			Results: []anthropic.PsyllamaWebSearchResult{
 				{Title: "News Result", URL: "https://example.com/news", Content: "Breaking news"},
 			},
 		}
@@ -1795,7 +1795,7 @@ func TestWebSearchCloudModelGating(t *testing.T) {
 	})
 
 	t.Run("cloud disabled blocks web search for cloud model", func(t *testing.T) {
-		t.Setenv("OLLAMA_NO_CLOUD", "1")
+		t.Setenv("PSYLLAMA_NO_CLOUD", "1")
 
 		handlerCalled := false
 		router := gin.New()
@@ -1821,13 +1821,13 @@ func TestWebSearchCloudModelGating(t *testing.T) {
 		if err := json.Unmarshal(resp.Body.Bytes(), &errResp); err != nil {
 			t.Fatalf("failed to parse error response: %v", err)
 		}
-		if !strings.Contains(errResp.Error.Message, "ollama cloud is disabled") {
+		if !strings.Contains(errResp.Error.Message, "psyllama cloud is disabled") {
 			t.Fatalf("expected cloud disabled error, got: %q", errResp.Error.Message)
 		}
 	})
 
 	t.Run("cloud disabled does not block local model if web_search is not called", func(t *testing.T) {
-		t.Setenv("OLLAMA_NO_CLOUD", "1")
+		t.Setenv("PSYLLAMA_NO_CLOUD", "1")
 
 		handlerCalled := false
 		router := gin.New()
@@ -1868,8 +1868,8 @@ func TestWebSearchDoesNotRequireAuthorizationHeaderForMockEndpoint(t *testing.T)
 	var authHeader string
 	searchServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader = r.Header.Get("Authorization")
-		resp := anthropic.OllamaWebSearchResponse{
-			Results: []anthropic.OllamaWebSearchResult{
+		resp := anthropic.PsyllamaWebSearchResponse{
+			Results: []anthropic.PsyllamaWebSearchResult{
 				{Title: "Result", URL: "https://example.com", Content: "content"},
 			},
 		}
@@ -1891,7 +1891,7 @@ func TestWebSearchDoesNotRequireAuthorizationHeaderForMockEndpoint(t *testing.T)
 		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer followupServer.Close()
-	t.Setenv("OLLAMA_HOST", followupServer.URL)
+	t.Setenv("PSYLLAMA_HOST", followupServer.URL)
 
 	router := gin.New()
 	router.Use(AnthropicMessagesMiddleware())
@@ -2030,11 +2030,11 @@ func TestWebSearchStreamingImmediateTakeover(t *testing.T) {
 		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer followupServer.Close()
-	t.Setenv("OLLAMA_HOST", followupServer.URL)
+	t.Setenv("PSYLLAMA_HOST", followupServer.URL)
 
 	searchServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp := anthropic.OllamaWebSearchResponse{
-			Results: []anthropic.OllamaWebSearchResult{
+		resp := anthropic.PsyllamaWebSearchResponse{
+			Results: []anthropic.PsyllamaWebSearchResult{
 				{Title: "Result", URL: "https://example.com", Content: "content"},
 			},
 		}
@@ -2142,11 +2142,11 @@ func TestWebSearchStreamingUsageUsesObservedChunkMetrics(t *testing.T) {
 		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer followupServer.Close()
-	t.Setenv("OLLAMA_HOST", followupServer.URL)
+	t.Setenv("PSYLLAMA_HOST", followupServer.URL)
 
 	searchServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp := anthropic.OllamaWebSearchResponse{
-			Results: []anthropic.OllamaWebSearchResult{
+		resp := anthropic.PsyllamaWebSearchResponse{
+			Results: []anthropic.PsyllamaWebSearchResult{
 				{Title: "Result", URL: "https://example.com", Content: "content"},
 			},
 		}
@@ -2255,11 +2255,11 @@ func TestWebSearchMixedToolCallsPreferWebSearch(t *testing.T) {
 		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer followupServer.Close()
-	t.Setenv("OLLAMA_HOST", followupServer.URL)
+	t.Setenv("PSYLLAMA_HOST", followupServer.URL)
 
 	searchServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp := anthropic.OllamaWebSearchResponse{
-			Results: []anthropic.OllamaWebSearchResult{
+		resp := anthropic.PsyllamaWebSearchResponse{
+			Results: []anthropic.PsyllamaWebSearchResult{
 				{Title: "Result", URL: "https://example.com", Content: "content"},
 			},
 		}
@@ -2370,11 +2370,11 @@ func TestWebSearchFollowupClientToolStopReasonToolUse(t *testing.T) {
 		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer followupServer.Close()
-	t.Setenv("OLLAMA_HOST", followupServer.URL)
+	t.Setenv("PSYLLAMA_HOST", followupServer.URL)
 
 	searchServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp := anthropic.OllamaWebSearchResponse{
-			Results: []anthropic.OllamaWebSearchResult{
+		resp := anthropic.PsyllamaWebSearchResponse{
+			Results: []anthropic.PsyllamaWebSearchResult{
 				{Title: "Result", URL: "https://example.com", Content: "content"},
 			},
 		}
@@ -2514,11 +2514,11 @@ func TestWebSearchMultiIterationLoop(t *testing.T) {
 		}
 	}))
 	defer followupServer.Close()
-	t.Setenv("OLLAMA_HOST", followupServer.URL)
+	t.Setenv("PSYLLAMA_HOST", followupServer.URL)
 
 	searchServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp := anthropic.OllamaWebSearchResponse{
-			Results: []anthropic.OllamaWebSearchResult{
+		resp := anthropic.PsyllamaWebSearchResponse{
+			Results: []anthropic.PsyllamaWebSearchResult{
 				{Title: "Result", URL: "https://example.com", Content: "content"},
 			},
 		}
@@ -2632,11 +2632,11 @@ func TestWebSearchLoopMaxLimit(t *testing.T) {
 		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer followupServer.Close()
-	t.Setenv("OLLAMA_HOST", followupServer.URL)
+	t.Setenv("PSYLLAMA_HOST", followupServer.URL)
 
 	searchServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp := anthropic.OllamaWebSearchResponse{
-			Results: []anthropic.OllamaWebSearchResult{
+		resp := anthropic.PsyllamaWebSearchResponse{
+			Results: []anthropic.PsyllamaWebSearchResult{
 				{Title: "Result", URL: "https://example.com", Content: "content"},
 			},
 		}
@@ -2740,11 +2740,11 @@ func TestWebSearchStreamingFinalStopReasonToolUse(t *testing.T) {
 		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer followupServer.Close()
-	t.Setenv("OLLAMA_HOST", followupServer.URL)
+	t.Setenv("PSYLLAMA_HOST", followupServer.URL)
 
 	searchServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp := anthropic.OllamaWebSearchResponse{
-			Results: []anthropic.OllamaWebSearchResult{
+		resp := anthropic.PsyllamaWebSearchResponse{
+			Results: []anthropic.PsyllamaWebSearchResult{
 				{Title: "Result", URL: "https://example.com", Content: "content"},
 			},
 		}
@@ -2860,11 +2860,11 @@ func TestWebSearchFollowupNon200ReturnsApiError(t *testing.T) {
 		http.Error(w, "boom", http.StatusInternalServerError)
 	}))
 	defer followupServer.Close()
-	t.Setenv("OLLAMA_HOST", followupServer.URL)
+	t.Setenv("PSYLLAMA_HOST", followupServer.URL)
 
 	searchServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp := anthropic.OllamaWebSearchResponse{
-			Results: []anthropic.OllamaWebSearchResult{
+		resp := anthropic.PsyllamaWebSearchResponse{
+			Results: []anthropic.PsyllamaWebSearchResult{
 				{Title: "Result", URL: "https://example.com", Content: "content"},
 			},
 		}

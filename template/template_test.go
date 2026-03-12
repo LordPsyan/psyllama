@@ -14,8 +14,8 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/fs/ggml"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/fs/ggml"
 )
 
 func TestNamed(t *testing.T) {
@@ -351,10 +351,10 @@ Hello friend![/INST] Hello human![INST] What is your name?[/INST] `,
 					{Role: "user", Content: "Hello friend!"},
 					{Role: "assistant", Content: "Hello human!"},
 					{Role: "user", Content: "What is your name?"},
-					{Role: "assistant", Content: "My name is Ollama and I"},
+					{Role: "assistant", Content: "My name is Psyllama and I"},
 				},
 			},
-			`[INST] Hello friend![/INST] Hello human![INST] What is your name?[/INST] My name is Ollama and I`,
+			`[INST] Hello friend![/INST] Hello human![INST] What is your name?[/INST] My name is Psyllama and I`,
 		},
 		{
 			"chatml",

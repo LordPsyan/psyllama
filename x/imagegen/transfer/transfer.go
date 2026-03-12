@@ -98,7 +98,7 @@ const (
 	DefaultDownloadConcurrency = 64
 	DefaultUploadConcurrency   = 32
 	maxRetries                 = 6
-	defaultUserAgent           = "ollama-transfer/1.0"
+	defaultUserAgent           = "psyllama-transfer/1.0"
 )
 
 var errMaxRetriesExceeded = errors.New("max retries exceeded")

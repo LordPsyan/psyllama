@@ -5,10 +5,10 @@ import (
 	"math"
 	"slices"
 
-	"github.com/ollama/ollama/fs"
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/ml/nn"
-	"github.com/ollama/ollama/ml/nn/rope"
+	"github.com/LordPsyan/psyllama/fs"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/ml/nn"
+	"github.com/LordPsyan/psyllama/ml/nn/rope"
 )
 
 type Grid struct {
@@ -131,7 +131,7 @@ func (sa *VisionSelfAttention) Forward(ctx ml.Context, hiddenStates, positions m
 
 	slog.Warn("glmocr: vision attention falling back to manual attention",
 		"batchSize", batchSize, "numHeads", opts.numHeads,
-		"hint", "set OLLAMA_FLASH_ATTENTION=1 to enable flash attention")
+		"hint", "set PSYLLAMA_FLASH_ATTENTION=1 to enable flash attention")
 
 	// Manual attention fallback
 	// q, k, v are [headDim, numHeads, batchSize] - GGML treats as 4D with implicit dim 3 = 1
@@ -211,7 +211,7 @@ func (d *VisionDownsample) Forward(ctx ml.Context, hiddenStates ml.Tensor, grid 
 	hiddenStates = hiddenStates.Permute(ctx, 2, 0, 1, 3).Contiguous(ctx)
 
 	// Step 3: Apply Conv2D without bias (bias added after reshape)
-	// Note: ggml_conv_2d takes (kernel, input) - kernel must be receiver in ollama
+	// Note: ggml_conv_2d takes (kernel, input) - kernel must be receiver in psyllama
 	s0, s1 := merge, merge
 	p0, p1 := 0, 0
 	d0, d1 := 1, 1

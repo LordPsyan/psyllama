@@ -14,9 +14,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/types/model"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/envconfig"
+	"github.com/LordPsyan/psyllama/types/model"
 )
 
 const defaultGatewayPort = 18789
@@ -55,14 +55,14 @@ func (c *Openclaw) Run(model string, args []string) error {
 	}
 
 	if !c.onboarded() {
-		fmt.Fprintf(os.Stderr, "\n%sSetting up OpenClaw with Ollama...%s\n", ansiGreen, ansiReset)
+		fmt.Fprintf(os.Stderr, "\n%sSetting up OpenClaw with Psyllama...%s\n", ansiGreen, ansiReset)
 		fmt.Fprintf(os.Stderr, "%s  Model: %s%s\n\n", ansiGray, model, ansiReset)
 
 		cmd := exec.Command(bin, "onboard",
 			"--non-interactive",
 			"--accept-risk",
 			"--auth-choice", "skip",
-			"--gateway-token", "ollama",
+			"--gateway-token", "psyllama",
 			"--install-daemon",
 			"--skip-channels",
 			"--skip-skills",
@@ -229,7 +229,7 @@ func printOpenclawReady(bin, token string, port int, firstLaunch bool) {
 }
 
 // openclawEnv returns the current environment with provider API keys cleared
-// so openclaw only uses the Ollama gateway, not keys from the user's shell.
+// so openclaw only uses the Psyllama gateway, not keys from the user's shell.
 func openclawEnv() []string {
 	clear := map[string]bool{
 		"ANTHROPIC_API_KEY":     true,
@@ -422,7 +422,7 @@ func ensureOpenclawInstalled() (string, error) {
 			"Install Node.js first:\n" +
 			"  https://nodejs.org/\n\n" +
 			"Then rerun:\n" +
-			"  ollama launch\n" +
+			"  psyllama launch\n" +
 			"and select OpenClaw")
 	}
 
@@ -488,7 +488,7 @@ func (c *Openclaw) Edit(models []string) error {
 		_ = json.Unmarshal(data, &config)
 	}
 
-	// Navigate/create: models.providers.ollama (preserving other providers)
+	// Navigate/create: models.providers.psyllama (preserving other providers)
 	modelsSection, _ := config["models"].(map[string]any)
 	if modelsSection == nil {
 		modelsSection = make(map[string]any)
@@ -497,18 +497,18 @@ func (c *Openclaw) Edit(models []string) error {
 	if providers == nil {
 		providers = make(map[string]any)
 	}
-	ollama, _ := providers["ollama"].(map[string]any)
-	if ollama == nil {
-		ollama = make(map[string]any)
+	psyllama, _ := providers["psyllama"].(map[string]any)
+	if psyllama == nil {
+		psyllama = make(map[string]any)
 	}
 
-	ollama["baseUrl"] = envconfig.Host().String()
+	psyllama["baseUrl"] = envconfig.Host().String()
 	// needed to register provider
-	ollama["apiKey"] = "ollama-local"
-	ollama["api"] = "ollama"
+	psyllama["apiKey"] = "psyllama-local"
+	psyllama["api"] = "psyllama"
 
 	// Build map of existing models to preserve user customizations
-	existingModels, _ := ollama["models"].([]any)
+	existingModels, _ := psyllama["models"].([]any)
 	existingByID := make(map[string]map[string]any)
 	for _, m := range existingModels {
 		if entry, ok := m.(map[string]any); ok {
@@ -533,9 +533,9 @@ func (c *Openclaw) Edit(models []string) error {
 		}
 		newModels = append(newModels, entry)
 	}
-	ollama["models"] = newModels
+	psyllama["models"] = newModels
 
-	providers["ollama"] = ollama
+	providers["psyllama"] = psyllama
 	modelsSection["providers"] = providers
 	config["models"] = modelsSection
 
@@ -552,7 +552,7 @@ func (c *Openclaw) Edit(models []string) error {
 	if modelConfig == nil {
 		modelConfig = make(map[string]any)
 	}
-	modelConfig["primary"] = "ollama/" + models[0]
+	modelConfig["primary"] = "psyllama/" + models[0]
 	defaults["model"] = modelConfig
 	agents["defaults"] = defaults
 	config["agents"] = agents
@@ -606,7 +606,7 @@ func clearSessionModelOverride(primary string) {
 	_ = os.WriteFile(path, out, 0o600)
 }
 
-const webSearchNpmPackage = "@ollama/openclaw-web-search"
+const webSearchNpmPackage = "@psyllama/openclaw-web-search"
 
 // ensureWebSearchPlugin installs the openclaw-web-search extension into the
 // user-level extensions directory (~/.openclaw/extensions/) if it isn't already
@@ -786,8 +786,8 @@ func (c *Openclaw) Models() []string {
 
 	modelsSection, _ := config["models"].(map[string]any)
 	providers, _ := modelsSection["providers"].(map[string]any)
-	ollama, _ := providers["ollama"].(map[string]any)
-	modelList, _ := ollama["models"].([]any)
+	psyllama, _ := providers["psyllama"].(map[string]any)
+	modelList, _ := psyllama["models"].([]any)
 
 	var result []string
 	for _, m := range modelList {

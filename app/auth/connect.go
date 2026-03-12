@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/ollama/ollama/auth"
+	"github.com/LordPsyan/psyllama/auth"
 )
 
 // BuildConnectURL generates the connect URL with the public key and device name

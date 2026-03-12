@@ -7,8 +7,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/logutil"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/logutil"
 )
 
 // TODO: call the init function

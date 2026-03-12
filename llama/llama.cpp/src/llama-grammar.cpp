@@ -1041,7 +1041,7 @@ llama_grammar_candidates llama_grammar_reject_candidates_for_stack(
 
 struct llama_grammar * llama_grammar_init_impl(
         const struct llama_vocab * vocab,
-        const struct ollama_vocab * ollama_vocab,
+        const struct psyllama_vocab * psyllama_vocab,
         const llama_grammar_element ** rules,
         size_t n_rules,
         size_t start_rule_index) {
@@ -1097,7 +1097,7 @@ struct llama_grammar * llama_grammar_init_impl(
     // then the pointers would be invalidated when the local vec_rules goes out of scope.
     return new llama_grammar {
         vocab,
-        ollama_vocab,
+        psyllama_vocab,
         std::move(vec_rules),
         std::move(stacks),
         /* .partial_utf8 = */             {},
@@ -1112,7 +1112,7 @@ struct llama_grammar * llama_grammar_init_impl(
 
 struct llama_grammar * llama_grammar_init_impl(
         const struct llama_vocab * vocab,
-        const struct ollama_vocab * ollama_vocab,
+        const struct psyllama_vocab * psyllama_vocab,
                       const char * grammar_str,
                       const char * grammar_root,
                               bool lazy,
@@ -1205,7 +1205,7 @@ struct llama_grammar * llama_grammar_init_impl(
     // then the pointers would be invalidated when the local vec_rules goes out of scope.
     return new llama_grammar {
         vocab,
-        ollama_vocab,
+        psyllama_vocab,
         std::move(vec_rules),
         std::move(stacks),
         /* .partial_utf8 = */             {},
@@ -1446,7 +1446,7 @@ void llama_grammar_accept_token(struct llama_grammar & grammar, llama_token toke
 }
 
 
-const std::string & ollama_vocab::token_to_piece(const uint32_t token) const {
+const std::string & psyllama_vocab::token_to_piece(const uint32_t token) const {
     try {
         return token_to_piece_map.at(token);
     } catch (const std::out_of_range&) {
@@ -1454,17 +1454,17 @@ const std::string & ollama_vocab::token_to_piece(const uint32_t token) const {
     }
 }
 
-void ollama_vocab::add_token_pieces(const uint32_t* tokens, size_t n_tokens, const char** pieces) {
+void psyllama_vocab::add_token_pieces(const uint32_t* tokens, size_t n_tokens, const char** pieces) {
     for (size_t i = 0; i < n_tokens; i++) {
         token_to_piece_map[tokens[i]] = pieces[i];
     }
 }
 
-bool ollama_vocab::is_eog(const uint32_t token) const {
+bool psyllama_vocab::is_eog(const uint32_t token) const {
     return special_eog_ids.count(token) > 0;
 }
 
-void ollama_vocab::set_eog_tokens(const uint32_t* tokens, size_t n_tokens) {
+void psyllama_vocab::set_eog_tokens(const uint32_t* tokens, size_t n_tokens) {
     for (size_t i = 0; i < n_tokens; i++) {
         special_eog_ids.insert(tokens[i]);
     }

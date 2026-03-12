@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/envconfig"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/envconfig"
 )
 
 // Claude implements Runner and AliasConfigurer for Claude Code integration
@@ -62,7 +62,7 @@ func (c *Claude) Run(model string, args []string) error {
 	env := append(os.Environ(),
 		"ANTHROPIC_BASE_URL="+envconfig.Host().String(),
 		"ANTHROPIC_API_KEY=",
-		"ANTHROPIC_AUTH_TOKEN=ollama",
+		"ANTHROPIC_AUTH_TOKEN=psyllama",
 	)
 
 	env = append(env, c.modelEnvVars(model)...)
@@ -71,7 +71,7 @@ func (c *Claude) Run(model string, args []string) error {
 	return cmd.Run()
 }
 
-// modelEnvVars returns Claude Code env vars that route all model tiers through Ollama.
+// modelEnvVars returns Claude Code env vars that route all model tiers through Psyllama.
 func (c *Claude) modelEnvVars(model string) []string {
 	primary := model
 	fast := model
@@ -145,7 +145,7 @@ func (c *Claude) ConfigureAliases(ctx context.Context, model string, existingAli
 	return aliases, true, nil
 }
 
-// SetAliases syncs the configured aliases to the Ollama server using prefix matching.
+// SetAliases syncs the configured aliases to the Psyllama server using prefix matching.
 // Cloud-only: for local models (fast is empty), we delete any existing aliases to
 // prevent stale routing to a previous cloud model.
 func (c *Claude) SetAliases(ctx context.Context, aliases map[string]string) error {

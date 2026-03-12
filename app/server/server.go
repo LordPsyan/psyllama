@@ -18,16 +18,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ollama/ollama/app/logrotate"
-	"github.com/ollama/ollama/app/store"
+	"github.com/LordPsyan/psyllama/app/logrotate"
+	"github.com/LordPsyan/psyllama/app/store"
 )
 
 const restartDelay = time.Second
 
-// Server is a managed ollama server process
+// Server is a managed psyllama server process
 type Server struct {
 	store *store.Store
-	bin   string // resolved path to `ollama`
+	bin   string // resolved path to `psyllama`
 	log   io.WriteCloser
 	dev   bool // true if running with the dev flag
 }
@@ -47,7 +47,7 @@ type InferenceInfo struct {
 }
 
 func New(s *store.Store, devMode bool) *Server {
-	p := resolvePath("ollama")
+	p := resolvePath("psyllama")
 	return &Server{store: s, bin: p, dev: devMode}
 }
 
@@ -83,7 +83,7 @@ func resolvePath(name string) string {
 	return name
 }
 
-// cleanup checks the pid file for a running ollama process
+// cleanup checks the pid file for a running psyllama process
 // and shuts it down gracefully if it is running
 func cleanup() error {
 	data, err := os.ReadFile(pidFile)
@@ -113,7 +113,7 @@ func cleanup() error {
 		return nil
 	}
 
-	slog.Info("detected previous ollama process, cleaning up", "pid", pid)
+	slog.Info("detected previous psyllama process, cleaning up", "pid", pid)
 	return stop(proc)
 }
 
@@ -141,7 +141,7 @@ func stop(proc *os.Process) error {
 		default:
 			ok, err := terminated(proc.Pid)
 			if err != nil {
-				slog.Error("error checking if ollama process is terminated", "err", err)
+				slog.Error("error checking if psyllama process is terminated", "err", err)
 				return err
 			}
 			if ok {
@@ -161,7 +161,7 @@ func (s *Server) Run(ctx context.Context) error {
 	defer s.log.Close()
 
 	if err := cleanup(); err != nil {
-		slog.Warn("failed to cleanup previous ollama process", "err", err)
+		slog.Warn("failed to cleanup previous psyllama process", "err", err)
 	}
 
 	reaped := false
@@ -190,15 +190,15 @@ func (s *Server) Run(ctx context.Context) error {
 			var exitErr *exec.ExitError
 			if errors.As(err, &exitErr) && exitErr.ExitCode() == 1 && !s.dev && !reaped {
 				reaped = true
-				// This could be a port conflict, try to kill any existing ollama processes
+				// This could be a port conflict, try to kill any existing psyllama processes
 				if err := reapServers(); err != nil {
-					slog.Warn("failed to stop existing ollama server", "err", err)
+					slog.Warn("failed to stop existing psyllama server", "err", err)
 				} else {
 					slog.Debug("conflicting server stopped, waiting for port to be released")
 					continue
 				}
 			}
-			slog.Error("ollama exited", "err", err)
+			slog.Error("psyllama exited", "err", err)
 		}
 	}
 	return ctx.Err()
@@ -225,25 +225,25 @@ func (s *Server) cmd(ctx context.Context) (*exec.Cmd, error) {
 		env[s[0]] = s[1]
 	}
 	if settings.Expose {
-		env["OLLAMA_HOST"] = "0.0.0.0"
+		env["PSYLLAMA_HOST"] = "0.0.0.0"
 	}
 	if settings.Browser {
-		env["OLLAMA_ORIGINS"] = "*"
+		env["PSYLLAMA_ORIGINS"] = "*"
 	}
 	if settings.Models != "" {
 		if _, err := os.Stat(settings.Models); err == nil {
-			env["OLLAMA_MODELS"] = settings.Models
+			env["PSYLLAMA_MODELS"] = settings.Models
 		} else {
 			slog.Warn("models path not accessible, using default", "path", settings.Models, "err", err)
 		}
 	}
 	if settings.ContextLength > 0 {
-		env["OLLAMA_CONTEXT_LENGTH"] = strconv.Itoa(settings.ContextLength)
+		env["PSYLLAMA_CONTEXT_LENGTH"] = strconv.Itoa(settings.ContextLength)
 	}
 	if cloudDisabled {
-		env["OLLAMA_NO_CLOUD"] = "1"
+		env["PSYLLAMA_NO_CLOUD"] = "1"
 	} else {
-		env["OLLAMA_NO_CLOUD"] = "0"
+		env["PSYLLAMA_NO_CLOUD"] = "0"
 	}
 	cmd.Env = []string{}
 	for k, v := range env {

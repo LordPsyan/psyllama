@@ -16,9 +16,9 @@ set(MLX_BUILD_SAFETENSORS ON)
 function(set_target_output_directory _target)
     if(TARGET ${_target})
         set_target_properties(${_target} PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY ${OLLAMA_BUILD_DIR}
-            LIBRARY_OUTPUT_DIRECTORY ${OLLAMA_BUILD_DIR}
-            ARCHIVE_OUTPUT_DIRECTORY ${OLLAMA_BUILD_DIR}
+            RUNTIME_OUTPUT_DIRECTORY ${PSYLLAMA_BUILD_DIR}
+            LIBRARY_OUTPUT_DIRECTORY ${PSYLLAMA_BUILD_DIR}
+            ARCHIVE_OUTPUT_DIRECTORY ${PSYLLAMA_BUILD_DIR}
         )
     endif()
 endfunction()
@@ -68,13 +68,13 @@ endif()
 
 # Allow local source overrides via environment variables
 # Resolve to absolute paths so FetchContent doesn't break on relative dirs.
-if(DEFINED ENV{OLLAMA_MLX_SOURCE})
-    get_filename_component(_mlx_src "$ENV{OLLAMA_MLX_SOURCE}" ABSOLUTE BASE_DIR ${CMAKE_SOURCE_DIR})
+if(DEFINED ENV{PSYLLAMA_MLX_SOURCE})
+    get_filename_component(_mlx_src "$ENV{PSYLLAMA_MLX_SOURCE}" ABSOLUTE BASE_DIR ${CMAKE_SOURCE_DIR})
     set(FETCHCONTENT_SOURCE_DIR_MLX "${_mlx_src}" CACHE PATH "" FORCE)
     message(STATUS "Using local MLX source: ${_mlx_src}")
 endif()
-if(DEFINED ENV{OLLAMA_MLX_C_SOURCE})
-    get_filename_component(_mlx_c_src "$ENV{OLLAMA_MLX_C_SOURCE}" ABSOLUTE BASE_DIR ${CMAKE_SOURCE_DIR})
+if(DEFINED ENV{PSYLLAMA_MLX_C_SOURCE})
+    get_filename_component(_mlx_c_src "$ENV{PSYLLAMA_MLX_C_SOURCE}" ABSOLUTE BASE_DIR ${CMAKE_SOURCE_DIR})
     set(FETCHCONTENT_SOURCE_DIR_MLX-C "${_mlx_c_src}" CACHE PATH "" FORCE)
     message(STATUS "Using local MLX-C source: ${_mlx_c_src}")
 endif()

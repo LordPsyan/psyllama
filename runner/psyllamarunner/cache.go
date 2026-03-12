@@ -1,4 +1,4 @@
-package ollamarunner
+package psyllamarunner
 
 import (
 	"errors"
@@ -7,10 +7,10 @@ import (
 	"math"
 	"time"
 
-	"github.com/ollama/ollama/kvcache"
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/model"
-	"github.com/ollama/ollama/model/input"
+	"github.com/LordPsyan/psyllama/kvcache"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/model"
+	"github.com/LordPsyan/psyllama/model/input"
 )
 
 type InputCache struct {

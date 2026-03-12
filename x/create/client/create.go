@@ -16,17 +16,17 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/manifest"
-	"github.com/ollama/ollama/parser"
-	"github.com/ollama/ollama/progress"
-	"github.com/ollama/ollama/types/model"
-	"github.com/ollama/ollama/x/create"
-	"github.com/ollama/ollama/x/imagegen/safetensors"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/manifest"
+	"github.com/LordPsyan/psyllama/parser"
+	"github.com/LordPsyan/psyllama/progress"
+	"github.com/LordPsyan/psyllama/types/model"
+	"github.com/LordPsyan/psyllama/x/create"
+	"github.com/LordPsyan/psyllama/x/imagegen/safetensors"
 )
 
-// MinOllamaVersion is the minimum Ollama version required for safetensors models.
-const MinOllamaVersion = "0.14.0"
+// MinPsyllamaVersion is the minimum Psyllama version required for safetensors models.
+const MinPsyllamaVersion = "0.14.0"
 
 // ModelfileConfig holds configuration extracted from a Modelfile.
 type ModelfileConfig struct {
@@ -339,7 +339,7 @@ func newManifestWriter(opts CreateOptions, capabilities []string, parserName, re
 		configData := model.ConfigV2{
 			ModelFormat:  "safetensors",
 			Capabilities: caps,
-			Requires:     MinOllamaVersion,
+			Requires:     MinPsyllamaVersion,
 			Parser:       resolveParserName(opts.Modelfile, parserName),
 			Renderer:     resolveRendererName(opts.Modelfile, rendererName),
 		}
@@ -399,7 +399,7 @@ func createModelfileLayers(mf *ModelfileConfig) ([]manifest.Layer, error) {
 	var layers []manifest.Layer
 
 	if mf.Template != "" {
-		layer, err := manifest.NewLayer(bytes.NewReader([]byte(mf.Template)), "application/vnd.ollama.image.template")
+		layer, err := manifest.NewLayer(bytes.NewReader([]byte(mf.Template)), "application/vnd.psyllama.image.template")
 		if err != nil {
 			return nil, fmt.Errorf("failed to create template layer: %w", err)
 		}
@@ -407,7 +407,7 @@ func createModelfileLayers(mf *ModelfileConfig) ([]manifest.Layer, error) {
 	}
 
 	if mf.System != "" {
-		layer, err := manifest.NewLayer(bytes.NewReader([]byte(mf.System)), "application/vnd.ollama.image.system")
+		layer, err := manifest.NewLayer(bytes.NewReader([]byte(mf.System)), "application/vnd.psyllama.image.system")
 		if err != nil {
 			return nil, fmt.Errorf("failed to create system layer: %w", err)
 		}
@@ -415,7 +415,7 @@ func createModelfileLayers(mf *ModelfileConfig) ([]manifest.Layer, error) {
 	}
 
 	if mf.License != "" {
-		layer, err := manifest.NewLayer(bytes.NewReader([]byte(mf.License)), "application/vnd.ollama.image.license")
+		layer, err := manifest.NewLayer(bytes.NewReader([]byte(mf.License)), "application/vnd.psyllama.image.license")
 		if err != nil {
 			return nil, fmt.Errorf("failed to create license layer: %w", err)
 		}
@@ -428,7 +428,7 @@ func createModelfileLayers(mf *ModelfileConfig) ([]manifest.Layer, error) {
 			return nil, fmt.Errorf("failed to encode parameters: %w", err)
 		}
 
-		layer, err := manifest.NewLayer(&b, "application/vnd.ollama.image.params")
+		layer, err := manifest.NewLayer(&b, "application/vnd.psyllama.image.params")
 		if err != nil {
 			return nil, fmt.Errorf("failed to create params layer: %w", err)
 		}

@@ -1,5 +1,5 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Jesse Gross <jesse@ollama.com>
+From: Jesse Gross <jesse@psyllama.com>
 Date: Wed, 23 Jul 2025 11:58:49 -0700
 Subject: [PATCH] ggml: No-alloc mode
 

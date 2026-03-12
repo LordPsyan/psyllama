@@ -19,7 +19,7 @@ Structured outputs let you enforce a JSON schema on model responses so you can r
   </Tab>
   <Tab title="Python">
     ```python
-    from ollama import chat
+    from psyllama import chat
 
     response = chat(
       model='gpt-oss',
@@ -31,9 +31,9 @@ Structured outputs let you enforce a JSON schema on model responses so you can r
   </Tab>
   <Tab title="JavaScript">
     ```javascript
-    import ollama from 'ollama'
+    import psyllama from 'psyllama'
 
-    const response = await ollama.chat({
+    const response = await psyllama.chat({
       model: 'gpt-oss',
       messages: [{ role: 'user', content: 'Tell me about Canada.' }],
       format: 'json'
@@ -77,7 +77,7 @@ Provide a JSON schema to the `format` field.
     Use Pydantic models and pass `model_json_schema()` to `format`, then validate the response:
 
     ```python
-    from ollama import chat
+    from psyllama import chat
     from pydantic import BaseModel
 
     class Country(BaseModel):
@@ -99,7 +99,7 @@ Provide a JSON schema to the `format` field.
     Serialize a Zod schema with `zodToJsonSchema()` and parse the structured response:
 
     ```javascript
-    import ollama from 'ollama'
+    import psyllama from 'psyllama'
     import { z } from 'zod'
     import { zodToJsonSchema } from 'zod-to-json-schema'
 
@@ -109,7 +109,7 @@ Provide a JSON schema to the `format` field.
       languages: z.array(z.string()),
     })
 
-    const response = await ollama.chat({
+    const response = await psyllama.chat({
       model: 'gpt-oss',
       messages: [{ role: 'user', content: 'Tell me about Canada.' }],
       format: zodToJsonSchema(Country),
@@ -126,7 +126,7 @@ Provide a JSON schema to the `format` field.
 Define the objects you want returned and let the model populate the fields:
 
 ```python
-from ollama import chat
+from psyllama import chat
 from pydantic import BaseModel
 
 class Pet(BaseModel):
@@ -154,7 +154,7 @@ print(pets)
 Vision models accept the same `format` parameter, enabling deterministic descriptions of images:
 
 ```python
-from ollama import chat
+from psyllama import chat
 from pydantic import BaseModel
 from typing import Literal, Optional
 

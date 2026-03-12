@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/api"
 	"github.com/spf13/cobra"
 )
 
@@ -173,7 +173,7 @@ func TestLaunchCmd_TUICallback(t *testing.T) {
 	t.Run("integration arg bypasses TUI", func(t *testing.T) {
 		srv := httptest.NewServer(http.NotFoundHandler())
 		defer srv.Close()
-		t.Setenv("OLLAMA_HOST", srv.URL)
+		t.Setenv("PSYLLAMA_HOST", srv.URL)
 
 		tuiCalled := false
 		mockTUI := func(cmd *cobra.Command) {
@@ -752,7 +752,7 @@ func TestResolveEditorLaunchModels_PicksWhenAllFiltered(t *testing.T) {
 		}
 	}))
 	defer srv.Close()
-	t.Setenv("OLLAMA_HOST", srv.URL)
+	t.Setenv("PSYLLAMA_HOST", srv.URL)
 
 	pickerCalled := false
 	models, err := resolveEditorModels("opencode", []string{"glm-5:cloud"}, func() ([]string, error) {
@@ -791,7 +791,7 @@ func TestResolveEditorLaunchModels_FiltersAndSkipsPickerWhenLocalRemains(t *test
 		}
 	}))
 	defer srv.Close()
-	t.Setenv("OLLAMA_HOST", srv.URL)
+	t.Setenv("PSYLLAMA_HOST", srv.URL)
 
 	pickerCalled := false
 	models, err := resolveEditorModels("droid", []string{"llama3.2", "glm-5:cloud"}, func() ([]string, error) {
@@ -836,7 +836,7 @@ func TestLaunchCmd_ModelFlagFiltersDisabledCloudFromSavedConfig(t *testing.T) {
 		}
 	}))
 	defer srv.Close()
-	t.Setenv("OLLAMA_HOST", srv.URL)
+	t.Setenv("PSYLLAMA_HOST", srv.URL)
 
 	stub := &stubEditorRunner{}
 	old, existed := integrations["stubeditor"]
@@ -1132,7 +1132,7 @@ func TestSelectModelsWithSelectors_CloudSelection_DoesNotPull(t *testing.T) {
 		}
 	}))
 	defer srv.Close()
-	t.Setenv("OLLAMA_HOST", srv.URL)
+	t.Setenv("PSYLLAMA_HOST", srv.URL)
 
 	single := func(title string, items []ModelItem, current string) (string, error) {
 		for _, item := range items {

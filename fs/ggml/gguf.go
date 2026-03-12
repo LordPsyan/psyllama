@@ -13,7 +13,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/ollama/ollama/fs"
+	"github.com/LordPsyan/psyllama/fs"
 	"golang.org/x/sync/errgroup"
 )
 

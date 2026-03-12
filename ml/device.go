@@ -17,8 +17,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ollama/ollama/format"
-	"github.com/ollama/ollama/logutil"
+	"github.com/LordPsyan/psyllama/format"
+	"github.com/LordPsyan/psyllama/logutil"
 )
 
 // GPULayers is a set of layers to be allocated on a single GPU
@@ -411,7 +411,7 @@ func ByLibrary(l []DeviceInfo) [][]DeviceInfo {
 }
 
 func LibraryPaths(l []DeviceInfo) []string {
-	gpuLibs := []string{LibOllamaPath}
+	gpuLibs := []string{LibPsyllamaPath}
 	for _, gpu := range l {
 		for _, dir := range gpu.LibraryPath {
 			needed := true

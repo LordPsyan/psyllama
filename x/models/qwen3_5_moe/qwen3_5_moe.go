@@ -2,8 +2,8 @@
 package qwen3_5_moe
 
 import (
-	"github.com/ollama/ollama/x/mlxrunner/model/base"
-	"github.com/ollama/ollama/x/models/qwen3_5"
+	"github.com/LordPsyan/psyllama/x/mlxrunner/model/base"
+	"github.com/LordPsyan/psyllama/x/models/qwen3_5"
 )
 
 func init() {

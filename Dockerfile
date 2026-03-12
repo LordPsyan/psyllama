@@ -90,7 +90,7 @@ RUN --mount=type=cache,target=/root/.ccache \
     cmake --preset 'ROCm 7' \
         && cmake --build --preset 'ROCm 7' -- -l $(nproc) \
         && cmake --install build --component HIP --strip
-RUN rm -f dist/lib/ollama/rocm/rocblas/library/*gfx90[06]*
+RUN rm -f dist/lib/psyllama/rocm/rocblas/library/*gfx90[06]*
 
 FROM --platform=linux/arm64 nvcr.io/nvidia/l4t-jetpack:${JETPACK5VERSION} AS jetpack-5
 ARG CMAKEVERSION
@@ -152,7 +152,7 @@ ENV PATH=/usr/local/cuda-13/bin:$PATH
 ENV BLAS_INCLUDE_DIRS=/usr/include/openblas
 ENV LAPACK_INCLUDE_DIRS=/usr/include/openblas
 ENV CGO_LDFLAGS="-L/usr/local/cuda-13/lib64 -L/usr/local/cuda-13/targets/x86_64-linux/lib/stubs"
-WORKDIR /go/src/github.com/ollama/ollama
+WORKDIR /go/src/github.com/psyllama/psyllama
 COPY CMakeLists.txt CMakePresets.json .
 COPY ml/backend/ggml/ggml ml/backend/ggml/ggml
 COPY x/imagegen/mlx x/imagegen/mlx
@@ -165,17 +165,17 @@ RUN --mount=type=cache,target=/root/.ccache \
     --mount=type=bind,from=local-mlx,target=/tmp/local-mlx \
     --mount=type=bind,from=local-mlx-c,target=/tmp/local-mlx-c \
     if [ -f /tmp/local-mlx/CMakeLists.txt ]; then \
-        export OLLAMA_MLX_SOURCE=/tmp/local-mlx; \
+        export PSYLLAMA_MLX_SOURCE=/tmp/local-mlx; \
     fi \
     && if [ -f /tmp/local-mlx-c/CMakeLists.txt ]; then \
-        export OLLAMA_MLX_C_SOURCE=/tmp/local-mlx-c; \
+        export PSYLLAMA_MLX_C_SOURCE=/tmp/local-mlx-c; \
     fi \
     && cmake --preset 'MLX CUDA 13' -DBLAS_INCLUDE_DIRS=/usr/include/openblas -DLAPACK_INCLUDE_DIRS=/usr/include/openblas \
         && cmake --build --preset 'MLX CUDA 13' -- -l $(nproc) \
         && cmake --install build --component MLX --strip
 
 FROM base AS build
-WORKDIR /go/src/github.com/ollama/ollama
+WORKDIR /go/src/github.com/psyllama/psyllama
 COPY go.mod go.sum .
 RUN curl -fsSL https://golang.org/dl/go$(awk '/^go/ { print $2 }' go.mod).linux-$(case $(uname -m) in x86_64) echo amd64 ;; aarch64) echo arm64 ;; esac).tar.gz | tar xz -C /usr/local
 ENV PATH=/usr/local/go/bin:$PATH
@@ -188,28 +188,28 @@ ARG CGO_CXXFLAGS
 ENV CGO_CFLAGS="${CGO_CFLAGS}"
 ENV CGO_CXXFLAGS="${CGO_CXXFLAGS}"
 RUN --mount=type=cache,target=/root/.cache/go-build \
-    go build -trimpath -buildmode=pie -o /bin/ollama .
+    go build -trimpath -buildmode=pie -o /bin/psyllama .
 
 FROM --platform=linux/amd64 scratch AS amd64
-# COPY --from=cuda-11 dist/lib/ollama/ /lib/ollama/
-COPY --from=cuda-12 dist/lib/ollama /lib/ollama/
-COPY --from=cuda-13 dist/lib/ollama /lib/ollama/
-COPY --from=vulkan  dist/lib/ollama  /lib/ollama/
-COPY --from=mlx     /go/src/github.com/ollama/ollama/dist/lib/ollama /lib/ollama/
+# COPY --from=cuda-11 dist/lib/psyllama/ /lib/psyllama/
+COPY --from=cuda-12 dist/lib/psyllama /lib/psyllama/
+COPY --from=cuda-13 dist/lib/psyllama /lib/psyllama/
+COPY --from=vulkan  dist/lib/psyllama  /lib/psyllama/
+COPY --from=mlx     /go/src/github.com/psyllama/psyllama/dist/lib/psyllama /lib/psyllama/
 
 FROM --platform=linux/arm64 scratch AS arm64
-# COPY --from=cuda-11 dist/lib/ollama/ /lib/ollama/
-COPY --from=cuda-12 dist/lib/ollama /lib/ollama/
-COPY --from=cuda-13 dist/lib/ollama/ /lib/ollama/
-COPY --from=jetpack-5 dist/lib/ollama/ /lib/ollama/
-COPY --from=jetpack-6 dist/lib/ollama/ /lib/ollama/
+# COPY --from=cuda-11 dist/lib/psyllama/ /lib/psyllama/
+COPY --from=cuda-12 dist/lib/psyllama /lib/psyllama/
+COPY --from=cuda-13 dist/lib/psyllama/ /lib/psyllama/
+COPY --from=jetpack-5 dist/lib/psyllama/ /lib/psyllama/
+COPY --from=jetpack-6 dist/lib/psyllama/ /lib/psyllama/
 
 FROM scratch AS rocm
-COPY --from=rocm-7 dist/lib/ollama /lib/ollama
+COPY --from=rocm-7 dist/lib/psyllama /lib/psyllama
 
 FROM ${FLAVOR} AS archive
-COPY --from=cpu dist/lib/ollama /lib/ollama
-COPY --from=build /bin/ollama /bin/ollama
+COPY --from=cpu dist/lib/psyllama /lib/psyllama
+COPY --from=build /bin/psyllama /bin/psyllama
 
 FROM ubuntu:24.04
 RUN apt-get update \
@@ -218,11 +218,11 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=archive /bin /usr/bin
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-COPY --from=archive /lib/ollama /usr/lib/ollama
+COPY --from=archive /lib/psyllama /usr/lib/psyllama
 ENV LD_LIBRARY_PATH=/usr/local/nvidia/lib:/usr/local/nvidia/lib64
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 ENV NVIDIA_VISIBLE_DEVICES=all
-ENV OLLAMA_HOST=0.0.0.0:11434
+ENV PSYLLAMA_HOST=0.0.0.0:11434
 EXPOSE 11434
-ENTRYPOINT ["/bin/ollama"]
+ENTRYPOINT ["/bin/psyllama"]
 CMD ["serve"]

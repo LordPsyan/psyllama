@@ -1,5 +1,5 @@
 // Package config provides integration configuration for external coding tools
-// (Claude Code, Codex, Droid, OpenCode) to use Ollama models.
+// (Claude Code, Codex, Droid, OpenCode) to use Psyllama models.
 package config
 
 import (
@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/api"
 )
 
 type integration struct {
@@ -31,7 +31,7 @@ func configPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(home, ".ollama", "config.json"), nil
+	return filepath.Join(home, ".psyllama", "config.json"), nil
 }
 
 func legacyConfigPath() (string, error) {
@@ -39,10 +39,10 @@ func legacyConfigPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(home, ".ollama", "config", "config.json"), nil
+	return filepath.Join(home, ".psyllama", "config", "config.json"), nil
 }
 
-// migrateConfig moves the config from the legacy path to ~/.ollama/config.json
+// migrateConfig moves the config from the legacy path to ~/.psyllama/config.json
 func migrateConfig() (bool, error) {
 	oldPath, err := legacyConfigPath()
 	if err != nil {
@@ -155,7 +155,7 @@ func SaveIntegration(appName string, models []string) error {
 	return save(cfg)
 }
 
-// integrationOnboarded marks an integration as onboarded in ollama's config.
+// integrationOnboarded marks an integration as onboarded in psyllama's config.
 func integrationOnboarded(appName string) error {
 	cfg, err := load()
 	if err != nil {
@@ -228,7 +228,7 @@ func SetLastSelection(selection string) error {
 	return save(cfg)
 }
 
-// ModelExists checks if a model exists on the Ollama server.
+// ModelExists checks if a model exists on the Psyllama server.
 func ModelExists(ctx context.Context, name string) bool {
 	if name == "" {
 		return false

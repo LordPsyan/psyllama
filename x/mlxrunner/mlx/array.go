@@ -12,7 +12,7 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/ollama/ollama/logutil"
+	"github.com/LordPsyan/psyllama/logutil"
 )
 
 type Array struct {

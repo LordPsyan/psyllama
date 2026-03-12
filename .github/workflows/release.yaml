@@ -22,7 +22,7 @@ jobs:
       - name: Set environment
         id: goflags
         run: |
-          echo GOFLAGS="'-ldflags=-w -s \"-X=github.com/ollama/ollama/version.Version=${GITHUB_REF_NAME#v}\" \"-X=github.com/ollama/ollama/server.mode=release\"'" | tee -a $GITHUB_OUTPUT
+          echo GOFLAGS="'-ldflags=-w -s \"-X=github.com/psyllama/psyllama/version.Version=${GITHUB_REF_NAME#v}\" \"-X=github.com/psyllama/psyllama/server.mode=release\"'" | tee -a $GITHUB_OUTPUT
           echo VERSION="${GITHUB_REF_NAME#v}" | tee -a $GITHUB_OUTPUT
           echo vendorsha=$(make -f Makefile.sync print-base) | tee -a $GITHUB_OUTPUT
 
@@ -239,7 +239,7 @@ jobs:
           cmake --preset "${{ matrix.preset }}" ${{ matrix.flags }} --install-prefix "$((pwd).Path)\dist\${{ matrix.os }}-${{ matrix.arch }}"
           cmake --build --parallel ([Environment]::ProcessorCount) --preset "${{ matrix.preset }}"
           cmake --install build --component "${{ startsWith(matrix.preset, 'MLX ') && 'MLX' || startsWith(matrix.preset, 'CUDA ') && 'CUDA' || startsWith(matrix.preset, 'ROCm ') && 'HIP' || startsWith(matrix.preset, 'Vulkan') && 'Vulkan' || 'CPU' }}" --strip
-          Remove-Item -Path dist\lib\ollama\rocm\rocblas\library\*gfx906* -ErrorAction SilentlyContinue
+          Remove-Item -Path dist\lib\psyllama\rocm\rocblas\library\*gfx906* -ErrorAction SilentlyContinue
         env:
           CMAKE_GENERATOR: Ninja
       - name: Log build results
@@ -314,7 +314,7 @@ jobs:
         with:
           node-version: "20"
       - run: |
-          ./scripts/build_windows ollama app
+          ./scripts/build_windows psyllama app
       - name: Log build results
         run: |
           gci -path .\dist -Recurse -File | ForEach-Object { get-filehash -path $_.FullName -Algorithm SHA256 } | format-list
@@ -336,7 +336,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: google-github-actions/auth@v2
         with:
-          project_id: ollama
+          project_id: psyllama
           credentials_json: ${{ secrets.GOOGLE_SIGNING_CREDENTIALS }}
       - run: |
           $ErrorActionPreference = "Stop"
@@ -347,7 +347,7 @@ jobs:
           Expand-Archive -Path "${{ runner.temp }}\plugin.zip" -DestinationPath "${{ runner.temp }}\plugin\"
           & "${{ runner.temp }}\plugin\*\kmscng.msi" /quiet
 
-          echo "${{ vars.OLLAMA_CERT }}" >ollama_inc.crt
+          echo "${{ vars.PSYLLAMA_CERT }}" >psyllama_inc.crt
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
@@ -378,7 +378,7 @@ jobs:
           path: |
             dist/*.zip
             dist/*.ps1
-            dist/OllamaSetup.exe
+            dist/PsyllamaSetup.exe
 
   linux-build:
     strategy:
@@ -417,16 +417,16 @@ jobs:
         run: |
           ./scripts/deduplicate_cuda_libs.sh dist/${{ matrix.os }}-${{ matrix.arch }}
       - run: |
-          for COMPONENT in bin/* lib/ollama/*; do
+          for COMPONENT in bin/* lib/psyllama/*; do
             case "$COMPONENT" in
-              bin/ollama*)               echo $COMPONENT >>ollama-${{ matrix.os }}-${{ matrix.arch }}.tar.in ;;
-              lib/ollama/*.so*)          echo $COMPONENT >>ollama-${{ matrix.os }}-${{ matrix.arch }}.tar.in ;;
-              lib/ollama/cuda_v*)        echo $COMPONENT >>ollama-${{ matrix.os }}-${{ matrix.arch }}.tar.in ;;
-              lib/ollama/vulkan*)        echo $COMPONENT >>ollama-${{ matrix.os }}-${{ matrix.arch }}.tar.in ;;
-              lib/ollama/mlx*)           echo $COMPONENT >>ollama-${{ matrix.os }}-${{ matrix.arch }}.tar.in ;;
-              lib/ollama/cuda_jetpack5)  echo $COMPONENT >>ollama-${{ matrix.os }}-${{ matrix.arch }}-jetpack5.tar.in ;;
-              lib/ollama/cuda_jetpack6)  echo $COMPONENT >>ollama-${{ matrix.os }}-${{ matrix.arch }}-jetpack6.tar.in ;;
-              lib/ollama/rocm)           echo $COMPONENT >>ollama-${{ matrix.os }}-${{ matrix.arch }}-rocm.tar.in ;;
+              bin/psyllama*)               echo $COMPONENT >>psyllama-${{ matrix.os }}-${{ matrix.arch }}.tar.in ;;
+              lib/psyllama/*.so*)          echo $COMPONENT >>psyllama-${{ matrix.os }}-${{ matrix.arch }}.tar.in ;;
+              lib/psyllama/cuda_v*)        echo $COMPONENT >>psyllama-${{ matrix.os }}-${{ matrix.arch }}.tar.in ;;
+              lib/psyllama/vulkan*)        echo $COMPONENT >>psyllama-${{ matrix.os }}-${{ matrix.arch }}.tar.in ;;
+              lib/psyllama/mlx*)           echo $COMPONENT >>psyllama-${{ matrix.os }}-${{ matrix.arch }}.tar.in ;;
+              lib/psyllama/cuda_jetpack5)  echo $COMPONENT >>psyllama-${{ matrix.os }}-${{ matrix.arch }}-jetpack5.tar.in ;;
+              lib/psyllama/cuda_jetpack6)  echo $COMPONENT >>psyllama-${{ matrix.os }}-${{ matrix.arch }}-jetpack6.tar.in ;;
+              lib/psyllama/rocm)           echo $COMPONENT >>psyllama-${{ matrix.os }}-${{ matrix.arch }}-rocm.tar.in ;;
             esac
           done
         working-directory: dist/${{ matrix.os }}-${{ matrix.arch }}

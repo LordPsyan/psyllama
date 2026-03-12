@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/api"
 )
 
 func TestResponsesInputMessage_UnmarshalJSON(t *testing.T) {

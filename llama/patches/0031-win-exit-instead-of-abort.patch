@@ -1,5 +1,5 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Daniel Hiltgen <daniel@ollama.com>
+From: Daniel Hiltgen <daniel@psyllama.com>
 Date: Tue, 18 Nov 2025 09:58:23 -0800
 Subject: [PATCH] win: exit instead of abort
 

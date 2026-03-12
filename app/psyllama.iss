@@ -1,19 +1,19 @@
-; Inno Setup Installer for Ollama
+; Inno Setup Installer for Psyllama
 ;
 ; To build the installer use the build script invoked from the top of the source tree
 ; 
 ; powershell -ExecutionPolicy Bypass -File .\scripts\build_windows.ps
 
 
-#define MyAppName "Ollama"
+#define MyAppName "Psyllama"
 #if GetEnv("PKG_VERSION") != ""
   #define MyAppVersion GetEnv("PKG_VERSION")
 #else
   #define MyAppVersion "0.0.0"
 #endif
-#define MyAppPublisher "Ollama"
-#define MyAppURL "https://ollama.com/"
-#define MyAppExeName "ollama app.exe"
+#define MyAppPublisher "Psyllama"
+#define MyAppURL "https://psyllama.com/"
+#define MyAppExeName "psyllama app.exe"
 #define MyIcon ".\assets\app.ico"
 
 [Setup]
@@ -34,7 +34,7 @@ DefaultDirName={localappdata}\Programs\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
-OutputBaseFilename="OllamaSetup"
+OutputBaseFilename="PsyllamaSetup"
 SetupIconFile={#MyIcon}
 UninstallDisplayIcon={uninstallexe}
 Compression=lzma2/ultra64
@@ -55,7 +55,7 @@ RestartIfNeededByRun=no
 ; https://jrsoftware.org/ishelp/index.php?topic=setup_wizardimagefile
 WizardSmallImageFile=.\assets\setup.bmp
 
-; Ollama requires Windows 10 22H2 or newer for proper unicode rendering
+; Psyllama requires Windows 10 22H2 or newer for proper unicode rendering
 ; TODO: consider setting this to 10.0.19045
 MinVersion=10.0.10240
 
@@ -79,7 +79,7 @@ SignTool=MySignTool
 SignedUninstaller=yes
 #endif
 
-SetupMutex=OllamaSetupMutex
+SetupMutex=PsyllamaSetupMutex
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -88,23 +88,23 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 DialogFontSize=12
 
 [Files]
-#if FileExists("..\dist\windows-ollama-app-amd64.exe")
-Source: "..\dist\windows-ollama-app-amd64.exe"; DestDir: "{app}"; DestName: "{#MyAppExeName}" ;Check: not IsArm64();  Flags: ignoreversion 64bit; BeforeInstall: TaskKill('{#MyAppExeName}')
+#if FileExists("..\dist\windows-psyllama-app-amd64.exe")
+Source: "..\dist\windows-psyllama-app-amd64.exe"; DestDir: "{app}"; DestName: "{#MyAppExeName}" ;Check: not IsArm64();  Flags: ignoreversion 64bit; BeforeInstall: TaskKill('{#MyAppExeName}')
 Source: "..\dist\windows-amd64\vc_redist.x64.exe"; DestDir: "{tmp}"; Check: not IsArm64() and vc_redist_needed(); Flags: deleteafterinstall
-Source: "..\dist\windows-amd64\ollama.exe"; DestDir: "{app}"; Check: not IsArm64(); Flags: ignoreversion 64bit; BeforeInstall: TaskKill('ollama.exe')
-Source: "..\dist\windows-amd64\lib\ollama\*"; DestDir: "{app}\lib\ollama\"; Check: not IsArm64(); Flags: ignoreversion 64bit recursesubdirs
+Source: "..\dist\windows-amd64\psyllama.exe"; DestDir: "{app}"; Check: not IsArm64(); Flags: ignoreversion 64bit; BeforeInstall: TaskKill('psyllama.exe')
+Source: "..\dist\windows-amd64\lib\psyllama\*"; DestDir: "{app}\lib\psyllama\"; Check: not IsArm64(); Flags: ignoreversion 64bit recursesubdirs
 #endif
 
 ; For local development, rely on binary compatibility at runtime since we can't cross compile
-#if FileExists("..\dist\windows-ollama-app-arm64.exe")
-Source: "..\dist\windows-ollama-app-arm64.exe"; DestDir: "{app}"; DestName: "{#MyAppExeName}" ;Check: IsArm64();  Flags: ignoreversion 64bit; BeforeInstall: TaskKill('{#MyAppExeName}')
+#if FileExists("..\dist\windows-psyllama-app-arm64.exe")
+Source: "..\dist\windows-psyllama-app-arm64.exe"; DestDir: "{app}"; DestName: "{#MyAppExeName}" ;Check: IsArm64();  Flags: ignoreversion 64bit; BeforeInstall: TaskKill('{#MyAppExeName}')
 #else 
-Source: "..\dist\windows-ollama-app-amd64.exe"; DestDir: "{app}"; DestName: "{#MyAppExeName}" ;Check: IsArm64();  Flags: ignoreversion 64bit; BeforeInstall: TaskKill('{#MyAppExeName}')
+Source: "..\dist\windows-psyllama-app-amd64.exe"; DestDir: "{app}"; DestName: "{#MyAppExeName}" ;Check: IsArm64();  Flags: ignoreversion 64bit; BeforeInstall: TaskKill('{#MyAppExeName}')
 #endif
 
-#if FileExists("..\dist\windows-arm64\ollama.exe")
+#if FileExists("..\dist\windows-arm64\psyllama.exe")
 Source: "..\dist\windows-arm64\vc_redist.arm64.exe"; DestDir: "{tmp}"; Check: IsArm64() and vc_redist_needed(); Flags: deleteafterinstall
-Source: "..\dist\windows-arm64\ollama.exe"; DestDir: "{app}"; Check: IsArm64(); Flags: ignoreversion 64bit; BeforeInstall: TaskKill('ollama.exe')
+Source: "..\dist\windows-arm64\psyllama.exe"; DestDir: "{app}"; Check: IsArm64(); Flags: ignoreversion 64bit; BeforeInstall: TaskKill('psyllama.exe')
 #endif
 
 Source: ".\assets\app.ico"; DestDir: "{app}"; Flags: ignoreversion
@@ -115,7 +115,7 @@ Name: "{app}\lib\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename:
 Name: "{userprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\app.ico"
 
 [InstallDelete]
-Type: files; Name: "{%LOCALAPPDATA}\Ollama\updates"
+Type: files; Name: "{%LOCALAPPDATA}\Psyllama\updates"
 
 [Run]
 #if DirExists("..\dist\windows-arm64")
@@ -128,43 +128,43 @@ Filename: "{cmd}"; Parameters: "/C set PATH={app};%PATH% & ""{app}\{#MyAppExeNam
 
 [UninstallRun]
 ; Filename: "{cmd}"; Parameters: "/C ""taskkill /im ''{#MyAppExeName}'' /f /t"; Flags: runhidden
-; Filename: "{cmd}"; Parameters: "/C ""taskkill /im ollama.exe /f /t"; Flags: runhidden
+; Filename: "{cmd}"; Parameters: "/C ""taskkill /im psyllama.exe /f /t"; Flags: runhidden
 Filename: "taskkill"; Parameters: "/im ""{#MyAppExeName}"" /f /t"; Flags: runhidden
-Filename: "taskkill"; Parameters: "/im ""ollama.exe"" /f /t"; Flags: runhidden
+Filename: "taskkill"; Parameters: "/im ""psyllama.exe"" /f /t"; Flags: runhidden
 ; HACK!  need to give the server and app enough time to exit
 ; TODO - convert this to a Pascal code script so it waits until they're no longer running, then completes
 Filename: "{cmd}"; Parameters: "/c timeout 5"; Flags: runhidden
 
 [UninstallDelete]
-Type: filesandordirs; Name: "{%TEMP}\ollama*"
-Type: filesandordirs; Name: "{%LOCALAPPDATA}\Ollama"
-Type: filesandordirs; Name: "{%LOCALAPPDATA}\Programs\Ollama"
-Type: filesandordirs; Name: "{%USERPROFILE}\.ollama\history"
+Type: filesandordirs; Name: "{%TEMP}\psyllama*"
+Type: filesandordirs; Name: "{%LOCALAPPDATA}\Psyllama"
+Type: filesandordirs; Name: "{%LOCALAPPDATA}\Programs\Psyllama"
+Type: filesandordirs; Name: "{%USERPROFILE}\.psyllama\history"
 Type: filesandordirs; Name: "{userstartup}\{#MyAppName}.lnk"
-; NOTE: if the user has a custom OLLAMA_MODELS it will be preserved
+; NOTE: if the user has a custom PSYLLAMA_MODELS it will be preserved
 
 [InstallDelete]
-Type: filesandordirs; Name: "{%TEMP}\ollama*"
-Type: filesandordirs; Name: "{app}\lib\ollama"
+Type: filesandordirs; Name: "{%TEMP}\psyllama*"
+Type: filesandordirs; Name: "{app}\lib\psyllama"
 
 [Messages]
-WizardReady=Ollama
+WizardReady=Psyllama
 ReadyLabel1=%nLet's get you up and running with your own large language models.
-SetupAppRunningError=Another Ollama installer is running.%n%nPlease cancel or finish the other installer, then click OK to continue with this install, or Cancel to exit.
+SetupAppRunningError=Another Psyllama installer is running.%n%nPlease cancel or finish the other installer, then click OK to continue with this install, or Cancel to exit.
 
 
 ;FinishedHeadingLabel=Run your first model
-;FinishedLabel=%nRun this command in a PowerShell or cmd terminal.%n%n%n    ollama run llama3.2
+;FinishedLabel=%nRun this command in a PowerShell or cmd terminal.%n%n%n    psyllama run llama3.2
 ;ClickFinish=%n
 
 [Registry]
 Root: HKCU; Subkey: "Environment"; \
     ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}"; \
     Check: NeedsAddPath('{app}')
-; Register ollama:// URL protocol
-Root: HKCU; Subkey: "Software\Classes\ollama"; ValueType: string; ValueName: ""; ValueData: "URL:Ollama Protocol"; Flags: uninsdeletekey
-Root: HKCU; Subkey: "Software\Classes\ollama"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""; Flags: uninsdeletekey
-Root: HKCU; Subkey: "Software\Classes\ollama\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Flags: uninsdeletekey
+; Register psyllama:// URL protocol
+Root: HKCU; Subkey: "Software\Classes\psyllama"; ValueType: string; ValueName: ""; ValueData: "URL:Psyllama Protocol"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\psyllama"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\psyllama\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Flags: uninsdeletekey
 
 [Code]
 
@@ -300,8 +300,8 @@ begin
       Caption := '';
     end;
 
-    if (DirExists(GetEnv('USERPROFILE') + '\.ollama\models\blobs')) then begin
-      ModelsDir := GetEnv('USERPROFILE') + '\.ollama\models';
+    if (DirExists(GetEnv('USERPROFILE') + '\.psyllama\models\blobs')) then begin
+      ModelsDir := GetEnv('USERPROFILE') + '\.psyllama\models';
       ModelsSize := GetDirSize(ModelsDir);
     end;
 
@@ -354,7 +354,7 @@ begin
       Log('user requested model cleanup');
       if (VarIsEmpty(ModelsDir)) then begin
         Log('cleaning up home directory models')
-        DelTree(GetEnv('USERPROFILE') + '\.ollama\models', True, True, True);
+        DelTree(GetEnv('USERPROFILE') + '\.psyllama\models', True, True, True);
       end else begin
         Log('cleaning up custom directory models ' + ModelsDir)
         DelTree(ModelsDir + '\blobs', True, True, True);

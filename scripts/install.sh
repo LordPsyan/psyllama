@@ -1,6 +1,6 @@
 #!/bin/sh
-# This script installs Ollama on Linux and macOS.
-# It detects the current operating system architecture and installs the appropriate version of Ollama.
+# This script installs Psyllama on Linux and macOS.
+# It detects the current operating system architecture and installs the appropriate version of Psyllama.
 
 # Wrap script in main function so that a truncated partial download doesn't end
 # up executing half a script.
@@ -39,7 +39,7 @@ case "$ARCH" in
     *) error "Unsupported architecture: $ARCH" ;;
 esac
 
-VER_PARAM="${OLLAMA_VERSION:+?version=$OLLAMA_VERSION}"
+VER_PARAM="${PSYLLAMA_VERSION:+?version=$PSYLLAMA_VERSION}"
 
 ###########################################
 # macOS
@@ -55,40 +55,40 @@ if [ "$OS" = "Darwin" ]; then
         exit 1
     fi
 
-    DOWNLOAD_URL="https://ollama.com/download/Ollama-darwin.zip${VER_PARAM}"
+    DOWNLOAD_URL="https://psyllama.com/download/Psyllama-darwin.zip${VER_PARAM}"
 
-    if pgrep -x Ollama >/dev/null 2>&1; then
-        status "Stopping running Ollama instance..."
-        pkill -x Ollama 2>/dev/null || true
+    if pgrep -x Psyllama >/dev/null 2>&1; then
+        status "Stopping running Psyllama instance..."
+        pkill -x Psyllama 2>/dev/null || true
         sleep 2
     fi
 
-    if [ -d "/Applications/Ollama.app" ]; then
-        status "Removing existing Ollama installation..."
-        rm -rf "/Applications/Ollama.app"
+    if [ -d "/Applications/Psyllama.app" ]; then
+        status "Removing existing Psyllama installation..."
+        rm -rf "/Applications/Psyllama.app"
     fi
 
-    status "Downloading Ollama for macOS..."
+    status "Downloading Psyllama for macOS..."
     curl --fail --show-error --location --progress-bar \
-        -o "$TEMP_DIR/Ollama-darwin.zip" "$DOWNLOAD_URL"
+        -o "$TEMP_DIR/Psyllama-darwin.zip" "$DOWNLOAD_URL"
 
-    status "Installing Ollama to /Applications..."
-    unzip -q "$TEMP_DIR/Ollama-darwin.zip" -d "$TEMP_DIR"
-    mv "$TEMP_DIR/Ollama.app" "/Applications/"
+    status "Installing Psyllama to /Applications..."
+    unzip -q "$TEMP_DIR/Psyllama-darwin.zip" -d "$TEMP_DIR"
+    mv "$TEMP_DIR/Psyllama.app" "/Applications/"
 
-    if [ ! -L "/usr/local/bin/ollama" ] || [ "$(readlink "/usr/local/bin/ollama")" != "/Applications/Ollama.app/Contents/Resources/ollama" ]; then
-        status "Adding 'ollama' command to PATH (may require password)..."
+    if [ ! -L "/usr/local/bin/psyllama" ] || [ "$(readlink "/usr/local/bin/psyllama")" != "/Applications/Psyllama.app/Contents/Resources/psyllama" ]; then
+        status "Adding 'psyllama' command to PATH (may require password)..."
         mkdir -p "/usr/local/bin" 2>/dev/null || sudo mkdir -p "/usr/local/bin"
-        ln -sf "/Applications/Ollama.app/Contents/Resources/ollama" "/usr/local/bin/ollama" 2>/dev/null || \
-            sudo ln -sf "/Applications/Ollama.app/Contents/Resources/ollama" "/usr/local/bin/ollama"
+        ln -sf "/Applications/Psyllama.app/Contents/Resources/psyllama" "/usr/local/bin/psyllama" 2>/dev/null || \
+            sudo ln -sf "/Applications/Psyllama.app/Contents/Resources/psyllama" "/usr/local/bin/psyllama"
     fi
 
-    if [ -z "${OLLAMA_NO_START:-}" ]; then
-        status "Starting Ollama..."
-        open -a Ollama --args hidden
+    if [ -z "${PSYLLAMA_NO_START:-}" ]; then
+        status "Starting Psyllama..."
+        open -a Psyllama --args hidden
     fi
 
-    status "Install complete. You can now run 'ollama'."
+    status "Install complete. You can now run 'psyllama'."
     exit 0
 fi
 
@@ -159,68 +159,68 @@ download_and_extract() {
 for BINDIR in /usr/local/bin /usr/bin /bin; do
     echo $PATH | grep -q $BINDIR && break || continue
 done
-OLLAMA_INSTALL_DIR=$(dirname ${BINDIR})
+PSYLLAMA_INSTALL_DIR=$(dirname ${BINDIR})
 
-if [ -d "$OLLAMA_INSTALL_DIR/lib/ollama" ] ; then
-    status "Cleaning up old version at $OLLAMA_INSTALL_DIR/lib/ollama"
-    $SUDO rm -rf "$OLLAMA_INSTALL_DIR/lib/ollama"
+if [ -d "$PSYLLAMA_INSTALL_DIR/lib/psyllama" ] ; then
+    status "Cleaning up old version at $PSYLLAMA_INSTALL_DIR/lib/psyllama"
+    $SUDO rm -rf "$PSYLLAMA_INSTALL_DIR/lib/psyllama"
 fi
-status "Installing ollama to $OLLAMA_INSTALL_DIR"
+status "Installing psyllama to $PSYLLAMA_INSTALL_DIR"
 $SUDO install -o0 -g0 -m755 -d $BINDIR
-$SUDO install -o0 -g0 -m755 -d "$OLLAMA_INSTALL_DIR/lib/ollama"
-download_and_extract "https://ollama.com/download" "$OLLAMA_INSTALL_DIR" "ollama-linux-${ARCH}"
+$SUDO install -o0 -g0 -m755 -d "$PSYLLAMA_INSTALL_DIR/lib/psyllama"
+download_and_extract "https://psyllama.com/download" "$PSYLLAMA_INSTALL_DIR" "psyllama-linux-${ARCH}"
 
-if [ "$OLLAMA_INSTALL_DIR/bin/ollama" != "$BINDIR/ollama" ] ; then
-    status "Making ollama accessible in the PATH in $BINDIR"
-    $SUDO ln -sf "$OLLAMA_INSTALL_DIR/ollama" "$BINDIR/ollama"
+if [ "$PSYLLAMA_INSTALL_DIR/bin/psyllama" != "$BINDIR/psyllama" ] ; then
+    status "Making psyllama accessible in the PATH in $BINDIR"
+    $SUDO ln -sf "$PSYLLAMA_INSTALL_DIR/psyllama" "$BINDIR/psyllama"
 fi
 
 # Check for NVIDIA JetPack systems with additional downloads
 if [ -f /etc/nv_tegra_release ] ; then
     if grep R36 /etc/nv_tegra_release > /dev/null ; then
-        download_and_extract "https://ollama.com/download" "$OLLAMA_INSTALL_DIR" "ollama-linux-${ARCH}-jetpack6"
+        download_and_extract "https://psyllama.com/download" "$PSYLLAMA_INSTALL_DIR" "psyllama-linux-${ARCH}-jetpack6"
     elif grep R35 /etc/nv_tegra_release > /dev/null ; then
-        download_and_extract "https://ollama.com/download" "$OLLAMA_INSTALL_DIR" "ollama-linux-${ARCH}-jetpack5"
+        download_and_extract "https://psyllama.com/download" "$PSYLLAMA_INSTALL_DIR" "psyllama-linux-${ARCH}-jetpack5"
     else
         warning "Unsupported JetPack version detected.  GPU may not be supported"
     fi
 fi
 
 install_success() {
-    status 'The Ollama API is now available at 127.0.0.1:11434.'
-    status 'Install complete. Run "ollama" from the command line.'
+    status 'The Psyllama API is now available at 127.0.0.1:11434.'
+    status 'Install complete. Run "psyllama" from the command line.'
 }
 trap install_success EXIT
 
 # Everything from this point onwards is optional.
 
 configure_systemd() {
-    if ! id ollama >/dev/null 2>&1; then
-        status "Creating ollama user..."
-        $SUDO useradd -r -s /bin/false -U -m -d /usr/share/ollama ollama
+    if ! id psyllama >/dev/null 2>&1; then
+        status "Creating psyllama user..."
+        $SUDO useradd -r -s /bin/false -U -m -d /usr/share/psyllama psyllama
     fi
     if getent group render >/dev/null 2>&1; then
-        status "Adding ollama user to render group..."
-        $SUDO usermod -a -G render ollama
+        status "Adding psyllama user to render group..."
+        $SUDO usermod -a -G render psyllama
     fi
     if getent group video >/dev/null 2>&1; then
-        status "Adding ollama user to video group..."
-        $SUDO usermod -a -G video ollama
+        status "Adding psyllama user to video group..."
+        $SUDO usermod -a -G video psyllama
     fi
 
-    status "Adding current user to ollama group..."
-    $SUDO usermod -a -G ollama $(whoami)
+    status "Adding current user to psyllama group..."
+    $SUDO usermod -a -G psyllama $(whoami)
 
-    status "Creating ollama systemd service..."
-    cat <<EOF | $SUDO tee /etc/systemd/system/ollama.service >/dev/null
+    status "Creating psyllama systemd service..."
+    cat <<EOF | $SUDO tee /etc/systemd/system/psyllama.service >/dev/null
 [Unit]
-Description=Ollama Service
+Description=Psyllama Service
 After=network-online.target
 
 [Service]
-ExecStart=$BINDIR/ollama serve
-User=ollama
-Group=ollama
+ExecStart=$BINDIR/psyllama serve
+User=psyllama
+Group=psyllama
 Restart=always
 RestartSec=3
 Environment="PATH=$PATH"
@@ -231,11 +231,11 @@ EOF
     SYSTEMCTL_RUNNING="$(systemctl is-system-running || true)"
     case $SYSTEMCTL_RUNNING in
         running|degraded)
-            status "Enabling and starting ollama service..."
+            status "Enabling and starting psyllama service..."
             $SUDO systemctl daemon-reload
-            $SUDO systemctl enable ollama
+            $SUDO systemctl enable psyllama
 
-            start_service() { $SUDO systemctl restart ollama; }
+            start_service() { $SUDO systemctl restart psyllama; }
             trap start_service EXIT
             ;;
         *)
@@ -298,12 +298,12 @@ fi
 
 if ! check_gpu lspci nvidia && ! check_gpu lshw nvidia && ! check_gpu lspci amdgpu && ! check_gpu lshw amdgpu; then
     install_success
-    warning "No NVIDIA/AMD GPU detected. Ollama will run in CPU-only mode."
+    warning "No NVIDIA/AMD GPU detected. Psyllama will run in CPU-only mode."
     exit 0
 fi
 
 if check_gpu lspci amdgpu || check_gpu lshw amdgpu; then
-    download_and_extract "https://ollama.com/download" "$OLLAMA_INSTALL_DIR" "ollama-linux-${ARCH}-rocm"
+    download_and_extract "https://psyllama.com/download" "$PSYLLAMA_INSTALL_DIR" "psyllama-linux-${ARCH}-rocm"
 
     install_success
     status "AMD GPU ready."

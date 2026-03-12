@@ -17,7 +17,7 @@ import (
 
 	"github.com/agnivade/levenshtein"
 
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/api"
 )
 
 //go:embed index.json

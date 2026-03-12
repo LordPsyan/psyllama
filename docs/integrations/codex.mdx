@@ -11,25 +11,25 @@ Install the [Codex CLI](https://developers.openai.com/codex/cli/):
 npm install -g @openai/codex
 ```
 
-## Usage with Ollama
+## Usage with Psyllama
 
 <Note>Codex requires a larger context window. It is recommended to use a context window of at least 64k tokens.</Note>
 
 ### Quick setup
 
 ```
-ollama launch codex
+psyllama launch codex
 ```
 
 To configure without launching:
 
 ```shell
-ollama launch codex --config
+psyllama launch codex --config
 ```
 
 ### Manual setup
 
-To use `codex` with Ollama, use the `--oss` flag:
+To use `codex` with Psyllama, use the `--oss` flag:
 
 ```
 codex --oss
@@ -50,21 +50,21 @@ codex --oss -m gpt-oss:120b-cloud
 ```
 
 
-## Connecting to ollama.com
+## Connecting to psyllama.com
 
 
-Create an [API key](https://ollama.com/settings/keys) from ollama.com and export it as `OLLAMA_API_KEY`.
+Create an [API key](https://psyllama.com/settings/keys) from psyllama.com and export it as `PSYLLAMA_API_KEY`.
 
-To use ollama.com directly, edit your `~/.codex/config.toml` file to point to ollama.com.
+To use psyllama.com directly, edit your `~/.codex/config.toml` file to point to psyllama.com.
 
 ```toml
 model = "gpt-oss:120b"
-model_provider = "ollama"
+model_provider = "psyllama"
 
-[model_providers.ollama]
-name = "Ollama"
-base_url = "https://ollama.com/v1"
-env_key = "OLLAMA_API_KEY"
+[model_providers.psyllama]
+name = "Psyllama"
+base_url = "https://psyllama.com/v1"
+env_key = "PSYLLAMA_API_KEY"
 ```
 
 Run `codex` in a new terminal to load the new settings.

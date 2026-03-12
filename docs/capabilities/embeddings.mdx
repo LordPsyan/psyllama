@@ -7,9 +7,9 @@ Embeddings turn text into numeric vectors you can store in a vector database, se
 
 ## Recommended models
 
-- [embeddinggemma](https://ollama.com/library/embeddinggemma)
-- [qwen3-embedding](https://ollama.com/library/qwen3-embedding)
-- [all-minilm](https://ollama.com/library/all-minilm)
+- [embeddinggemma](https://psyllama.com/library/embeddinggemma)
+- [qwen3-embedding](https://psyllama.com/library/qwen3-embedding)
+- [all-minilm](https://psyllama.com/library/all-minilm)
 
 ## Generate embeddings
 
@@ -18,13 +18,13 @@ Embeddings turn text into numeric vectors you can store in a vector database, se
     Generate embeddings directly from the command line:
 
     ```shell
-    ollama run embeddinggemma "Hello world"
+    psyllama run embeddinggemma "Hello world"
     ```
 
     You can also pipe text to generate embeddings:
 
     ```shell
-    echo "Hello world" | ollama run embeddinggemma
+    echo "Hello world" | psyllama run embeddinggemma
     ```
 
     Output is a JSON array.
@@ -42,9 +42,9 @@ Embeddings turn text into numeric vectors you can store in a vector database, se
   </Tab>
   <Tab title="Python">
     ```python
-    import ollama
+    import psyllama
 
-    single = ollama.embed(
+    single = psyllama.embed(
       model='embeddinggemma',
       input='The quick brown fox jumps over the lazy dog.'
     )
@@ -53,9 +53,9 @@ Embeddings turn text into numeric vectors you can store in a vector database, se
   </Tab>
   <Tab title="JavaScript">
     ```javascript
-    import ollama from 'ollama'
+    import psyllama from 'psyllama'
 
-    const single = await ollama.embed({
+    const single = await psyllama.embed({
       model: 'embeddinggemma',
       input: 'The quick brown fox jumps over the lazy dog.',
     })
@@ -89,9 +89,9 @@ Pass an array of strings to `input`.
   </Tab>
   <Tab title="Python">
     ```python
-    import ollama
+    import psyllama
 
-    batch = ollama.embed(
+    batch = psyllama.embed(
       model='embeddinggemma',
       input=[
         'The quick brown fox jumps over the lazy dog.',
@@ -104,9 +104,9 @@ Pass an array of strings to `input`.
   </Tab>
   <Tab title="JavaScript">
     ```javascript
-    import ollama from 'ollama'
+    import psyllama from 'psyllama'
 
-    const batch = await ollama.embed({
+    const batch = await psyllama.embed({
       model: 'embeddinggemma',
       input: [
         'The quick brown fox jumps over the lazy dog.',

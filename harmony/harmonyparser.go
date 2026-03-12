@@ -7,8 +7,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/logutil"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/logutil"
 )
 
 type harmonyParserState int
@@ -261,7 +261,7 @@ const (
 )
 
 // HarmonyMessageHandler processes harmony events and accumulates content appropriately.
-// This is a higher level interface that maps harmony concepts into ollama concepts
+// This is a higher level interface that maps harmony concepts into psyllama concepts
 type HarmonyMessageHandler struct {
 	state           harmonyMessageState
 	HarmonyParser   *HarmonyParser

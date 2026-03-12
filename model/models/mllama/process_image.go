@@ -7,8 +7,8 @@ import (
 
 	"golang.org/x/image/draw"
 
-	"github.com/ollama/ollama/fs"
-	"github.com/ollama/ollama/model/imageproc"
+	"github.com/LordPsyan/psyllama/fs"
+	"github.com/LordPsyan/psyllama/model/imageproc"
 )
 
 type supportedAspectRatio struct {

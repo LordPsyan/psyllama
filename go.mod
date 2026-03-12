@@ -1,4 +1,4 @@
-module github.com/ollama/ollama
+module github.com/LordPsyan/psyllama
 
 go 1.24.1
 

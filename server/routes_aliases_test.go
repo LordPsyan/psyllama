@@ -11,8 +11,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/types/model"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/types/model"
 )
 
 func TestAliasShadowingRejected(t *testing.T) {
@@ -68,7 +68,7 @@ func TestAliasResolvesForChatRemote(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	t.Setenv("OLLAMA_REMOTES", p.Hostname())
+	t.Setenv("PSYLLAMA_REMOTES", p.Hostname())
 
 	s := Server{}
 	w := createRequest(t, s.CreateHandler, api.CreateRequest{
@@ -431,14 +431,14 @@ func TestAliasSavePreservesCloudDisable(t *testing.T) {
 	tmpDir := t.TempDir()
 	setTestHome(t, tmpDir)
 
-	configPath := filepath.Join(tmpDir, ".ollama", "server.json")
+	configPath := filepath.Join(tmpDir, ".psyllama", "server.json")
 	if err := os.MkdirAll(filepath.Dir(configPath), 0o755); err != nil {
 		t.Fatal(err)
 	}
 
 	initial := map[string]any{
 		"version":              serverConfigVersion,
-		"disable_ollama_cloud": true,
+		"disable_psyllama_cloud": true,
 		"aliases":              []aliasEntry{},
 	}
 	data, err := json.Marshal(initial)
@@ -465,11 +465,11 @@ func TestAliasSavePreservesCloudDisable(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	raw, ok := updatedCfg["disable_ollama_cloud"]
+	raw, ok := updatedCfg["disable_psyllama_cloud"]
 	if !ok {
-		t.Fatal("expected disable_ollama_cloud key to be preserved")
+		t.Fatal("expected disable_psyllama_cloud key to be preserved")
 	}
 	if string(raw) != "true" {
-		t.Fatalf("expected disable_ollama_cloud to remain true, got %s", string(raw))
+		t.Fatalf("expected disable_psyllama_cloud to remain true, got %s", string(raw))
 	}
 }

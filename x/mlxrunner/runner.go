@@ -10,12 +10,12 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/x/mlxrunner/mlx"
-	"github.com/ollama/ollama/x/mlxrunner/model"
-	"github.com/ollama/ollama/x/mlxrunner/model/base"
-	"github.com/ollama/ollama/x/mlxrunner/sample"
-	"github.com/ollama/ollama/x/tokenizer"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/x/mlxrunner/mlx"
+	"github.com/LordPsyan/psyllama/x/mlxrunner/model"
+	"github.com/LordPsyan/psyllama/x/mlxrunner/model/base"
+	"github.com/LordPsyan/psyllama/x/mlxrunner/sample"
+	"github.com/LordPsyan/psyllama/x/tokenizer"
 )
 
 type Request struct {

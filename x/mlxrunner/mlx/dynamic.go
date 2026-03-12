@@ -94,8 +94,8 @@ func init() {
 		return
 	}
 
-	// Try OLLAMA_LIBRARY_PATH first, including mlx_* subdirectories
-	if paths, ok := os.LookupEnv("OLLAMA_LIBRARY_PATH"); ok {
+	// Try PSYLLAMA_LIBRARY_PATH first, including mlx_* subdirectories
+	if paths, ok := os.LookupEnv("PSYLLAMA_LIBRARY_PATH"); ok {
 		for _, dir := range filepath.SplitList(paths) {
 			if tryLoadFromDir(dir) {
 				return
@@ -125,7 +125,7 @@ func init() {
 	}
 
 	if cwd, err := os.Getwd(); err == nil {
-		searchDirs = append(searchDirs, filepath.Join(cwd, "build", "lib", "ollama"))
+		searchDirs = append(searchDirs, filepath.Join(cwd, "build", "lib", "psyllama"))
 	}
 
 	// Also scan mlx_* subdirectories within each search dir

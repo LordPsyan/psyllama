@@ -3,7 +3,7 @@ package renderers
 import (
 	"fmt"
 
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/api"
 )
 
 type Renderer interface {
@@ -18,7 +18,7 @@ type (
 )
 
 // RenderImgTags is a global flag that tells renderers to use [img] tags
-// for images. This is set by the Ollama server package on init, or left as
+// for images. This is set by the Psyllama server package on init, or left as
 // false for other environments where renderers are used
 var RenderImgTags bool
 

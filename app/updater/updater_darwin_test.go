@@ -11,13 +11,13 @@ import (
 
 func TestDoUpgrade(t *testing.T) {
 	tmpDir := t.TempDir()
-	BundlePath = filepath.Join(tmpDir, "Ollama.app")
+	BundlePath = filepath.Join(tmpDir, "Psyllama.app")
 	appContents := filepath.Join(BundlePath, "Contents")
 	appBackupDir = filepath.Join(tmpDir, "backup")
-	appContentsOld := filepath.Join(appBackupDir, "Ollama.app", "Contents")
+	appContentsOld := filepath.Join(appBackupDir, "Psyllama.app", "Contents")
 	UpdateStageDir = filepath.Join(tmpDir, "updates")
 	UpgradeMarkerFile = filepath.Join(tmpDir, "upgraded")
-	bundle := filepath.Join(UpdateStageDir, "foo", "ollama-darwin.zip")
+	bundle := filepath.Join(UpdateStageDir, "foo", "psyllama-darwin.zip")
 
 	err := os.MkdirAll(filepath.Join(appContents, "MacOS"), 0o755)
 	if err != nil {
@@ -52,16 +52,16 @@ func TestDoUpgrade(t *testing.T) {
 	// Generate valid (partial) zip file for remaining scenarios
 	if err := zipCreationHelper(bundle, []testPayload{
 		{
-			Name: "Ollama.app/Contents/MacOS/Ollama",
+			Name: "Psyllama.app/Contents/MacOS/Psyllama",
 			Body: []byte("would be app binary"),
 		},
 		{
-			Name: "Ollama.app/Contents/Resources/ollama",
+			Name: "Psyllama.app/Contents/Resources/psyllama",
 			Body: []byte("would be the cli"),
 		},
 		{
-			Name: "Ollama.app/Contents/Resources/dummy",
-			Body: []byte("./ollama"),
+			Name: "Psyllama.app/Contents/Resources/dummy",
+			Body: []byte("./psyllama"),
 			Mode: os.ModeSymlink,
 		},
 	}); err != nil {
@@ -105,10 +105,10 @@ func TestDoUpgrade(t *testing.T) {
 	if _, err := os.Stat(UpgradeMarkerFile); err != nil {
 		t.Fatalf("missing marker %s", UpgradeMarkerFile)
 	}
-	if _, err := os.Stat(filepath.Join(BundlePath, "Contents", "MacOS", "Ollama")); err != nil {
+	if _, err := os.Stat(filepath.Join(BundlePath, "Contents", "MacOS", "Psyllama")); err != nil {
 		t.Fatalf("missing new App")
 	}
-	if _, err := os.Stat(filepath.Join(BundlePath, "Contents", "Resources", "ollama")); err != nil {
+	if _, err := os.Stat(filepath.Join(BundlePath, "Contents", "Resources", "psyllama")); err != nil {
 		t.Fatalf("missing new cli")
 	}
 
@@ -138,21 +138,21 @@ func TestDoUpgrade(t *testing.T) {
 	if _, err := os.Stat(appContentsOld); err == nil {
 		t.Fatal("old contents still exists")
 	}
-	if _, err := os.Stat(filepath.Join(BundlePath, "Contents", "MacOS", "Ollama")); err != nil {
+	if _, err := os.Stat(filepath.Join(BundlePath, "Contents", "MacOS", "Psyllama")); err != nil {
 		t.Fatalf("missing old App")
 	}
-	if _, err := os.Stat(filepath.Join(BundlePath, "Contents", "Resources", "ollama")); err != nil {
+	if _, err := os.Stat(filepath.Join(BundlePath, "Contents", "Resources", "psyllama")); err != nil {
 		t.Fatalf("missing old cli")
 	}
 }
 
 func TestDoUpgradeAtStartup(t *testing.T) {
 	tmpDir := t.TempDir()
-	BundlePath = filepath.Join(tmpDir, "Ollama.app")
+	BundlePath = filepath.Join(tmpDir, "Psyllama.app")
 	appBackupDir = filepath.Join(tmpDir, "backup")
 	UpdateStageDir = filepath.Join(tmpDir, "updates")
 	UpgradeMarkerFile = filepath.Join(tmpDir, "upgraded")
-	bundle := filepath.Join(UpdateStageDir, "foo", "ollama-darwin.zip")
+	bundle := filepath.Join(UpdateStageDir, "foo", "psyllama-darwin.zip")
 
 	if err := DoUpgradeAtStartup(); err == nil {
 		t.Fatal("expected failure without download")
@@ -166,16 +166,16 @@ func TestDoUpgradeAtStartup(t *testing.T) {
 
 	if err := zipCreationHelper(bundle, []testPayload{
 		{
-			Name: "Ollama.app/Contents/MacOS/Ollama",
+			Name: "Psyllama.app/Contents/MacOS/Psyllama",
 			Body: []byte("would be app binary"),
 		},
 		{
-			Name: "Ollama.app/Contents/Resources/ollama",
+			Name: "Psyllama.app/Contents/Resources/psyllama",
 			Body: []byte("would be the cli"),
 		},
 		{
-			Name: "Ollama.app/Contents/Resources/dummy",
-			Body: []byte("./ollama"),
+			Name: "Psyllama.app/Contents/Resources/dummy",
+			Body: []byte("./psyllama"),
 			Mode: os.ModeSymlink,
 		},
 	}); err != nil {
@@ -192,9 +192,9 @@ func TestDoUpgradeAtStartup(t *testing.T) {
 
 func TestVerifyDownloadFailures(t *testing.T) {
 	tmpDir := t.TempDir()
-	BundlePath = filepath.Join(tmpDir, "Ollama.app")
+	BundlePath = filepath.Join(tmpDir, "Psyllama.app")
 	UpdateStageDir = filepath.Join(tmpDir, "staging")
-	bundle := filepath.Join(UpdateStageDir, "foo", "ollama-darwin.zip")
+	bundle := filepath.Join(UpdateStageDir, "foo", "psyllama-darwin.zip")
 	if err := os.MkdirAll(filepath.Dir(bundle), 0o755); err != nil {
 		t.Fatal("failed to create empty dirs")
 	}
@@ -205,29 +205,29 @@ func TestVerifyDownloadFailures(t *testing.T) {
 	}{
 		{"breakout", []testPayload{
 			{
-				Name: "Ollama.app/",
+				Name: "Psyllama.app/",
 				Body: []byte{},
 			}, {
-				Name: "Ollama.app/Resources/ollama",
+				Name: "Psyllama.app/Resources/psyllama",
 				Body: []byte("cli payload here"),
 			}, {
-				Name: "Ollama.app/Contents/MacOS/Ollama",
+				Name: "Psyllama.app/Contents/MacOS/Psyllama",
 				Body: []byte("../../../../breakout"),
 				Mode: os.ModeSymlink,
 			},
 		}, "bundle contains link outside"},
 		{"absolute", []testPayload{{
-			Name: "Ollama.app/Contents/MacOS/Ollama",
+			Name: "Psyllama.app/Contents/MacOS/Psyllama",
 			Body: []byte("/etc/foo"),
 			Mode: os.ModeSymlink,
 		}}, "bundle contains absolute"},
 		{"missing", []testPayload{{
-			Name: "Ollama.app/Contents/MacOS/Ollama",
+			Name: "Psyllama.app/Contents/MacOS/Psyllama",
 			Body: []byte("../nothere"),
 			Mode: os.ModeSymlink,
 		}}, "no such file or directory"},
 		{"unsigned", []testPayload{{
-			Name: "Ollama.app/Contents/MacOS/Ollama",
+			Name: "Psyllama.app/Contents/MacOS/Psyllama",
 			Body: []byte{0xfa, 0xcf, 0xfe, 0xed, 0x00, 0x0c, 0x01, 0x00},
 		}}, "signature verification failed"},
 	}
@@ -292,13 +292,13 @@ func TestAlreadyMoved(t *testing.T) {
 		t.Fatal("failed to find executable path")
 	}
 	tmpDir := t.TempDir()
-	testApp := filepath.Join(tmpDir, "Ollama.app")
+	testApp := filepath.Join(tmpDir, "Psyllama.app")
 	err = os.MkdirAll(filepath.Join(testApp, "Contents", "MacOS"), 0o755)
 	if err != nil {
 		t.Fatal("failed to create Contents dir")
 	}
 	SystemWidePath = testApp
-	testBinary := filepath.Join(testApp, "Contents", "MacOS", "Ollama")
+	testBinary := filepath.Join(testApp, "Contents", "MacOS", "Psyllama")
 	if err := os.Symlink(exe, testBinary); err != nil {
 		t.Fatalf("failed to create symlink to executable: %s", err)
 	}
@@ -309,12 +309,12 @@ func TestAlreadyMoved(t *testing.T) {
 	}
 
 	// "Keep scenario"
-	testApp = filepath.Join(tmpDir, "Ollama 2.app")
+	testApp = filepath.Join(tmpDir, "Psyllama 2.app")
 	err = os.MkdirAll(filepath.Join(testApp, "Contents", "MacOS"), 0o755)
 	if err != nil {
 		t.Fatal("failed to create Contents dir")
 	}
-	testBinary = filepath.Join(testApp, "Contents", "MacOS", "Ollama")
+	testBinary = filepath.Join(testApp, "Contents", "MacOS", "Psyllama")
 	if err := os.Symlink(exe, testBinary); err != nil {
 		t.Fatalf("failed to create symlink to executable: %s", err)
 	}

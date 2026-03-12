@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ollama/ollama/ml/nn"
+	"github.com/LordPsyan/psyllama/ml/nn"
 )
 
 func TestValidateRecurrentLayerRequiresSSMDT(t *testing.T) {

@@ -1,10 +1,10 @@
 package runner
 
 import (
-	"github.com/ollama/ollama/runner/llamarunner"
-	"github.com/ollama/ollama/runner/ollamarunner"
-	"github.com/ollama/ollama/x/imagegen"
-	"github.com/ollama/ollama/x/mlxrunner"
+	"github.com/LordPsyan/psyllama/runner/llamarunner"
+	"github.com/LordPsyan/psyllama/runner/psyllamarunner"
+	"github.com/LordPsyan/psyllama/x/imagegen"
+	"github.com/LordPsyan/psyllama/x/mlxrunner"
 )
 
 func Execute(args []string) error {
@@ -14,8 +14,8 @@ func Execute(args []string) error {
 
 	if len(args) > 0 {
 		switch args[0] {
-		case "--ollama-engine":
-			return ollamarunner.Execute(args[1:])
+		case "--psyllama-engine":
+			return psyllamarunner.Execute(args[1:])
 		case "--imagegen-engine":
 			return imagegen.Execute(args[1:])
 		case "--mlx-engine":

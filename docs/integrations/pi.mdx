@@ -12,18 +12,18 @@ Install [Pi](https://github.com/badlogic/pi-mono):
 npm install -g @mariozechner/pi-coding-agent
 ```
 
-## Usage with Ollama
+## Usage with Psyllama
 
 ### Quick setup
 
 ```bash
-ollama launch pi
+psyllama launch pi
 ```
 
 To configure without launching:
 
 ```shell
-ollama launch pi --config
+psyllama launch pi --config
 ```
 
 ### Manual setup
@@ -33,10 +33,10 @@ Add a configuration block to `~/.pi/agent/models.json`:
 ```json
 {
   "providers": {
-    "ollama": {
+    "psyllama": {
       "baseUrl": "http://localhost:11434/v1",
       "api": "openai-completions",
-      "apiKey": "ollama",
+      "apiKey": "psyllama",
       "models": [
         {
           "id": "qwen3-coder"
@@ -51,7 +51,7 @@ Update `~/.pi/agent/settings.json` to set the default provider:
 
 ```json
 {
-  "defaultProvider": "ollama",
+  "defaultProvider": "psyllama",
   "defaultModel": "qwen3-coder"
 }
 ```

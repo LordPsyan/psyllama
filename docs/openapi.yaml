@@ -1,15 +1,15 @@
 openapi: 3.1.0
 info:
-  title: Ollama API
+  title: Psyllama API
   version: 0.1.0
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
   description: |
-    OpenAPI specification for the Ollama HTTP API
+    OpenAPI specification for the Psyllama HTTP API
 servers:
   - url: http://localhost:11434
-    description: Ollama
+    description: Psyllama
 security: []
 components:
   securitySchemes:
@@ -604,7 +604,7 @@ components:
           description: Name of the upstream model, if the model is remote
         remote_host:
           type: string
-          description: URL of the upstream Ollama host, if the model is remote
+          description: URL of the upstream Psyllama host, if the model is remote
         modified_at:
           type: string
           description: Last modified timestamp in ISO 8601 format
@@ -739,7 +739,7 @@ components:
       properties:
         version:
           type: string
-          description: Version of Ollama
+          description: Version of Psyllama
     TokenLogprob:
       type: object
       description: Log probability information for a single token alternative
@@ -1300,9 +1300,9 @@ paths:
           label: Create from existing
           source: |
             curl http://localhost:11434/api/create -d '{
-              "model": "ollama",
+              "model": "psyllama",
               "from": "gemma3",
-              "system": "You are Ollama the llama."
+              "system": "You are Psyllama the llama."
             }'
         - lang: bash
           label: Quantize
@@ -1473,7 +1473,7 @@ paths:
   /api/version:
     get:
       summary: Get version
-      description: Retrieve the version of the Ollama
+      description: Retrieve the version of the Psyllama
       operationId: version
       x-codeSamples:
         - lang: bash

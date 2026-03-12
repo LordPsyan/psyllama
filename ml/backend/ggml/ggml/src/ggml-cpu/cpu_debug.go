@@ -2,5 +2,5 @@
 
 package cpu
 
-// #cgo CPPFLAGS: -DOLLAMA_DEBUG
+// #cgo CPPFLAGS: -DPSYLLAMA_DEBUG
 import "C"

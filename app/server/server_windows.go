@@ -15,8 +15,8 @@ import (
 )
 
 var (
-	pidFile       = filepath.Join(os.Getenv("LOCALAPPDATA"), "Ollama", "ollama.pid")
-	serverLogPath = filepath.Join(os.Getenv("LOCALAPPDATA"), "Ollama", "server.log")
+	pidFile       = filepath.Join(os.Getenv("LOCALAPPDATA"), "Psyllama", "psyllama.pid")
+	serverLogPath = filepath.Join(os.Getenv("LOCALAPPDATA"), "Psyllama", "server.log")
 )
 
 func commandContext(ctx context.Context, name string, arg ...string) *exec.Cmd {
@@ -101,18 +101,18 @@ func terminated(pid int) (bool, error) {
 	return true, nil
 }
 
-// reapServers kills all ollama processes except our own
+// reapServers kills all psyllama processes except our own
 func reapServers() error {
 	// Get current process ID to avoid killing ourselves
 	currentPID := os.Getpid()
 
-	// Use wmic to find ollama processes
-	cmd := exec.Command("wmic", "process", "where", "name='ollama.exe'", "get", "ProcessId")
+	// Use wmic to find psyllama processes
+	cmd := exec.Command("wmic", "process", "where", "name='psyllama.exe'", "get", "ProcessId")
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	output, err := cmd.Output()
 	if err != nil {
-		// No ollama processes found
-		slog.Debug("no ollama processes found")
+		// No psyllama processes found
+		slog.Debug("no psyllama processes found")
 		return nil //nolint:nilerr
 	}
 
@@ -141,7 +141,7 @@ func reapServers() error {
 
 		cmd := exec.Command("taskkill", "/F", "/PID", pidStr)
 		if err := cmd.Run(); err != nil {
-			slog.Warn("failed to kill ollama process", "pid", pid, "err", err)
+			slog.Warn("failed to kill psyllama process", "pid", pid, "err", err)
 		}
 	}
 

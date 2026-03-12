@@ -9,9 +9,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/logutil"
-	"github.com/ollama/ollama/x/mlxrunner/mlx"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/logutil"
+	"github.com/LordPsyan/psyllama/x/mlxrunner/mlx"
 )
 
 func prefillChunkSize() int {

@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ollama/ollama/api"
+	"github.com/LordPsyan/psyllama/api"
 )
 
 func TestVisionModels(t *testing.T) {
@@ -65,7 +65,7 @@ func TestVisionModels(t *testing.T) {
 			defer cancel()
 			client, _, cleanup := InitServerConnection(ctx, t)
 
-			// Note: sometimes it returns "the ollamas" sometimes "the ollams"
+			// Note: sometimes it returns "the psyllamas" sometimes "the ollams"
 			resp := "the ollam"
 			defer cleanup()
 			if err := PullIfMissing(ctx, client, req.Model); err != nil {
@@ -105,7 +105,7 @@ func TestIntegrationSplitBatch(t *testing.T) {
 		},
 	}
 
-	// Note: sometimes it returns "the ollamas" sometimes "the ollams"
+	// Note: sometimes it returns "the psyllamas" sometimes "the ollams"
 	resp := "the ollam"
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()

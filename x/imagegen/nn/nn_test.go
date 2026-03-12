@@ -8,13 +8,13 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/ollama/ollama/x/imagegen/mlx"
+	"github.com/LordPsyan/psyllama/x/imagegen/mlx"
 )
 
 // TestMain initializes MLX before running tests.
 // If MLX libraries are not available, tests are skipped.
 func TestMain(m *testing.M) {
-	// Change to repo root so ./build/lib/ollama/ path works
+	// Change to repo root so ./build/lib/psyllama/ path works
 	_, thisFile, _, _ := runtime.Caller(0)
 	repoRoot := filepath.Join(filepath.Dir(thisFile), "..", "..", "..")
 	if err := os.Chdir(repoRoot); err != nil {

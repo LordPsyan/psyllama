@@ -82,7 +82,7 @@ function checkEnv {
     } else {
         $script:PKG_VERSION="0.0.0"
     }
-    Write-Output "Building Ollama $script:VERSION with package version $script:PKG_VERSION"
+    Write-Output "Building Psyllama $script:VERSION with package version $script:PKG_VERSION"
 
     # Note: Windows Kits 10 signtool crashes with GCP's plugin
     if ($null -eq $env:SIGN_TOOL) {
@@ -91,17 +91,17 @@ function checkEnv {
         ${script:SignTool}=${env:SIGN_TOOL}
     }
     if ("${env:KEY_CONTAINER}") {
-        if (Test-Path "${script:SRC_DIR}\ollama_inc.crt") {
-            ${script:OLLAMA_CERT}=$(resolve-path "${script:SRC_DIR}\ollama_inc.crt")
+        if (Test-Path "${script:SRC_DIR}\psyllama_inc.crt") {
+            ${script:PSYLLAMA_CERT}=$(resolve-path "${script:SRC_DIR}\psyllama_inc.crt")
             Write-host "Code signing enabled"
         } else {
-            Write-Output "WARNING: KEY_CONTAINER is set but ollama_inc.crt not found at ${script:SRC_DIR}\ollama_inc.crt - code signing disabled"
+            Write-Output "WARNING: KEY_CONTAINER is set but psyllama_inc.crt not found at ${script:SRC_DIR}\psyllama_inc.crt - code signing disabled"
         }
     } else {
-        Write-Output "Code signing disabled - please set KEY_CONTAINERS to sign and copy ollama_inc.crt to the top of the source tree"
+        Write-Output "Code signing disabled - please set KEY_CONTAINERS to sign and copy psyllama_inc.crt to the top of the source tree"
     }
-    if ($env:OLLAMA_BUILD_PARALLEL) {
-        $script:JOBS=[int]$env:OLLAMA_BUILD_PARALLEL
+    if ($env:PSYLLAMA_BUILD_PARALLEL) {
+        $script:JOBS=[int]$env:PSYLLAMA_BUILD_PARALLEL
     } else {
         # Use physical core count rather than logical processors (hyperthreads)
         # to avoid saturating the system during builds
@@ -116,7 +116,7 @@ function checkEnv {
             $script:JOBS = [Environment]::ProcessorCount
         }
     }
-    Write-Output "Build parallelism: $script:JOBS (set OLLAMA_BUILD_PARALLEL to override)"
+    Write-Output "Build parallelism: $script:JOBS (set PSYLLAMA_BUILD_PARALLEL to override)"
 }
 
 
@@ -124,7 +124,7 @@ function cpu {
     mkdir -Force -path "${script:DIST_DIR}\" | Out-Null
     if ($script:ARCH -ne "arm64") {
         Remove-Item -ea 0 -recurse -force -path "${script:SRC_DIR}\dist\windows-${script:ARCH}"
-        New-Item "${script:SRC_DIR}\dist\windows-${script:ARCH}\lib\ollama\" -ItemType Directory -ea 0
+        New-Item "${script:SRC_DIR}\dist\windows-${script:ARCH}\lib\psyllama\" -ItemType Directory -ea 0
 
         & cmake -B build\cpu --preset CPU --install-prefix $script:DIST_DIR
         if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
@@ -235,7 +235,7 @@ function rocm6 {
             if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
             & cmake --install build\rocm --component "HIP" --strip
             if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
-            Remove-Item -Path $script:DIST_DIR\lib\ollama\rocm\rocblas\library\*gfx906* -ErrorAction SilentlyContinue
+            Remove-Item -Path $script:DIST_DIR\lib\psyllama\rocm\rocblas\library\*gfx906* -ErrorAction SilentlyContinue
         } else {
             Write-Output "ROCm not detected, skipping"
         }
@@ -314,16 +314,16 @@ function mlxCuda13 {
     }
 }
 
-function ollama {
+function psyllama {
     mkdir -Force -path "${script:DIST_DIR}\" | Out-Null
-    Write-Output "Building ollama CLI"
-    & go build -trimpath -ldflags "-s -w -X=github.com/ollama/ollama/version.Version=$script:VERSION -X=github.com/ollama/ollama/server.mode=release" .
+    Write-Output "Building psyllama CLI"
+    & go build -trimpath -ldflags "-s -w -X=github.com/psyllama/psyllama/version.Version=$script:VERSION -X=github.com/psyllama/psyllama/server.mode=release" .
     if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
-    cp .\ollama.exe "${script:DIST_DIR}\"
+    cp .\psyllama.exe "${script:DIST_DIR}\"
 }
 
 function app {
-    Write-Output "Building Ollama App $script:VERSION with package version $script:PKG_VERSION"
+    Write-Output "Building Psyllama App $script:VERSION with package version $script:PKG_VERSION"
 
     if (!(Get-Command npm -ErrorAction SilentlyContinue)) {
         Write-Output "npm is not installed. Please install Node.js and npm first:"
@@ -374,7 +374,7 @@ function app {
     Write-Output "Running go generate"
     & go generate ./...
     if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
-	& go build -trimpath -ldflags "-s -w -H windowsgui -X=github.com/ollama/ollama/app/version.Version=$script:VERSION" -o .\dist\windows-ollama-app-${script:ARCH}.exe ./app/cmd/app/
+	& go build -trimpath -ldflags "-s -w -H windowsgui -X=github.com/psyllama/psyllama/app/version.Version=$script:VERSION" -o .\dist\windows-psyllama-app-${script:ARCH}.exe ./app/cmd/app/
     if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
 }
 
@@ -393,14 +393,14 @@ function sign {
     Copy-Item -Path "${script:SRC_DIR}\scripts\install.ps1" -Destination "${script:SRC_DIR}\dist\install.ps1" -ErrorAction Stop
 
     if ("${env:KEY_CONTAINER}") {
-        Write-Output "Signing Ollama executables, scripts and libraries"
-        & "${script:SignTool}" sign /v /fd sha256 /t http://timestamp.digicert.com /f "${script:OLLAMA_CERT}" `
+        Write-Output "Signing Psyllama executables, scripts and libraries"
+        & "${script:SignTool}" sign /v /fd sha256 /t http://timestamp.digicert.com /f "${script:PSYLLAMA_CERT}" `
             /csp "Google Cloud KMS Provider" /kc ${env:KEY_CONTAINER} `
             $(get-childitem -path "${script:SRC_DIR}\dist\windows-*" -r -include @('*.exe', '*.dll'))
         if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
 
         Write-Output "Signing install.ps1"
-        & "${script:SignTool}" sign /v /fd sha256 /t http://timestamp.digicert.com /f "${script:OLLAMA_CERT}" `
+        & "${script:SignTool}" sign /v /fd sha256 /t http://timestamp.digicert.com /f "${script:PSYLLAMA_CERT}" `
             /csp "Google Cloud KMS Provider" /kc ${env:KEY_CONTAINER} `
             "${script:SRC_DIR}\dist\install.ps1"
         if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
@@ -414,39 +414,39 @@ function installer {
         Write-Output "ERROR: missing Inno Setup installation directory - install from https://jrsoftware.org/isdl.php"
         exit 1
     }
-    Write-Output "Building Ollama Installer"
+    Write-Output "Building Psyllama Installer"
     cd "${script:SRC_DIR}\app"
     $env:PKG_VERSION=$script:PKG_VERSION
     if ("${env:KEY_CONTAINER}") {
-        & "${script:INNO_SETUP_DIR}\ISCC.exe" /DARCH=$script:TARGET_ARCH /SMySignTool="${script:SignTool} sign /fd sha256 /t http://timestamp.digicert.com /f ${script:OLLAMA_CERT} /csp `$qGoogle Cloud KMS Provider`$q /kc ${env:KEY_CONTAINER} `$f" .\ollama.iss
+        & "${script:INNO_SETUP_DIR}\ISCC.exe" /DARCH=$script:TARGET_ARCH /SMySignTool="${script:SignTool} sign /fd sha256 /t http://timestamp.digicert.com /f ${script:PSYLLAMA_CERT} /csp `$qGoogle Cloud KMS Provider`$q /kc ${env:KEY_CONTAINER} `$f" .\psyllama.iss
     } else {
-        & "${script:INNO_SETUP_DIR}\ISCC.exe" /DARCH=$script:TARGET_ARCH .\ollama.iss
+        & "${script:INNO_SETUP_DIR}\ISCC.exe" /DARCH=$script:TARGET_ARCH .\psyllama.iss
     }
     if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
 }
 
 function zip {
     if (Test-Path -Path "${script:SRC_DIR}\dist\windows-amd64") {
-        if (Test-Path -Path "${script:SRC_DIR}\dist\windows-amd64\lib\ollama\rocm") {
-            Write-Output "Generating stand-alone distribution zip file ${script:SRC_DIR}\dist\ollama-windows-amd64-rocm.zip"
+        if (Test-Path -Path "${script:SRC_DIR}\dist\windows-amd64\lib\psyllama\rocm") {
+            Write-Output "Generating stand-alone distribution zip file ${script:SRC_DIR}\dist\psyllama-windows-amd64-rocm.zip"
             # Temporarily adjust paths so we can retain the same directory structure
             Remove-Item -ea 0 -r "${script:SRC_DIR}\dist\windows-amd64-rocm"
-            mkdir -Force -path "${script:SRC_DIR}\dist\windows-amd64-rocm\lib\ollama"
-            Write-Output "Extract this ROCm zip file to the same location where you extracted ollama-windows-amd64.zip" > "${script:SRC_DIR}\dist\windows-amd64-rocm\README.txt"
-            Move-Item -path "${script:SRC_DIR}\dist\windows-amd64\lib\ollama\rocm" -destination "${script:SRC_DIR}\dist\windows-amd64-rocm\lib\ollama" -ErrorAction Stop
-            Compress-Archive -CompressionLevel Optimal -Path "${script:SRC_DIR}\dist\windows-amd64-rocm\*" -DestinationPath "${script:SRC_DIR}\dist\ollama-windows-amd64-rocm.zip" -Force
+            mkdir -Force -path "${script:SRC_DIR}\dist\windows-amd64-rocm\lib\psyllama"
+            Write-Output "Extract this ROCm zip file to the same location where you extracted psyllama-windows-amd64.zip" > "${script:SRC_DIR}\dist\windows-amd64-rocm\README.txt"
+            Move-Item -path "${script:SRC_DIR}\dist\windows-amd64\lib\psyllama\rocm" -destination "${script:SRC_DIR}\dist\windows-amd64-rocm\lib\psyllama" -ErrorAction Stop
+            Compress-Archive -CompressionLevel Optimal -Path "${script:SRC_DIR}\dist\windows-amd64-rocm\*" -DestinationPath "${script:SRC_DIR}\dist\psyllama-windows-amd64-rocm.zip" -Force
         }
 
-        Write-Output "Generating stand-alone distribution zip file ${script:SRC_DIR}\dist\ollama-windows-amd64.zip"
-        Compress-Archive -CompressionLevel Optimal -Path "${script:SRC_DIR}\dist\windows-amd64\*" -DestinationPath "${script:SRC_DIR}\dist\ollama-windows-amd64.zip" -Force
+        Write-Output "Generating stand-alone distribution zip file ${script:SRC_DIR}\dist\psyllama-windows-amd64.zip"
+        Compress-Archive -CompressionLevel Optimal -Path "${script:SRC_DIR}\dist\windows-amd64\*" -DestinationPath "${script:SRC_DIR}\dist\psyllama-windows-amd64.zip" -Force
         if (Test-Path -Path "${script:SRC_DIR}\dist\windows-amd64-rocm") {
-            Move-Item -destination "${script:SRC_DIR}\dist\windows-amd64\lib\ollama\rocm" -path "${script:SRC_DIR}\dist\windows-amd64-rocm\lib\ollama\rocm" -ErrorAction Stop
+            Move-Item -destination "${script:SRC_DIR}\dist\windows-amd64\lib\psyllama\rocm" -path "${script:SRC_DIR}\dist\windows-amd64-rocm\lib\psyllama\rocm" -ErrorAction Stop
         }
     }
 
     if (Test-Path -Path "${script:SRC_DIR}\dist\windows-arm64") {
-        Write-Output "Generating stand-alone distribution zip file ${script:SRC_DIR}\dist\ollama-windows-arm64.zip"
-        Compress-Archive -CompressionLevel Optimal -Path "${script:SRC_DIR}\dist\windows-arm64\*" -DestinationPath "${script:SRC_DIR}\dist\ollama-windows-arm64.zip" -Force
+        Write-Output "Generating stand-alone distribution zip file ${script:SRC_DIR}\dist\psyllama-windows-arm64.zip"
+        Compress-Archive -CompressionLevel Optimal -Path "${script:SRC_DIR}\dist\windows-arm64\*" -DestinationPath "${script:SRC_DIR}\dist\psyllama-windows-arm64.zip" -Force
     }
 }
 
@@ -464,7 +464,7 @@ try {
         rocm6
         vulkan
         mlxCuda13
-        ollama
+        psyllama
         app
         deps
         sign

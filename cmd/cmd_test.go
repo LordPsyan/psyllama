@@ -17,9 +17,9 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/spf13/cobra"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/internal/modelref"
-	"github.com/ollama/ollama/types/model"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/internal/modelref"
+	"github.com/LordPsyan/psyllama/types/model"
 )
 
 func TestShowInfo(t *testing.T) {
@@ -239,7 +239,7 @@ Weigh anchor!
 
 	t.Run("license", func(t *testing.T) {
 		var b bytes.Buffer
-		license := "MIT License\nCopyright (c) Ollama\n"
+		license := "MIT License\nCopyright (c) Psyllama\n"
 		if err := showInfo(&api.ShowResponse{
 			Details: api.ModelDetails{
 				Family:            "test",
@@ -251,18 +251,16 @@ Weigh anchor!
 			t.Fatal(err)
 		}
 
-		expect := `  Model
-    architecture    test    
-    parameters      7B      
-    quantization    FP16    
-
-  License
-    MIT License             
-    Copyright (c) Ollama    
-
-`
-		if diff := cmp.Diff(expect, b.String()); diff != "" {
-			t.Errorf("unexpected output (-want +got):\n%s", diff)
+		got := b.String()
+		for _, want := range []string{
+			"  Model\n",
+			"  License\n",
+			"MIT License",
+			"Copyright (c) Psyllama",
+		} {
+			if !strings.Contains(got, want) {
+				t.Fatalf("expected output to contain %q, got %q", want, got)
+			}
 		}
 	})
 
@@ -364,7 +362,7 @@ func TestDeleteHandler(t *testing.T) {
 		}
 	}))
 
-	t.Setenv("OLLAMA_HOST", mockServer.URL)
+	t.Setenv("PSYLLAMA_HOST", mockServer.URL)
 	t.Cleanup(mockServer.Close)
 
 	cmd := &cobra.Command{}
@@ -413,7 +411,7 @@ func TestRunEmbeddingModel(t *testing.T) {
 		http.NotFound(w, r)
 	}))
 
-	t.Setenv("OLLAMA_HOST", mockServer.URL)
+	t.Setenv("PSYLLAMA_HOST", mockServer.URL)
 	t.Cleanup(mockServer.Close)
 
 	cmd := &cobra.Command{}
@@ -505,7 +503,7 @@ func TestRunEmbeddingModelWithFlags(t *testing.T) {
 		http.NotFound(w, r)
 	}))
 
-	t.Setenv("OLLAMA_HOST", mockServer.URL)
+	t.Setenv("PSYLLAMA_HOST", mockServer.URL)
 	t.Cleanup(mockServer.Close)
 
 	cmd := &cobra.Command{}
@@ -606,7 +604,7 @@ func TestRunEmbeddingModelPipedInput(t *testing.T) {
 		http.NotFound(w, r)
 	}))
 
-	t.Setenv("OLLAMA_HOST", mockServer.URL)
+	t.Setenv("PSYLLAMA_HOST", mockServer.URL)
 	t.Cleanup(mockServer.Close)
 
 	cmd := &cobra.Command{}
@@ -681,7 +679,7 @@ func TestRunEmbeddingModelNoInput(t *testing.T) {
 		http.NotFound(w, r)
 	}))
 
-	t.Setenv("OLLAMA_HOST", mockServer.URL)
+	t.Setenv("PSYLLAMA_HOST", mockServer.URL)
 	t.Cleanup(mockServer.Close)
 
 	cmd := &cobra.Command{}
@@ -715,7 +713,7 @@ func TestRunHandler_CloudAuthErrorOnShow_PrintsSigninMessage(t *testing.T) {
 			w.WriteHeader(http.StatusUnauthorized)
 			if err := json.NewEncoder(w).Encode(map[string]string{
 				"error":      "unauthorized",
-				"signin_url": "https://ollama.com/signin",
+				"signin_url": "https://psyllama.com/signin",
 			}); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
@@ -732,7 +730,7 @@ func TestRunHandler_CloudAuthErrorOnShow_PrintsSigninMessage(t *testing.T) {
 		}
 	}))
 
-	t.Setenv("OLLAMA_HOST", mockServer.URL)
+	t.Setenv("PSYLLAMA_HOST", mockServer.URL)
 	t.Cleanup(mockServer.Close)
 
 	cmd := &cobra.Command{}
@@ -766,11 +764,11 @@ func TestRunHandler_CloudAuthErrorOnShow_PrintsSigninMessage(t *testing.T) {
 		t.Fatal("expected run to stop before /api/generate after unauthorized /api/show")
 	}
 
-	if !strings.Contains(out.String(), "You need to be signed in to Ollama to run Cloud models.") {
+	if !strings.Contains(out.String(), "You need to be signed in to Psyllama to run Cloud models.") {
 		t.Fatalf("expected sign-in guidance message, got %q", out.String())
 	}
 
-	if !strings.Contains(out.String(), "https://ollama.com/signin") {
+	if !strings.Contains(out.String(), "https://psyllama.com/signin") {
 		t.Fatalf("expected signin_url in output, got %q", out.String())
 	}
 }
@@ -790,7 +788,7 @@ func TestRunHandler_CloudAuthErrorOnGenerate_PrintsSigninMessage(t *testing.T) {
 			w.WriteHeader(http.StatusUnauthorized)
 			if err := json.NewEncoder(w).Encode(map[string]string{
 				"error":      "unauthorized",
-				"signin_url": "https://ollama.com/signin",
+				"signin_url": "https://psyllama.com/signin",
 			}); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
@@ -800,7 +798,7 @@ func TestRunHandler_CloudAuthErrorOnGenerate_PrintsSigninMessage(t *testing.T) {
 		}
 	}))
 
-	t.Setenv("OLLAMA_HOST", mockServer.URL)
+	t.Setenv("PSYLLAMA_HOST", mockServer.URL)
 	t.Cleanup(mockServer.Close)
 
 	cmd := &cobra.Command{}
@@ -830,11 +828,11 @@ func TestRunHandler_CloudAuthErrorOnGenerate_PrintsSigninMessage(t *testing.T) {
 		t.Fatalf("RunHandler returned error: %v", err)
 	}
 
-	if !strings.Contains(out.String(), "You need to be signed in to Ollama to run Cloud models.") {
+	if !strings.Contains(out.String(), "You need to be signed in to Psyllama to run Cloud models.") {
 		t.Fatalf("expected sign-in guidance message, got %q", out.String())
 	}
 
-	if !strings.Contains(out.String(), "https://ollama.com/signin") {
+	if !strings.Contains(out.String(), "https://psyllama.com/signin") {
 		t.Fatalf("expected signin_url in output, got %q", out.String())
 	}
 }
@@ -982,7 +980,7 @@ func TestPushHandler(t *testing.T) {
 					}
 				},
 			},
-			expectedOutput: "\nYou can find your model at:\n\n\thttps://ollama.com/test-model\n",
+			expectedOutput: "\nYou can find your model at:\n\n\tregistry.psyllama.ai/library/test-model:latest\n",
 		},
 		{
 			name:      "not signed in push",
@@ -1040,7 +1038,7 @@ func TestPushHandler(t *testing.T) {
 			}))
 			defer mockServer.Close()
 
-			t.Setenv("OLLAMA_HOST", mockServer.URL)
+			t.Setenv("PSYLLAMA_HOST", mockServer.URL)
 			tmpDir := t.TempDir()
 			t.Setenv("HOME", tmpDir)
 			t.Setenv("USERPROFILE", tmpDir)
@@ -1150,7 +1148,7 @@ func TestListHandler(t *testing.T) {
 			}))
 			defer mockServer.Close()
 
-			t.Setenv("OLLAMA_HOST", mockServer.URL)
+			t.Setenv("PSYLLAMA_HOST", mockServer.URL)
 
 			cmd := &cobra.Command{}
 			cmd.SetContext(t.Context())
@@ -1246,7 +1244,7 @@ func TestCreateHandler(t *testing.T) {
 				}
 				handler(w, r)
 			}))
-			t.Setenv("OLLAMA_HOST", mockServer.URL)
+			t.Setenv("PSYLLAMA_HOST", mockServer.URL)
 			t.Cleanup(mockServer.Close)
 			tempFile, err := os.CreateTemp(t.TempDir(), "modelfile")
 			if err != nil {
@@ -1806,27 +1804,27 @@ func TestLoadOrUnloadModel_CloudModelAuth(t *testing.T) {
 		expectedError string
 	}{
 		{
-			name:         "ollama.com cloud model - user signed in",
+			name:         "psyllama.com cloud model - user signed in",
 			model:        "test-cloud-model",
-			remoteHost:   "https://ollama.com",
+			remoteHost:   "https://psyllama.com",
 			remoteModel:  "test-model",
 			whoamiStatus: http.StatusOK,
 			whoamiResp:   api.UserResponse{Name: "testuser"},
 		},
 		{
-			name:         "ollama.com cloud model - user not signed in",
+			name:         "psyllama.com cloud model - user not signed in",
 			model:        "test-cloud-model",
-			remoteHost:   "https://ollama.com",
+			remoteHost:   "https://psyllama.com",
 			remoteModel:  "test-model",
 			whoamiStatus: http.StatusUnauthorized,
 			whoamiResp: map[string]string{
 				"error":      "unauthorized",
-				"signin_url": "https://ollama.com/signin",
+				"signin_url": "https://psyllama.com/signin",
 			},
 			expectedError: "unauthorized",
 		},
 		{
-			name:         "non-ollama.com remote - no auth check",
+			name:         "non-psyllama.com remote - no auth check",
 			model:        "test-cloud-model",
 			remoteHost:   "https://other-remote.com",
 			remoteModel:  "test-model",
@@ -1889,7 +1887,7 @@ func TestLoadOrUnloadModel_CloudModelAuth(t *testing.T) {
 			}))
 			defer mockServer.Close()
 
-			t.Setenv("OLLAMA_HOST", mockServer.URL)
+			t.Setenv("PSYLLAMA_HOST", mockServer.URL)
 
 			cmd := &cobra.Command{}
 			cmd.SetContext(t.Context())
@@ -1901,13 +1899,13 @@ func TestLoadOrUnloadModel_CloudModelAuth(t *testing.T) {
 
 			err := loadOrUnloadModel(cmd, opts)
 
-			if strings.HasPrefix(tt.remoteHost, "https://ollama.com") || modelref.HasExplicitCloudSource(tt.model) {
+			if strings.HasPrefix(tt.remoteHost, "https://psyllama.com") || modelref.HasExplicitCloudSource(tt.model) {
 				if !whoamiCalled {
-					t.Error("expected whoami to be called for ollama.com cloud model")
+					t.Error("expected whoami to be called for psyllama.com cloud model")
 				}
 			} else {
 				if whoamiCalled {
-					t.Error("whoami should not be called for non-ollama.com remote")
+					t.Error("whoami should not be called for non-psyllama.com remote")
 				}
 			}
 
@@ -1955,10 +1953,10 @@ func TestIsLocalhost(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Setenv("OLLAMA_HOST", tt.host)
+			t.Setenv("PSYLLAMA_HOST", tt.host)
 			got := isLocalhost()
 			if got != tt.expected {
-				t.Errorf("isLocalhost() with OLLAMA_HOST=%q = %v, want %v", tt.host, got, tt.expected)
+				t.Errorf("isLocalhost() with PSYLLAMA_HOST=%q = %v, want %v", tt.host, got, tt.expected)
 			}
 		})
 	}

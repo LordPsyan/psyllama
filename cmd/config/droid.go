@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"slices"
 
-	"github.com/ollama/ollama/envconfig"
+	"github.com/LordPsyan/psyllama/envconfig"
 )
 
 // Droid implements Runner and Editor for Droid integration
@@ -110,20 +110,20 @@ func (d *Droid) Edit(models []string) error {
 		json.Unmarshal(data, &settings) // ignore error, zero values are fine
 	}
 
-	// Keep only non-Ollama models from the raw map (preserves extra fields)
-	// Rebuild Ollama models
-	var nonOllamaModels []any
+	// Keep only non-Psyllama models from the raw map (preserves extra fields)
+	// Rebuild Psyllama models
+	var nonPsyllamaModels []any
 	if rawModels, ok := settingsMap["customModels"].([]any); ok {
 		for _, raw := range rawModels {
 			if m, ok := raw.(map[string]any); ok {
-				if m["apiKey"] != "ollama" {
-					nonOllamaModels = append(nonOllamaModels, raw)
+				if m["apiKey"] != "psyllama" {
+					nonPsyllamaModels = append(nonPsyllamaModels, raw)
 				}
 			}
 		}
 	}
 
-	// Build new Ollama model entries with sequential indices (0, 1, 2, ...)
+	// Build new Psyllama model entries with sequential indices (0, 1, 2, ...)
 
 	var newModels []any
 	var defaultModelID string
@@ -139,7 +139,7 @@ func (d *Droid) Edit(models []string) error {
 			Model:           model,
 			DisplayName:     model,
 			BaseURL:         envconfig.Host().String() + "/v1",
-			APIKey:          "ollama",
+			APIKey:          "psyllama",
 			Provider:        "generic-chat-completion-api",
 			MaxOutputTokens: maxOutput,
 			SupportsImages:  false,
@@ -151,7 +151,7 @@ func (d *Droid) Edit(models []string) error {
 		}
 	}
 
-	settingsMap["customModels"] = append(newModels, nonOllamaModels...)
+	settingsMap["customModels"] = append(newModels, nonPsyllamaModels...)
 
 	// Update session default settings (preserve unknown fields in the nested object)
 	sessionSettings, ok := settingsMap["sessionDefaultSettings"].(map[string]any)
@@ -191,7 +191,7 @@ func (d *Droid) Models() []string {
 
 	var result []string
 	for _, m := range settings.CustomModels {
-		if m.APIKey == "ollama" {
+		if m.APIKey == "psyllama" {
 			result = append(result, m.Model)
 		}
 	}

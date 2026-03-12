@@ -6,8 +6,8 @@ import (
 	"math/rand/v2"
 	"slices"
 
-	"github.com/ollama/ollama/llama"
-	"github.com/ollama/ollama/tokenizer"
+	"github.com/LordPsyan/psyllama/llama"
+	"github.com/LordPsyan/psyllama/tokenizer"
 )
 
 // token represents information about a single token during sampling
@@ -155,7 +155,7 @@ func (s *Sampler) sample(tokens []token) (token, error) {
 	return tokens[idx], nil
 }
 
-// TODO(parthsareen): update sampler interface to use json unmarshal https://github.com/ollama/ollama/issues/9278
+// TODO(parthsareen): update sampler interface to use json unmarshal https://github.com/LordPsyan/psyllama/issues/9278
 func NewSampler(temperature float32, topK int, topP float32, minP float32, repeatPenalty float32, presencePenalty float32, frequencyPenalty float32, seed int, grammar *GrammarSampler) Sampler {
 	var rng *rand.Rand
 	if seed != -1 {

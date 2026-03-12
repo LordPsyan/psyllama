@@ -26,15 +26,15 @@ import (
 
 	"golang.org/x/sync/semaphore"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/format"
-	"github.com/ollama/ollama/fs/ggml"
-	"github.com/ollama/ollama/llama"
-	"github.com/ollama/ollama/logutil"
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/model"
-	"github.com/ollama/ollama/tokenizer"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/envconfig"
+	"github.com/LordPsyan/psyllama/format"
+	"github.com/LordPsyan/psyllama/fs/ggml"
+	"github.com/LordPsyan/psyllama/llama"
+	"github.com/LordPsyan/psyllama/logutil"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/model"
+	"github.com/LordPsyan/psyllama/tokenizer"
 )
 
 type filteredEnv []string
@@ -44,7 +44,7 @@ func (e filteredEnv) LogValue() slog.Value {
 	for _, env := range e {
 		if key, value, ok := strings.Cut(env, "="); ok {
 			switch {
-			case strings.HasPrefix(key, "OLLAMA_"),
+			case strings.HasPrefix(key, "PSYLLAMA_"),
 				strings.HasPrefix(key, "CUDA_"),
 				strings.HasPrefix(key, "ROCR_"),
 				strings.HasPrefix(key, "ROCM_"),
@@ -113,7 +113,7 @@ type llamaServer struct {
 	ggml *ggml.GGML
 }
 
-type ollamaServer struct {
+type psyllamaServer struct {
 	llmServer
 
 	tokenizer tokenizer.Tokenizer // tokenizer handles text encoding/decoding
@@ -144,7 +144,7 @@ func NewLlamaServer(systemInfo ml.SystemInfo, gpus []ml.DeviceInfo, modelPath st
 	var llamaModel *llama.Model
 	var tok tokenizer.Tokenizer
 	var err error
-	if envconfig.NewEngine() || f.KV().OllamaEngineRequired() {
+	if envconfig.NewEngine() || f.KV().PsyllamaEngineRequired() {
 		if len(projectors) == 0 {
 			tok, err = model.NewTextProcessor(modelPath)
 		} else {
@@ -152,7 +152,7 @@ func NewLlamaServer(systemInfo ml.SystemInfo, gpus []ml.DeviceInfo, modelPath st
 		}
 		if err != nil {
 			// To prepare for opt-out mode, instead of treating this as an error, we fallback to the old runner
-			slog.Debug("model not yet supported by Ollama engine, switching to compatibility mode", "model", modelPath, "error", err)
+			slog.Debug("model not yet supported by Psyllama engine, switching to compatibility mode", "model", modelPath, "error", err)
 		}
 	}
 	if tok == nil {
@@ -224,24 +224,24 @@ func NewLlamaServer(systemInfo ml.SystemInfo, gpus []ml.DeviceInfo, modelPath st
 		if kvct != "" {
 			if f.KVCacheTypeIsQuantized(kvct) {
 				if flashAttention != ml.FlashAttentionEnabled {
-					slog.Warn("OLLAMA_FLASH_ATTENTION must be enabled to use a quantized OLLAMA_KV_CACHE_TYPE", "type", kvct)
+					slog.Warn("PSYLLAMA_FLASH_ATTENTION must be enabled to use a quantized PSYLLAMA_KV_CACHE_TYPE", "type", kvct)
 					loadRequest.KvCacheType = ""
 				} else if f.SupportsKVCacheType(kvct) {
 					loadRequest.KvCacheType = kvct
 				} else {
-					slog.Warn("unsupported OLLAMA_KV_CACHE_TYPE", "type", kvct)
+					slog.Warn("unsupported PSYLLAMA_KV_CACHE_TYPE", "type", kvct)
 				}
 			} else {
 				if f.SupportsKVCacheType(kvct) {
 					loadRequest.KvCacheType = kvct
 				} else {
-					slog.Warn("unsupported OLLAMA_KV_CACHE_TYPE", "type", kvct)
+					slog.Warn("unsupported PSYLLAMA_KV_CACHE_TYPE", "type", kvct)
 				}
 			}
 		}
 		loadRequest.FlashAttention = flashAttention
 	} else {
-		// For Ollama engine, use our SupportsFlashAttention logic
+		// For Psyllama engine, use our SupportsFlashAttention logic
 		if fa {
 			slog.Info("enabling flash attention")
 			loadRequest.FlashAttention = ml.FlashAttentionEnabled
@@ -302,7 +302,7 @@ func NewLlamaServer(systemInfo ml.SystemInfo, gpus []ml.DeviceInfo, modelPath st
 		if err != nil && s.status != nil && s.status.LastErrMsg != "" {
 			slog.Error("llama runner terminated", "error", err)
 			if strings.Contains(s.status.LastErrMsg, "unknown model") {
-				s.status.LastErrMsg = "this model is not supported by your version of Ollama. You may need to upgrade"
+				s.status.LastErrMsg = "this model is not supported by your version of Psyllama. You may need to upgrade"
 			}
 			s.done <- errors.New(s.status.LastErrMsg)
 		} else {
@@ -311,13 +311,13 @@ func NewLlamaServer(systemInfo ml.SystemInfo, gpus []ml.DeviceInfo, modelPath st
 	}()
 
 	if tok != nil {
-		return &ollamaServer{llmServer: s, tokenizer: tok}, nil
+		return &psyllamaServer{llmServer: s, tokenizer: tok}, nil
 	} else {
 		return &llamaServer{llmServer: s, ggml: f}, nil
 	}
 }
 
-func StartRunner(ollamaEngine bool, modelPath string, gpuLibs []string, out io.Writer, extraEnvs map[string]string) (cmd *exec.Cmd, port int, err error) {
+func StartRunner(psyllamaEngine bool, modelPath string, gpuLibs []string, out io.Writer, extraEnvs map[string]string) (cmd *exec.Cmd, port int, err error) {
 	var exe string
 	exe, err = os.Executable()
 	if err != nil {
@@ -341,8 +341,8 @@ func StartRunner(ollamaEngine bool, modelPath string, gpuLibs []string, out io.W
 		port = rand.Intn(65535-49152) + 49152 // get a random port in the ephemeral range
 	}
 	params := []string{"runner"}
-	if ollamaEngine {
-		params = append(params, "--ollama-engine")
+	if psyllamaEngine {
+		params = append(params, "--psyllama-engine")
 	}
 	if modelPath != "" {
 		params = append(params, "--model", modelPath)
@@ -393,7 +393,7 @@ func StartRunner(ollamaEngine bool, modelPath string, gpuLibs []string, out io.W
 
 	// Update or add the path variable with our adjusted version
 	pathNeeded := true
-	ollamaPathNeeded := true
+	psyllamaPathNeeded := true
 	extraEnvsDone := map[string]bool{}
 	for k := range extraEnvs {
 		extraEnvsDone[k] = false
@@ -403,9 +403,9 @@ func StartRunner(ollamaEngine bool, modelPath string, gpuLibs []string, out io.W
 		if strings.EqualFold(cmp[0], pathEnv) {
 			cmd.Env[i] = pathEnv + "=" + pathEnvVal
 			pathNeeded = false
-		} else if strings.EqualFold(cmp[0], "OLLAMA_LIBRARY_PATH") {
-			cmd.Env[i] = "OLLAMA_LIBRARY_PATH=" + strings.Join(gpuLibs, string(filepath.ListSeparator))
-			ollamaPathNeeded = false
+		} else if strings.EqualFold(cmp[0], "PSYLLAMA_LIBRARY_PATH") {
+			cmd.Env[i] = "PSYLLAMA_LIBRARY_PATH=" + strings.Join(gpuLibs, string(filepath.ListSeparator))
+			psyllamaPathNeeded = false
 		} else if len(extraEnvs) != 0 {
 			for k, v := range extraEnvs {
 				if strings.EqualFold(cmp[0], k) {
@@ -418,8 +418,8 @@ func StartRunner(ollamaEngine bool, modelPath string, gpuLibs []string, out io.W
 	if pathNeeded {
 		cmd.Env = append(cmd.Env, pathEnv+"="+pathEnvVal)
 	}
-	if ollamaPathNeeded {
-		cmd.Env = append(cmd.Env, "OLLAMA_LIBRARY_PATH="+strings.Join(gpuLibs, string(filepath.ListSeparator)))
+	if psyllamaPathNeeded {
+		cmd.Env = append(cmd.Env, "PSYLLAMA_LIBRARY_PATH="+strings.Join(gpuLibs, string(filepath.ListSeparator)))
 	}
 	for k, done := range extraEnvsDone {
 		if !done {
@@ -480,7 +480,7 @@ type LoadRequest struct {
 	GPULayers      ml.GPULayersList
 	MultiUserCache bool
 
-	// Legacy fields - not used with the Ollama engine
+	// Legacy fields - not used with the Psyllama engine
 	ProjectorPath string
 	MainGPU       int
 	UseMmap       bool
@@ -743,7 +743,7 @@ func projectorMemoryRequirements(filename string) (weights uint64) {
 // allowing for faster iteration, but may return less information.
 //
 // Returns the list of GPU IDs that were used in the final allocation on success
-func (s *ollamaServer) Load(ctx context.Context, systemInfo ml.SystemInfo, gpus []ml.DeviceInfo, requireFull bool) ([]ml.DeviceID, error) {
+func (s *psyllamaServer) Load(ctx context.Context, systemInfo ml.SystemInfo, gpus []ml.DeviceInfo, requireFull bool) ([]ml.DeviceID, error) {
 	var success bool
 	defer func() {
 		if !success {
@@ -1203,7 +1203,7 @@ func (s *llmServer) initModel(ctx context.Context, req LoadRequest, operation Lo
 	resp, err := http.DefaultClient.Do(r)
 	if err != nil {
 		slog.Error("do load request", "error", err)
-		return nil, errors.New("model failed to load, this may be due to resource limitations or an internal error, check ollama server logs for details")
+		return nil, errors.New("model failed to load, this may be due to resource limitations or an internal error, check psyllama server logs for details")
 	}
 	defer resp.Body.Close()
 
@@ -1608,7 +1608,7 @@ func (s *llmServer) Completion(ctx context.Context, req CompletionRequest, fn fu
 		return err
 	} else if err != nil {
 		slog.Error("post predict", "error", err)
-		return errors.New("model runner has unexpectedly stopped, this may be due to resource limitations or an internal error, check ollama server logs for details")
+		return errors.New("model runner has unexpectedly stopped, this may be due to resource limitations or an internal error, check psyllama server logs for details")
 	}
 	defer res.Body.Close()
 
@@ -1774,7 +1774,7 @@ func (s *llamaServer) Tokenize(ctx context.Context, content string) ([]int, erro
 	return s.llamaModel.Tokenize(content, false, true)
 }
 
-func (s *ollamaServer) Tokenize(ctx context.Context, content string) ([]int, error) {
+func (s *psyllamaServer) Tokenize(ctx context.Context, content string) ([]int, error) {
 	tokens, err := s.tokenizer.Encode(content, false)
 	if err != nil {
 		return nil, err
@@ -1804,7 +1804,7 @@ func (s *llamaServer) Detokenize(ctx context.Context, tokens []int) (string, err
 	return resp, nil
 }
 
-func (s *ollamaServer) Detokenize(ctx context.Context, tokens []int) (string, error) {
+func (s *psyllamaServer) Detokenize(ctx context.Context, tokens []int) (string, error) {
 	toks := make([]int32, len(tokens))
 	for i, t := range tokens {
 		toks[i] = int32(t)
@@ -1894,7 +1894,7 @@ func (s *llmServer) ContextLength() int {
 	return s.options.NumCtx
 }
 
-func (s *ollamaServer) GetDeviceInfos(ctx context.Context) []ml.DeviceInfo {
+func (s *psyllamaServer) GetDeviceInfos(ctx context.Context) []ml.DeviceInfo {
 	devices, err := ml.GetDevicesFromRunner(ctx, s)
 	if err != nil {
 		if s.cmd != nil && s.cmd.ProcessState == nil {

@@ -24,20 +24,20 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-cmp/cmp"
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/fs/ggml"
-	"github.com/ollama/ollama/openai"
-	"github.com/ollama/ollama/server/internal/client/ollama"
-	"github.com/ollama/ollama/types/model"
-	"github.com/ollama/ollama/version"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/fs/ggml"
+	"github.com/LordPsyan/psyllama/openai"
+	"github.com/LordPsyan/psyllama/server/internal/client/psyllama"
+	"github.com/LordPsyan/psyllama/types/model"
+	"github.com/LordPsyan/psyllama/version"
 )
 
 func createTestFile(t *testing.T, name string) (string, string) {
 	t.Helper()
 
-	modelDir := os.Getenv("OLLAMA_MODELS")
+	modelDir := os.Getenv("PSYLLAMA_MODELS")
 	if modelDir == "" {
-		t.Fatalf("OLLAMA_MODELS not specified")
+		t.Fatalf("PSYLLAMA_MODELS not specified")
 	}
 
 	f, err := os.CreateTemp(t.TempDir(), name)
@@ -103,7 +103,7 @@ func TestRoutes(t *testing.T) {
 	createTestModel := func(t *testing.T, name string) {
 		t.Helper()
 
-		_, digest := createTestFile(t, "ollama-model")
+		_, digest := createTestFile(t, "psyllama-model")
 
 		fn := func(resp api.ProgressResponse) {
 			t.Logf("Status: %s", resp.Status)
@@ -339,7 +339,7 @@ func TestRoutes(t *testing.T) {
 			Method: http.MethodPost,
 			Path:   "/api/create",
 			Setup: func(t *testing.T, req *http.Request) {
-				_, digest := createTestFile(t, "ollama-model")
+				_, digest := createTestFile(t, "psyllama-model")
 				stream := false
 				createReq := api.CreateRequest{
 					Name:   "t-bone",
@@ -496,15 +496,15 @@ func TestRoutes(t *testing.T) {
 	}
 
 	modelsDir := t.TempDir()
-	t.Setenv("OLLAMA_MODELS", modelsDir)
+	t.Setenv("PSYLLAMA_MODELS", modelsDir)
 
-	rc := &ollama.Registry{
+	rc := &psyllama.Registry{
 		// This is a temporary measure to allow us to move forward,
-		// surfacing any code contacting ollama.com we do not intended
+		// surfacing any code contacting psyllama.com we do not intended
 		// to.
 		//
 		// Currently, this only handles DELETE /api/delete, which
-		// should not make any contact with the ollama.com registry, so
+		// should not make any contact with the psyllama.com registry, so
 		// be clear about that.
 		//
 		// Tests that do need to contact the registry here, will be
@@ -560,7 +560,7 @@ func casingShuffle(s string) string {
 }
 
 func TestManifestCaseSensitivity(t *testing.T) {
-	t.Setenv("OLLAMA_MODELS", t.TempDir())
+	t.Setenv("PSYLLAMA_MODELS", t.TempDir())
 
 	r := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -590,7 +590,7 @@ func TestManifestCaseSensitivity(t *testing.T) {
 	checkManifestList := func() {
 		t.Helper()
 
-		mandir := filepath.Join(os.Getenv("OLLAMA_MODELS"), "manifests/")
+		mandir := filepath.Join(os.Getenv("PSYLLAMA_MODELS"), "manifests/")
 		var entries []string
 		t.Logf("dir entries:")
 		fsys := os.DirFS(mandir)
@@ -687,7 +687,7 @@ func TestManifestCaseSensitivity(t *testing.T) {
 }
 
 func TestShow(t *testing.T) {
-	t.Setenv("OLLAMA_MODELS", t.TempDir())
+	t.Setenv("PSYLLAMA_MODELS", t.TempDir())
 
 	var s Server
 
@@ -865,7 +865,7 @@ func TestFilterThinkTags(t *testing.T) {
 				{Role: "user", Content: "What is the answer?"},
 			},
 			model: &Model{
-				Name:      "registry.ollama.ai/library/deepseek-r1:latest",
+				Name:      "registry.psyllama.ai/library/deepseek-r1:latest",
 				ShortName: "deepseek-r1:7b",
 				Config:    model.ConfigV2{},
 			},

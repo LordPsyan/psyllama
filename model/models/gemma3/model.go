@@ -6,13 +6,13 @@ import (
 	"math"
 	"slices"
 
-	"github.com/ollama/ollama/fs"
-	"github.com/ollama/ollama/kvcache"
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/ml/nn"
-	"github.com/ollama/ollama/model"
-	"github.com/ollama/ollama/model/input"
-	"github.com/ollama/ollama/tokenizer"
+	"github.com/LordPsyan/psyllama/fs"
+	"github.com/LordPsyan/psyllama/kvcache"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/ml/nn"
+	"github.com/LordPsyan/psyllama/model"
+	"github.com/LordPsyan/psyllama/model/input"
+	"github.com/LordPsyan/psyllama/tokenizer"
 )
 
 type Model struct {
@@ -76,7 +76,7 @@ func New(c fs.Config) (model.Model, error) {
 	case "gpt2":
 		t = tokenizer.NewBytePairEncoding(&vocabulary)
 	default:
-		// Previous uploads of Gemma 3 on Ollama did not have token 106
+		// Previous uploads of Gemma 3 on Psyllama did not have token 106
 		// (i.e. "<end_of_turn>") so we need to add in case it's not already present
 		vocabulary.EOS = append(vocabulary.EOS, int32(c.Uint("tokenizer.ggml.eot_token_id", 106)))
 		t = tokenizer.NewSentencePiece(&vocabulary)

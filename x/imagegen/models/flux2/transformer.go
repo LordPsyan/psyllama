@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/ollama/ollama/x/imagegen/manifest"
-	"github.com/ollama/ollama/x/imagegen/mlx"
-	"github.com/ollama/ollama/x/imagegen/nn"
-	"github.com/ollama/ollama/x/imagegen/safetensors"
+	"github.com/LordPsyan/psyllama/x/imagegen/manifest"
+	"github.com/LordPsyan/psyllama/x/imagegen/mlx"
+	"github.com/LordPsyan/psyllama/x/imagegen/nn"
+	"github.com/LordPsyan/psyllama/x/imagegen/safetensors"
 )
 
 // TransformerConfig holds Flux2 transformer configuration
@@ -389,7 +389,7 @@ type Flux2Transformer2DModel struct {
 	*TransformerConfig
 }
 
-// Load loads the Flux2 transformer from ollama blob storage.
+// Load loads the Flux2 transformer from psyllama blob storage.
 func (m *Flux2Transformer2DModel) Load(modelManifest *manifest.ModelManifest) error {
 	fmt.Print("  Loading transformer... ")
 

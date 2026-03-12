@@ -1723,8 +1723,8 @@ func mlxLibName() string {
 func findMLXLibrary() string {
 	libName := mlxLibName()
 
-	// 1. OLLAMA_LIBRARY_PATH — check each dir and mlx_* subdirs
-	if paths, ok := os.LookupEnv("OLLAMA_LIBRARY_PATH"); ok {
+	// 1. PSYLLAMA_LIBRARY_PATH — check each dir and mlx_* subdirs
+	if paths, ok := os.LookupEnv("PSYLLAMA_LIBRARY_PATH"); ok {
 		for _, dir := range filepath.SplitList(paths) {
 			candidate := filepath.Join(dir, libName)
 			if _, err := os.Stat(candidate); err == nil {
@@ -1741,7 +1741,7 @@ func findMLXLibrary() string {
 		}
 	}
 
-	// 2. Executable directory and lib/ollama/mlx* subdirs
+	// 2. Executable directory and lib/psyllama/mlx* subdirs
 	if exe, err := os.Executable(); err == nil {
 		if eval, err := filepath.EvalSymlinks(exe); err == nil {
 			exe = eval
@@ -1754,13 +1754,13 @@ func findMLXLibrary() string {
 			return candidate
 		}
 
-		// Check exe_dir/lib/ollama/mlx* subdirectories
-		// and exe_dir/../lib/ollama/mlx* (standard bin/lib sibling layout)
-		for _, libOllamaDir := range []string{
-			filepath.Join(exeDir, "lib", "ollama"),
-			filepath.Join(exeDir, "..", "lib", "ollama"),
+		// Check exe_dir/lib/psyllama/mlx* subdirectories
+		// and exe_dir/../lib/psyllama/mlx* (standard bin/lib sibling layout)
+		for _, libPsyllamaDir := range []string{
+			filepath.Join(exeDir, "lib", "psyllama"),
+			filepath.Join(exeDir, "..", "lib", "psyllama"),
 		} {
-			if mlxDirs, err := filepath.Glob(filepath.Join(libOllamaDir, "mlx*")); err == nil {
+			if mlxDirs, err := filepath.Glob(filepath.Join(libPsyllamaDir, "mlx*")); err == nil {
 				for _, mlxDir := range mlxDirs {
 					candidate = filepath.Join(mlxDir, libName)
 					if _, err := os.Stat(candidate); err == nil {
@@ -1773,7 +1773,7 @@ func findMLXLibrary() string {
 
 	// 3. Build directory (for tests run from repo root)
 	if cwd, err := os.Getwd(); err == nil {
-		candidate := filepath.Join(cwd, "build", "lib", "ollama", libName)
+		candidate := filepath.Join(cwd, "build", "lib", "psyllama", libName)
 		if _, err := os.Stat(candidate); err == nil {
 			return candidate
 		}

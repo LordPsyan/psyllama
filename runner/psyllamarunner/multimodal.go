@@ -1,10 +1,10 @@
-package ollamarunner
+package psyllamarunner
 
 import (
 	"errors"
 
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/model/input"
+	"github.com/LordPsyan/psyllama/ml"
+	"github.com/LordPsyan/psyllama/model/input"
 )
 
 // Tensors can't be used across multiple compute graphs. This is a problem

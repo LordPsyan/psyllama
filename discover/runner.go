@@ -16,11 +16,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/format"
-	"github.com/ollama/ollama/llm"
-	"github.com/ollama/ollama/logutil"
-	"github.com/ollama/ollama/ml"
+	"github.com/LordPsyan/psyllama/envconfig"
+	"github.com/LordPsyan/psyllama/format"
+	"github.com/LordPsyan/psyllama/llm"
+	"github.com/LordPsyan/psyllama/logutil"
+	"github.com/LordPsyan/psyllama/ml"
 )
 
 var (
@@ -52,7 +52,7 @@ func GPUDevices(ctx context.Context, runners []ml.FilteredRunnerDiscovery) []ml.
 		if eval, err := filepath.EvalSymlinks(exe); err == nil {
 			exe = eval
 		}
-		files, err := filepath.Glob(filepath.Join(ml.LibOllamaPath, "*", "*ggml-*"))
+		files, err := filepath.Glob(filepath.Join(ml.LibPsyllamaPath, "*", "*ggml-*"))
 		if err != nil {
 			slog.Debug("unable to lookup runner library directories", "error", err)
 		}
@@ -100,15 +100,15 @@ func GPUDevices(ctx context.Context, runners []ml.FilteredRunnerDiscovery) []ml.
 				} else if jetpack != "" && filepath.Base(dir) != "cuda_"+jetpack {
 					continue
 				} else if jetpack == "" && strings.Contains(filepath.Base(dir), "cuda_jetpack") {
-					slog.Debug("jetpack not detected (set JETSON_JETPACK or OLLAMA_LLM_LIBRARY to override), skipping", "libDir", dir)
+					slog.Debug("jetpack not detected (set JETSON_JETPACK or PSYLLAMA_LLM_LIBRARY to override), skipping", "libDir", dir)
 					continue
 				} else if !envconfig.EnableVulkan() && strings.Contains(filepath.Base(dir), "vulkan") {
-					slog.Info("experimental Vulkan support disabled.  To enable, set OLLAMA_VULKAN=1")
+					slog.Info("experimental Vulkan support disabled.  To enable, set PSYLLAMA_VULKAN=1")
 					continue
 				}
-				dirs = []string{ml.LibOllamaPath, dir}
+				dirs = []string{ml.LibPsyllamaPath, dir}
 			} else {
-				dirs = []string{ml.LibOllamaPath}
+				dirs = []string{ml.LibPsyllamaPath}
 			}
 
 			ctx1stPass, cancel := context.WithTimeout(ctx, bootstrapTimeout)
@@ -246,7 +246,7 @@ func GPUDevices(ctx context.Context, runners []ml.FilteredRunnerDiscovery) []ml.
 		libDirs = make(map[string]struct{})
 		for _, dev := range devices {
 			dir := dev.LibraryPath[len(dev.LibraryPath)-1]
-			if dir != ml.LibOllamaPath {
+			if dir != ml.LibPsyllamaPath {
 				libDirs[dir] = struct{}{}
 			}
 		}
@@ -337,7 +337,7 @@ func GPUDevices(ctx context.Context, runners []ml.FilteredRunnerDiscovery) []ml.
 			devFilter := ml.GetVisibleDevicesEnv(devices, false)
 
 			for dir := range libDirs {
-				updatedDevices := bootstrapDevices(ctx, []string{ml.LibOllamaPath, dir}, devFilter)
+				updatedDevices := bootstrapDevices(ctx, []string{ml.LibPsyllamaPath, dir}, devFilter)
 				for _, u := range updatedDevices {
 					for i := range devices {
 						if u.DeviceID == devices[i].DeviceID && u.PCIID == devices[i].PCIID {
@@ -427,21 +427,21 @@ func (r *bootstrapRunner) HasExited() bool {
 	return false
 }
 
-func bootstrapDevices(ctx context.Context, ollamaLibDirs []string, extraEnvs map[string]string) []ml.DeviceInfo {
+func bootstrapDevices(ctx context.Context, psyllamaLibDirs []string, extraEnvs map[string]string) []ml.DeviceInfo {
 	var out io.Writer
 	if envconfig.LogLevel() == logutil.LevelTrace {
 		out = os.Stderr
 	}
 	start := time.Now()
 	defer func() {
-		slog.Debug("bootstrap discovery took", "duration", time.Since(start), "OLLAMA_LIBRARY_PATH", ollamaLibDirs, "extra_envs", extraEnvs)
+		slog.Debug("bootstrap discovery took", "duration", time.Since(start), "PSYLLAMA_LIBRARY_PATH", psyllamaLibDirs, "extra_envs", extraEnvs)
 	}()
 
-	logutil.Trace("starting runner for device discovery", "libDirs", ollamaLibDirs, "extraEnvs", extraEnvs)
+	logutil.Trace("starting runner for device discovery", "libDirs", psyllamaLibDirs, "extraEnvs", extraEnvs)
 	cmd, port, err := llm.StartRunner(
-		true, // ollama engine
+		true, // psyllama engine
 		"",   // no model
-		ollamaLibDirs,
+		psyllamaLibDirs,
 		out,
 		extraEnvs,
 	)
@@ -459,12 +459,12 @@ func bootstrapDevices(ctx context.Context, ollamaLibDirs []string, extraEnvs map
 	if err != nil {
 		if cmd.ProcessState != nil && cmd.ProcessState.ExitCode() >= 0 {
 			// Expected during bootstrapping while we filter out unsupported AMD GPUs
-			logutil.Trace("runner exited", "OLLAMA_LIBRARY_PATH", ollamaLibDirs, "extra_envs", extraEnvs, "code", cmd.ProcessState.ExitCode())
+			logutil.Trace("runner exited", "PSYLLAMA_LIBRARY_PATH", psyllamaLibDirs, "extra_envs", extraEnvs, "code", cmd.ProcessState.ExitCode())
 		} else {
-			slog.Info("failure during GPU discovery", "OLLAMA_LIBRARY_PATH", ollamaLibDirs, "extra_envs", extraEnvs, "error", err)
+			slog.Info("failure during GPU discovery", "PSYLLAMA_LIBRARY_PATH", psyllamaLibDirs, "extra_envs", extraEnvs, "error", err)
 		}
 	}
-	logutil.Trace("runner enumerated devices", "OLLAMA_LIBRARY_PATH", ollamaLibDirs, "devices", devices)
+	logutil.Trace("runner enumerated devices", "PSYLLAMA_LIBRARY_PATH", psyllamaLibDirs, "devices", devices)
 
 	return devices
 }
@@ -498,7 +498,7 @@ func detectIncompatibleLibraries() {
 	if err != nil || basePath == "" {
 		return
 	}
-	if !strings.HasPrefix(basePath, ml.LibOllamaPath) {
+	if !strings.HasPrefix(basePath, ml.LibPsyllamaPath) {
 		slog.Warn("potentially incompatible library detected in PATH", "location", basePath)
 	}
 }

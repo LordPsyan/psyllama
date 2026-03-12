@@ -13,15 +13,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/ollama/ollama/anthropic"
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/envconfig"
-	internalcloud "github.com/ollama/ollama/internal/cloud"
-	"github.com/ollama/ollama/internal/modelref"
-	"github.com/ollama/ollama/logutil"
+	"github.com/LordPsyan/psyllama/anthropic"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/envconfig"
+	internalcloud "github.com/LordPsyan/psyllama/internal/cloud"
+	"github.com/LordPsyan/psyllama/internal/modelref"
+	"github.com/LordPsyan/psyllama/logutil"
 )
 
-// AnthropicWriter wraps the response writer to transform Ollama responses to Anthropic format
+// AnthropicWriter wraps the response writer to transform Psyllama responses to Anthropic format
 type AnthropicWriter struct {
 	BaseWriter
 	stream    bool
@@ -93,7 +93,7 @@ type WebSearchAnthropicWriter struct {
 	newLoopContext func() (context.Context, context.CancelFunc)
 	inner          *AnthropicWriter
 	req            anthropic.MessagesRequest // original Anthropic request
-	chatReq        *api.ChatRequest          // converted Ollama request (for followup calls)
+	chatReq        *api.ChatRequest          // converted Psyllama request (for followup calls)
 	stream         bool
 
 	estimatedInputTokens int
@@ -285,7 +285,7 @@ func (w *WebSearchAnthropicWriter) runWebSearchLoop(ctx context.Context, initial
 		)
 
 		toolUseID := loopServerToolUseID(w.inner.id, loop)
-		searchResults := anthropic.ConvertOllamaToAnthropicResults(searchResp)
+		searchResults := anthropic.ConvertPsyllamaToAnthropicResults(searchResp)
 		serverContent = append(serverContent,
 			anthropic.ContentBlock{
 				Type:  "server_tool_use",
@@ -507,7 +507,7 @@ func buildWebSearchAssistantMessage(response api.ChatResponse, webSearchCall api
 	return assistantMsg
 }
 
-func formatWebSearchResultsForToolMessage(results []anthropic.OllamaWebSearchResult) string {
+func formatWebSearchResultsForToolMessage(results []anthropic.PsyllamaWebSearchResult) string {
 	var resultText strings.Builder
 	for _, r := range results {
 		fmt.Fprintf(&resultText, "Title: %s\nURL: %s\n", r.Title, r.URL)
@@ -880,7 +880,7 @@ func AnthropicMessagesMiddleware() gin.HandlerFunc {
 		}
 
 		if hasWebSearchTool(req.Tools) {
-			// Guard against runtime cloud-disable policy (OLLAMA_NO_CLOUD/server.json)
+			// Guard against runtime cloud-disable policy (PSYLLAMA_NO_CLOUD/server.json)
 			// for cloud models. Local models may still receive web_search tool definitions;
 			// execution is validated when the model actually emits a web_search tool call.
 			if isCloudModelName(req.Model) {

@@ -3,8 +3,8 @@ package qwen3_5
 import (
 	"testing"
 
-	"github.com/ollama/ollama/x/mlxrunner/cache"
-	"github.com/ollama/ollama/x/mlxrunner/mlx"
+	"github.com/LordPsyan/psyllama/x/mlxrunner/cache"
+	"github.com/LordPsyan/psyllama/x/mlxrunner/mlx"
 )
 
 func TestParseConfigNestedDefaults(t *testing.T) {

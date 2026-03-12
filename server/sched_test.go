@@ -11,15 +11,15 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/format"
-	"github.com/ollama/ollama/fs/ggml"
-	"github.com/ollama/ollama/llm"
-	"github.com/ollama/ollama/ml"
+	"github.com/LordPsyan/psyllama/api"
+	"github.com/LordPsyan/psyllama/format"
+	"github.com/LordPsyan/psyllama/fs/ggml"
+	"github.com/LordPsyan/psyllama/llm"
+	"github.com/LordPsyan/psyllama/ml"
 )
 
 func TestMain(m *testing.M) {
-	os.Setenv("OLLAMA_DEBUG", "1")
+	os.Setenv("PSYLLAMA_DEBUG", "1")
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	slog.SetDefault(logger)
 	os.Exit(m.Run())
@@ -175,8 +175,8 @@ func TestSchedRequestsSameModelSameRequest(t *testing.T) {
 	s.waitForRecovery = 10 * time.Millisecond
 	s.getGpuFn = getGpuFn
 	s.getSystemInfoFn = getSystemInfoFn
-	a := newScenarioRequest(t, ctx, "ollama-model-1", 10, &api.Duration{Duration: 5 * time.Millisecond}, nil)
-	b := newScenarioRequest(t, ctx, "ollama-model-1", 11, &api.Duration{Duration: 0}, nil)
+	a := newScenarioRequest(t, ctx, "psyllama-model-1", 10, &api.Duration{Duration: 5 * time.Millisecond}, nil)
+	b := newScenarioRequest(t, ctx, "psyllama-model-1", 11, &api.Duration{Duration: 0}, nil)
 	b.req.model = a.req.model
 	b.f = a.f
 
@@ -219,8 +219,8 @@ func TestSchedRequestsSimpleReloadSameModel(t *testing.T) {
 	s.waitForRecovery = 10 * time.Millisecond
 	s.getGpuFn = getGpuFn
 	s.getSystemInfoFn = getSystemInfoFn
-	a := newScenarioRequest(t, ctx, "ollama-model-1", 10, &api.Duration{Duration: 5 * time.Millisecond}, nil)
-	b := newScenarioRequest(t, ctx, "ollama-model-1", 20, &api.Duration{Duration: 5 * time.Millisecond}, nil)
+	a := newScenarioRequest(t, ctx, "psyllama-model-1", 10, &api.Duration{Duration: 5 * time.Millisecond}, nil)
+	b := newScenarioRequest(t, ctx, "psyllama-model-1", 20, &api.Duration{Duration: 5 * time.Millisecond}, nil)
 	tmpModel := *a.req.model
 	b.req.model = &tmpModel
 	b.f = a.f
@@ -307,7 +307,7 @@ func TestSchedRequestsMultipleLoadedModels(t *testing.T) {
 	require.Len(t, s.loaded, 1)
 	s.loadedMu.Unlock()
 
-	t.Setenv("OLLAMA_MAX_LOADED_MODELS", "0")
+	t.Setenv("PSYLLAMA_MAX_LOADED_MODELS", "0")
 	s.newServerFn = b.newServer
 	slog.Info("Loading B")
 	s.pendingReqCh <- b.req
@@ -398,10 +398,10 @@ func TestSchedGetRunner(t *testing.T) {
 	ctx, done := context.WithTimeout(t.Context(), 3*time.Second)
 	defer done()
 
-	a := newScenarioRequest(t, ctx, "ollama-model-1a", 10, &api.Duration{Duration: 2 * time.Millisecond}, nil)
-	b := newScenarioRequest(t, ctx, "ollama-model-1b", 10, &api.Duration{Duration: 2 * time.Millisecond}, nil)
-	c := newScenarioRequest(t, ctx, "ollama-model-1c", 10, &api.Duration{Duration: 2 * time.Millisecond}, nil)
-	t.Setenv("OLLAMA_MAX_QUEUE", "1")
+	a := newScenarioRequest(t, ctx, "psyllama-model-1a", 10, &api.Duration{Duration: 2 * time.Millisecond}, nil)
+	b := newScenarioRequest(t, ctx, "psyllama-model-1b", 10, &api.Duration{Duration: 2 * time.Millisecond}, nil)
+	c := newScenarioRequest(t, ctx, "psyllama-model-1c", 10, &api.Duration{Duration: 2 * time.Millisecond}, nil)
+	t.Setenv("PSYLLAMA_MAX_QUEUE", "1")
 	s := InitScheduler(ctx)
 	s.waitForRecovery = 10 * time.Millisecond
 	s.getGpuFn = getGpuFn
@@ -568,7 +568,7 @@ func TestSchedPrematureExpired(t *testing.T) {
 	defer done()
 
 	// Same model, same request
-	scenario1a := newScenarioRequest(t, ctx, "ollama-model-1a", 10, &api.Duration{Duration: 100 * time.Millisecond}, nil)
+	scenario1a := newScenarioRequest(t, ctx, "psyllama-model-1a", 10, &api.Duration{Duration: 100 * time.Millisecond}, nil)
 	s := InitScheduler(ctx)
 	s.waitForRecovery = 10 * time.Millisecond
 	s.getGpuFn = getGpuFn
@@ -784,7 +784,7 @@ func TestSchedAlreadyCanceled(t *testing.T) {
 	defer done()
 	dctx, done2 := context.WithCancel(ctx)
 	done2()
-	scenario1a := newScenarioRequest(t, dctx, "ollama-model-1", 10, &api.Duration{Duration: 0}, nil)
+	scenario1a := newScenarioRequest(t, dctx, "psyllama-model-1", 10, &api.Duration{Duration: 0}, nil)
 	s := InitScheduler(ctx)
 	s.waitForRecovery = 10 * time.Millisecond
 	slog.Info("scenario1a")

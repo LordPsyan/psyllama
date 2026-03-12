@@ -9,10 +9,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ollama/ollama/x/imagegen/manifest"
-	"github.com/ollama/ollama/x/imagegen/mlx"
-	"github.com/ollama/ollama/x/imagegen/models/flux2"
-	"github.com/ollama/ollama/x/imagegen/models/zimage"
+	"github.com/LordPsyan/psyllama/x/imagegen/manifest"
+	"github.com/LordPsyan/psyllama/x/imagegen/mlx"
+	"github.com/LordPsyan/psyllama/x/imagegen/models/flux2"
+	"github.com/LordPsyan/psyllama/x/imagegen/models/zimage"
 )
 
 // ImageModel is the interface for image generation models.
