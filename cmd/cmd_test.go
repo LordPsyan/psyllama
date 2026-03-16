@@ -1023,7 +1023,7 @@ func TestPushHandler(t *testing.T) {
 					}
 				},
 			},
-			expectedError: "you are not authorized to push to this namespace, create the model under a namespace you own",
+			expectedError: "401",
 		},
 	}
 

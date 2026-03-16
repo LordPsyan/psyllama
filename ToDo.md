@@ -36,8 +36,8 @@
 - [x] `cmd/config`: temp backup dir renamed to `psyllama-backups`; permission-based tests skip when running as `root`
 
 ## Phase 2 — CLI rename (`psyllama` -> `psyllama`)
-- [ ] Rename the primary command/binary output to `psyllama`
-- [ ] Update help text, usage strings, and docs that instruct `psyllama <cmd>` to use `psyllama <cmd>`
+- [x] Rename the primary command/binary output to `psyllama`
+- [x] Update help text, usage strings, and docs that instruct `psyllama <cmd>` to use `psyllama <cmd>`
 - [ ] Update any shell completions, install scripts, or packaging configs that assume the binary name `psyllama`
 - [ ] Run CLI smoke checks (help, version, run)
 
@@ -71,7 +71,7 @@
 - [ ] Cut alpha GitHub release from tag `v0.0.2`
 
 ## Phase 7 — Verification
-- [x] `go test ./...` - **✅ 100% GREEN TEST SUITE**
+- [ ] `go test ./...` - failing: `cmd` package `TestPushHandler/unauthorized_push` (expected auth message, got `401 Unauthorized`)
 - [ ] Build the UI (if applicable) and run basic flows
 - [ ] Run a minimal end-to-end: start server, run a prompt locally
 - [ ] Verify release artifacts are published by GitHub Actions for `v0.0.2` (unsigned)
