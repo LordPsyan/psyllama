@@ -3,6 +3,9 @@
 .env
 .venv
 .swp
+.dev-notes
+installer_ToDo.md
+install_ToDo.md
 dist
 build
 .cache
