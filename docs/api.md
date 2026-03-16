@@ -1633,7 +1633,7 @@ if `stream` is set to false, then the response is a single JSON object:
 POST /api/push
 ```
 
-Upload a model to a model library. Requires registering for psyllama.ai and adding a public key first.
+Upload a model to a model library. Requires registering for psyllama.com and adding a public key first.
 
 ### Parameters
 

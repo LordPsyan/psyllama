@@ -44,7 +44,8 @@ jobs:
       CGO_LDFLAGS: '-mmacosx-version-min=14.0 -O3'
     steps:
       - uses: actions/checkout@v4
-      - run: |
+      - if: ${{ secrets.MACOS_SIGNING_KEY != '' }}
+        run: |
           echo $MACOS_SIGNING_KEY | base64 --decode > certificate.p12
           security create-keychain -p password build.keychain
           security default-keychain -s build.keychain
@@ -332,14 +333,18 @@ jobs:
       GOFLAGS: ${{ needs.setup-environment.outputs.GOFLAGS }}
       VERSION: ${{ needs.setup-environment.outputs.VERSION }}
       KEY_CONTAINER: ${{ vars.KEY_CONTAINER }}
+      SIGNING_ENABLED: ${{ secrets.GOOGLE_SIGNING_CREDENTIALS != '' && vars.KEY_CONTAINER != '' && vars.PSYLLAMA_CERT != '' }}
     steps:
       - uses: actions/checkout@v4
-      - uses: google-github-actions/auth@v2
+      - if: ${{ env.SIGNING_ENABLED == 'true' }}
+        uses: google-github-actions/auth@v2
         with:
           project_id: psyllama
           credentials_json: ${{ secrets.GOOGLE_SIGNING_CREDENTIALS }}
-      - run: |
+      - if: ${{ env.SIGNING_ENABLED == 'true' }}
+        run: |
           $ErrorActionPreference = "Stop"
+
           Invoke-WebRequest -Uri "https://go.microsoft.com/fwlink/p/?LinkId=323507" -OutFile "${{ runner.temp }}\sdksetup.exe"
           Start-Process "${{ runner.temp }}\sdksetup.exe" -ArgumentList @("/q") -NoNewWindow -Wait
 
@@ -368,7 +373,11 @@ jobs:
         run: |
           gci -path .\dist -recurse
       - run: |
-          ./scripts/build_windows.ps1 deps sign installer zip
+          if ("${env:SIGNING_ENABLED}" -eq "true") {
+            ./scripts/build_windows.ps1 deps sign installer zip
+          } else {
+            ./scripts/build_windows.ps1 deps zip
+          }
       - name: Log contents after build
         run: |
           gci -path .\dist -Recurse -File | ForEach-Object { get-filehash -path $_.FullName -Algorithm SHA256 } | format-list
@@ -378,6 +387,11 @@ jobs:
           path: |
             dist/*.zip
             dist/*.ps1
+      - if: ${{ hashFiles('dist/PsyllamaSetup.exe') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundles-windows-installer
+          path: |
             dist/PsyllamaSetup.exe
 
   linux-build:
@@ -471,6 +485,7 @@ jobs:
               CGO_CXXFLAGS
               GOFLAGS
               FLAVOR=rocm
+    if: ${{ secrets.DOCKER_ACCESS_TOKEN != '' && vars.DOCKER_USER != '' && vars.DOCKER_REPO != '' }}
     runs-on: ${{ matrix.arch == 'arm64' && format('{0}-{1}', matrix.os, matrix.arch) || matrix.os }}
     environment: release
     needs: setup-environment
@@ -507,6 +522,7 @@ jobs:
     strategy:
       matrix:
         suffix: ['', '-rocm']
+    if: ${{ secrets.DOCKER_ACCESS_TOKEN != '' && vars.DOCKER_USER != '' && vars.DOCKER_REPO != '' }}
     runs-on: linux
     environment: release
     needs: [docker-build-push]

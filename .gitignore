@@ -43,3 +43,6 @@ code.lock
 languagepacks.json
 logs/
 machineid
+
+.windsurf/
+Service Worker/

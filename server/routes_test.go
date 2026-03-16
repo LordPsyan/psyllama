@@ -865,7 +865,7 @@ func TestFilterThinkTags(t *testing.T) {
 				{Role: "user", Content: "What is the answer?"},
 			},
 			model: &Model{
-				Name:      "registry.psyllama.ai/library/deepseek-r1:latest",
+				Name:      "registry.psyllama.com/library/deepseek-r1:latest",
 				ShortName: "deepseek-r1:7b",
 				Config:    model.ConfigV2{},
 			},

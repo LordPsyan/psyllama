@@ -801,7 +801,7 @@ func PushHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	n := model.ParseName(args[0])
-	if strings.HasSuffix(n.Host, ".psyllama.ai") || strings.HasSuffix(n.Host, ".psyllama.com") {
+	if strings.HasSuffix(n.Host, ".psyllama.com") || strings.HasSuffix(n.Host, ".psyllama.com") {
 		_, err := client.Whoami(cmd.Context())
 		if err != nil {
 			var aErr api.AuthorizationError
@@ -865,6 +865,11 @@ func PushHandler(cmd *cobra.Command, args []string) error {
 		}
 		errStr := strings.ToLower(err.Error())
 		if strings.Contains(errStr, "access denied") || strings.Contains(errStr, "unauthorized") {
+			// Avoid masking the underlying error when pushing to the custom registry.
+			// This helps diagnose actual registry auth issues vs. namespace policy.
+			if n.Host == "registry.psyllama.com" && n.Namespace == "library" {
+				return err
+			}
 			return errors.New("you are not authorized to push to this namespace, create the model under a namespace you own")
 		}
 		return err
@@ -874,8 +879,8 @@ func PushHandler(cmd *cobra.Command, args []string) error {
 	spinner.Stop()
 
 	destination := n.String()
-	if strings.HasSuffix(n.Host, ".psyllama.ai") || strings.HasSuffix(n.Host, ".psyllama.com") {
-		destination = "registry.psyllama.ai/library/" + n.DisplayShortest()
+	if strings.HasSuffix(n.Host, ".psyllama.com") || strings.HasSuffix(n.Host, ".psyllama.com") {
+		destination = "registry.psyllama.com/library/" + n.DisplayShortest()
 	}
 	fmt.Printf("\nYou can find your model at:\n\n")
 	fmt.Printf("\t%s\n", destination)

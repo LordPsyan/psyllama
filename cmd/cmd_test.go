@@ -980,7 +980,7 @@ func TestPushHandler(t *testing.T) {
 					}
 				},
 			},
-			expectedOutput: "\nYou can find your model at:\n\n\tregistry.psyllama.ai/library/test-model:latest\n",
+			expectedOutput: "\nYou can find your model at:\n\n\tregistry.psyllama.com/library/test-model:latest\n",
 		},
 		{
 			name:      "not signed in push",

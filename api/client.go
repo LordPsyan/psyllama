@@ -325,7 +325,7 @@ func (c *Client) Pull(ctx context.Context, req *PullRequest, fn PullProgressFunc
 // It's similar to other progress function types like [PullProgressFunc].
 type PushProgressFunc func(ProgressResponse) error
 
-// Push uploads a model to the model library; requires registering for psyllama.ai
+// Push uploads a model to the model library; requires registering for psyllama.com
 // and adding a public key first. fn is called each time progress is made on
 // the request and can be used to display a progress bar, etc.
 func (c *Client) Push(ctx context.Context, req *PushRequest, fn PushProgressFunc) error {

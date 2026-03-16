@@ -49,7 +49,7 @@ func defaultBlobDir() string {
 
 // resolveManifestPath converts a model name to a manifest file path.
 func resolveManifestPath(modelName string) string {
-	host := "registry.psyllama.ai"
+	host := "registry.psyllama.com"
 	namespace := "library"
 	name := modelName
 	tag := "latest"

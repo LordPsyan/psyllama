@@ -26,7 +26,7 @@ type parsedModelRef struct {
 	// Example: "gpt-oss:20b:cloud" -> "gpt-oss:20b".
 	Base string
 	// Name is Base parsed as a fully-qualified model.Name with defaults applied.
-	// Example: "registry.psyllama.ai/library/gpt-oss:20b".
+	// Example: "registry.psyllama.com/library/gpt-oss:20b".
 	Name model.Name
 	// Source captures explicit source intent from the original input.
 	// Example: "gpt-oss:20b:cloud" -> modelSourceCloud.

@@ -43,8 +43,8 @@ func TestDelete(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test2", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test2", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -61,7 +61,7 @@ func TestDelete(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test2", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test2", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -130,7 +130,7 @@ func TestDeleteCloudSourceNormalizesToLegacyName(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "gpt-oss", "20b-cloud"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "gpt-oss", "20b-cloud"),
 	})
 
 	w = createRequest(t, s.DeleteHandler, api.DeleteRequest{Name: "gpt-oss:20b:cloud"})

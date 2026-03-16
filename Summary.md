@@ -1,35 +1,35 @@
 # Summary
 
 ## Goal
-Convert the repository from an Ollama-branded and Ollama-cloud-integrated codebase to a `psyllama`-branded, `psyllama`-namespaced fork.
+Convert the repository from an Psyllama-branded and Psyllama-cloud-integrated codebase to a `psyllama`-branded, `psyllama`-namespaced fork.
 
-## Key findings about current `ollama.com` usage
-The repository references `ollama.com` for multiple distinct concerns:
+## Key findings about current `psyllama.com` usage
+The repository references `psyllama.com` for multiple distinct concerns:
 
 - **Downloads / installers**
-  - `https://ollama.com/install.sh`, `https://ollama.com/install.ps1`
-  - `https://ollama.com/download/...` artifacts (Linux/macOS/Windows)
+  - `https://psyllama.com/install.sh`, `https://psyllama.com/install.ps1`
+  - `https://psyllama.com/download/...` artifacts (Linux/macOS/Windows)
 
 - **Cloud inference proxying**
-  - Server-side cloud proxy defaults to `https://ollama.com:443`
+  - Server-side cloud proxy defaults to `https://psyllama.com:443`
   - Requests may be signed and forwarded upstream for cloud models
 
 - **Hosted REST APIs**
-  - `https://ollama.com/api/web_search`
-  - `https://ollama.com/api/web_fetch`
-  - `https://ollama.com/api/tags`
-  - `https://ollama.com/api/chat` (docs/examples)
+  - `https://psyllama.com/api/web_search`
+  - `https://psyllama.com/api/web_fetch`
+  - `https://psyllama.com/api/tags`
+  - `https://psyllama.com/api/chat` (docs/examples)
 
 - **Authentication / API keys / account flows**
-  - API keys at `https://ollama.com/settings/keys`
-  - Signing flows that special-case `ollama.com` in some client/tool code
+  - API keys at `https://psyllama.com/settings/keys`
+  - Signing flows that special-case `psyllama.com` in some client/tool code
 
 - **Model library and registry**
-  - UI/docs references to `https://ollama.com/library` and related pages
-  - Registry-related code uses `registry.ollama.ai` masks and a manifest spec reference
+  - UI/docs references to `https://psyllama.com/library` and related pages
+  - Registry-related code uses `registry.psyllama.ai` masks and a manifest spec reference
 
 - **Upgrade UX**
-  - UI links to `https://ollama.com/upgrade`
+  - UI links to `https://psyllama.com/upgrade`
 
 ## Decisions you made (authoritative)
 - **Command name**: change to `psyllama` (e.g. `psyllama run ...`).
@@ -47,8 +47,12 @@ The repository references `ollama.com` for multiple distinct concerns:
 - **Phase 1 (mechanical / compile-first)**: completed
 - **Test status**: `go test ./...` passes
 - **Notable adjustments**:
-  - Config backup temp dir renamed from `ollama-backups` to `psyllama-backups`.
+  - Config backup temp dir renamed from `psyllama-backups` to `psyllama-backups`.
   - Permission-based tests in `cmd/config` are skipped when running as `root` (since root bypasses chmod-based failure conditions).
+
+- **Release**:
+  - Planned first alpha release tag: `v0.0.1`.
+  - Release pipeline is configured to allow an unsigned/no-notarization alpha release without requiring GitHub Actions signing/notarization secrets.
 
 - **Phase 2 (product surface):**
   - Rename CLI binary/command to `psyllama`.
@@ -56,5 +60,5 @@ The repository references `ollama.com` for multiple distinct concerns:
   - Migrate env vars to `PSYLLAMA_*`.
 
 - **Phase 3 (external services):**
-  - Remove/disable `ollama.com` cloud proxy, web search/fetch tools, and any registry auth assumptions.
+  - Remove/disable `psyllama.com` cloud proxy, web search/fetch tools, and any registry auth assumptions.
   - Later, implement `psyllama.com` equivalents if desired.

@@ -1280,7 +1280,7 @@ func (s *Server) loadModel() {
 	s.ready.Done()
 }
 
-// load is the handler called by the Ollama server to process different
+// load is the handler called by the Psyllama server to process different
 // load operations
 func (s *Server) load(w http.ResponseWriter, r *http.Request) {
 	s.loadMu.Lock()
@@ -1366,7 +1366,7 @@ func (s *Server) load(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// info is the handler called by the Ollama server to report information
+// info is the handler called by the Psyllama server to report information
 // about the GPU devices in use by this runner
 func (s *Server) info(w http.ResponseWriter, r *http.Request) {
 	s.loadMu.Lock()
@@ -1426,7 +1426,7 @@ func Execute(args []string) error {
 		return err
 	}
 	slog.SetDefault(logutil.NewLogger(os.Stderr, envconfig.LogLevel()))
-	slog.Info("starting ollama engine")
+	slog.Info("starting psyllama engine")
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

@@ -20,14 +20,14 @@ func TestParseNameParts(t *testing.T) {
 		wantValidDigest bool
 	}{
 		{
-			in: "registry.psyllama.ai/library/dolphin-mistral:7b-v2.6-dpo-laser-q6_K",
+			in: "registry.psyllama.com/library/dolphin-mistral:7b-v2.6-dpo-laser-q6_K",
 			want: Name{
-				Host:      "registry.psyllama.ai",
+				Host:      "registry.psyllama.com",
 				Namespace: "library",
 				Model:     "dolphin-mistral",
 				Tag:       "7b-v2.6-dpo-laser-q6_K",
 			},
-			wantFilepath: filepath.Join("registry.psyllama.ai", "library", "dolphin-mistral", "7b-v2.6-dpo-laser-q6_K"),
+			wantFilepath: filepath.Join("registry.psyllama.com", "library", "dolphin-mistral", "7b-v2.6-dpo-laser-q6_K"),
 		},
 		{
 			in: "scheme://host:port/namespace/model:tag",
@@ -84,14 +84,14 @@ func TestParseNameParts(t *testing.T) {
 				Namespace: "namespace",
 				Model:     "model",
 			},
-			wantFilepath: filepath.Join("registry.psyllama.ai", "namespace", "model", "latest"),
+			wantFilepath: filepath.Join("registry.psyllama.com", "namespace", "model", "latest"),
 		},
 		{
 			in: "model",
 			want: Name{
 				Model: "model",
 			},
-			wantFilepath: filepath.Join("registry.psyllama.ai", "library", "model", "latest"),
+			wantFilepath: filepath.Join("registry.psyllama.com", "library", "model", "latest"),
 		},
 		{
 			in: "h/nn/mm:t",
@@ -194,7 +194,7 @@ func TestNameparseNameDefault(t *testing.T) {
 	const name = "xx"
 	n := ParseName(name)
 	got := n.String()
-	want := "registry.psyllama.ai/library/xx:latest"
+	want := "registry.psyllama.com/library/xx:latest"
 	if got != want {
 		t.Errorf("parseName(%q).String() = %q; want %q", name, got, want)
 	}
@@ -291,9 +291,9 @@ func TestParseNameFromFilepath(t *testing.T) {
 
 func TestDisplayShortest(t *testing.T) {
 	cases := map[string]string{
-		"registry.psyllama.ai/library/model:latest": "model:latest",
-		"registry.psyllama.ai/library/model:tag":    "model:tag",
-		"registry.psyllama.ai/namespace/model:tag":  "namespace/model:tag",
+		"registry.psyllama.com/library/model:latest": "model:latest",
+		"registry.psyllama.com/library/model:tag":    "model:tag",
+		"registry.psyllama.com/namespace/model:tag":  "namespace/model:tag",
 		"host/namespace/model:tag":                "host/namespace/model:tag",
 		"host/library/model:tag":                  "host/library/model:tag",
 	}

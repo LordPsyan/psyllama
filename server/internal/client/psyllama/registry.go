@@ -1,6 +1,6 @@
-// Package ollama provides a client for interacting with an Ollama registry
+// Package psyllama provides a client for interacting with an Psyllama registry
 // which pushes and pulls model manifests and layers as defined by the
-// [ollama.com/manifest].
+// [psyllama.com/manifest].
 package psyllama
 
 import (
@@ -91,7 +91,7 @@ func DefaultCache() (*blob.DiskCache, error) {
 	return defaultCache()
 }
 
-// Error is the standard error returned by Ollama APIs. It can represent a
+// Error is the standard error returned by Psyllama APIs. It can represent a
 // single or multiple error response.
 //
 // Single error responses have the following format:
@@ -167,7 +167,7 @@ func (e *Error) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const DefaultMask = "registry.psyllama.ai/library/_:latest"
+const DefaultMask = "registry.psyllama.com/library/_:latest"
 
 var defaultMask = func() names.Name {
 	n := names.Parse(DefaultMask)
@@ -185,7 +185,7 @@ func CompleteName(name string) string {
 }
 
 // Registry is a client for performing push and pull operations against an
-// Ollama registry.
+// Psyllama registry.
 type Registry struct {
 	// Cache is the cache used to store models. If nil, [DefaultCache] is
 	// used.
@@ -298,14 +298,14 @@ func UserAgent() string {
 	version := buildinfo.Main.Version
 	if version == "(devel)" {
 		// When using `go run .` the version is "(devel)". This is seen
-		// as an invalid version by ollama.com and so it defaults to
+		// as an invalid version by psyllama.com and so it defaults to
 		// "needs upgrade" for some requests, such as pulls. These
 		// checks can be skipped by using the special version "v0.0.0",
 		// so we set it to that here.
 		version = "v0.0.0"
 	}
 
-	return fmt.Sprintf("ollama/%s (%s %s) Go/%s",
+	return fmt.Sprintf("psyllama/%s (%s %s) Go/%s",
 		version,
 		runtime.GOARCH,
 		runtime.GOOS,
@@ -460,7 +460,7 @@ func (r *trackingReader) Read(p []byte) (n int, err error) {
 // For layers larger then [Registry.MaxChunkSize], the layer is downloaded in
 // chunks of the specified size, and then reassembled and verified. This is
 // typically slower than splitting the model up across layers, and is mostly
-// utilized for layers of type equal to "application/vnd.ollama.image".
+// utilized for layers of type equal to "application/vnd.psyllama.image".
 func (r *Registry) Pull(ctx context.Context, name string) error {
 	m, err := r.Resolve(ctx, name)
 	if err != nil {
@@ -653,7 +653,7 @@ func (r *Registry) Unlink(name string) (ok bool, _ error) {
 	return c.Unlink(n.String())
 }
 
-// Manifest represents a [ollama.com/manifest].
+// Manifest represents a [psyllama.com/manifest].
 type Manifest struct {
 	Name   string   `json:"-"` // the canonical name of the model
 	Data   []byte   `json:"-"` // the raw data of the manifest
@@ -712,7 +712,7 @@ func (m Manifest) MarshalJSON() ([]byte, error) {
 		// present, it will cause an error to be returned during the
 		// last phase of the commit which expects it, but does nothing
 		// with it. This will be fixed in a future release of
-		// ollama.com.
+		// psyllama.com.
 		Config Layer `json:"config"`
 	}{
 		M: M(m),
@@ -1030,10 +1030,10 @@ func (r *Registry) send(ctx context.Context, method, path string, body io.Reader
 	return sendRequest(r.client(), req)
 }
 
-// makeAuthToken creates an Ollama auth token for the given private key.
+// makeAuthToken creates an Psyllama auth token for the given private key.
 //
 // NOTE: This format is OLD, overly complex, and should be replaced. We're
-// inheriting it from the original Ollama client and ollama.com
+// inheriting it from the original Psyllama client and psyllama.com
 // implementations, so we need to support it for now.
 func makeAuthToken(key crypto.PrivateKey) (string, error) {
 	privKey, _ := key.(*ed25519.PrivateKey)
@@ -1041,7 +1041,7 @@ func makeAuthToken(key crypto.PrivateKey) (string, error) {
 		return "", fmt.Errorf("unsupported private key type: %T", key)
 	}
 
-	url := fmt.Sprintf("https://ollama.com?ts=%d", time.Now().Unix())
+	url := fmt.Sprintf("https://psyllama.com?ts=%d", time.Now().Unix())
 	// Part 1: the checkData (e.g. the URL with a timestamp)
 
 	// Part 2: the public key
@@ -1075,7 +1075,7 @@ func makeAuthToken(key crypto.PrivateKey) (string, error) {
 	return b.String(), nil
 }
 
-// The original spec for Ollama tokens was to use the SHA256 of the zero
+// The original spec for Psyllama tokens was to use the SHA256 of the zero
 // string as part of the signature. I'm not sure why that was, but we still
 // need it to verify the signature.
 var zeroSum = func() string {
@@ -1085,7 +1085,7 @@ var zeroSum = func() string {
 }()
 
 // checkData takes a URL and creates the original string format of the
-// data signature that is used by the ollama client to sign requests
+// data signature that is used by the psyllama client to sign requests
 func checkData(url string) string {
 	return fmt.Sprintf("GET,%s,%s", url, zeroSum)
 }
@@ -1157,9 +1157,9 @@ func (r *Registry) parseNameExtended(s string) (scheme string, _ names.Name, _ b
 //
 // Examples:
 //
-//	http://ollama.com/bmizerany/smol:latest@digest
-//	https://ollama.com/bmizerany/smol:latest
-//	ollama.com/bmizerany/smol:latest@digest // returns "https" scheme.
+//	http://psyllama.com/bmizerany/smol:latest@digest
+//	https://psyllama.com/bmizerany/smol:latest
+//	psyllama.com/bmizerany/smol:latest@digest // returns "https" scheme.
 //	model@digest
 //	@digest
 func splitExtended(s string) (scheme, name, digest string) {

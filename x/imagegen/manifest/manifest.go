@@ -70,8 +70,8 @@ func LoadManifest(modelName string) (*ModelManifest, error) {
 // resolveManifestPath converts a model name to a manifest file path.
 func resolveManifestPath(modelName string) string {
 	// Parse model name into components
-	// Default: registry.psyllama.ai/library/<name>/<tag>
-	host := "registry.psyllama.ai"
+	// Default: registry.psyllama.com/library/<name>/<tag>
+	host := "registry.psyllama.com"
 	namespace := "library"
 	name := modelName
 	tag := "latest"

@@ -6,7 +6,7 @@
 No MEMORIES were retrieved. Continue your work without acknowledging this message.
 
 ### ASSISTANT
-## Files that contain `ollama.com`
+## Files that contain `psyllama.com`
 
 ### Root docs / meta
 - `README.md`
@@ -46,9 +46,9 @@ No MEMORIES were retrieved. Continue your work without acknowledging this messag
 - `docs/docs.json`
 
 ### Server / runtime (`server/`)
-- `server/internal/client/ollama/registry.go`
+- `server/internal/client/psyllama/registry.go`
 - `server/cloud_proxy.go`
-- plus tests referencing ollama.com:
+- plus tests referencing psyllama.com:
   - `server/create_test.go`
   - `server/routes.go`
   - `server/routes_create_test.go`
@@ -86,7 +86,7 @@ No MEMORIES were retrieved. Continue your work without acknowledging this messag
 - `app/ui/ui.go`
 - `app/ui/ui_test.go`
 - `app/updater/updater.go`
-- `app/ollama.iss`
+- `app/psyllama.iss`
 - Frontend:
   - `app/ui/app/src/lib/config.ts`
   - `app/ui/app/src/components/Chat.tsx`
@@ -96,7 +96,7 @@ No MEMORIES were retrieved. Continue your work without acknowledging this messag
 
 ---
 
-## What the project is “looking for” from `ollama.com`
+## What the project is “looking for” from `psyllama.com`
 
 ### 1) **Downloads / installers**
 Referenced in:
@@ -104,44 +104,44 @@ Referenced in:
 - `scripts/install.sh`
 - `scripts/install.ps1`
 
-What it uses from `ollama.com`:
+What it uses from `psyllama.com`:
 - **Install scripts hosted on the site**
-  - `https://ollama.com/install.sh`
-  - `https://ollama.com/install.ps1`
+  - `https://psyllama.com/install.sh`
+  - `https://psyllama.com/install.ps1`
 - **Binary downloads**
-  - `https://ollama.com/download/...`
-  - Linux tarballs: `https://ollama.com/download/ollama-linux-<arch>.tar.zst` (or `.tgz` fallback)
-  - macOS zip: `https://ollama.com/download/Ollama-darwin.zip`
-  - Windows installer: `https://ollama.com/download/OllamaSetup.exe`
+  - `https://psyllama.com/download/...`
+  - Linux tarballs: `https://psyllama.com/download/psyllama-linux-<arch>.tar.zst` (or `.tgz` fallback)
+  - macOS zip: `https://psyllama.com/download/Psyllama-darwin.zip`
+  - Windows installer: `https://psyllama.com/download/OllamaSetup.exe`
 - **Optional version selection** via querystring `?version=$OLLAMA_VERSION`
 
-### 2) **Cloud inference proxying (ollama.com as a remote host)**
+### 2) **Cloud inference proxying (psyllama.com as a remote host)**
 Referenced in:
 - `server/cloud_proxy.go`
 - `docs/cloud.mdx`
 - `docs/api/authentication.mdx`
 
-What it uses from `ollama.com`:
+What it uses from `psyllama.com`:
 - A **cloud base URL** defaulting to:
-  - `https://ollama.com:443`
-- It signs requests for ollama.com using `auth.Sign(...)` (local credentials) and forwards local `/v1/...` style requests upstream when the model is a `*-cloud` model.
+  - `https://psyllama.com:443`
+- It signs requests for psyllama.com using `auth.Sign(...)` (local credentials) and forwards local `/v1/...` style requests upstream when the model is a `*-cloud` model.
 
-### 3) **Hosted REST APIs on `https://ollama.com/api/...`**
+### 3) **Hosted REST APIs on `https://psyllama.com/api/...`**
 Referenced in:
 - `docs/cloud.mdx`
 - `docs/capabilities/web-search.mdx`
 - `x/tools/websearch.go`
 - `x/tools/webfetch.go`
 
-What it uses from `ollama.com`:
+What it uses from `psyllama.com`:
 - **Web search API**
-  - `POST https://ollama.com/api/web_search`
+  - `POST https://psyllama.com/api/web_search`
 - **Web fetch API**
-  - `POST https://ollama.com/api/web_fetch`
+  - `POST https://psyllama.com/api/web_fetch`
 - **Model listing on cloud**
-  - `GET https://ollama.com/api/tags`
+  - `GET https://psyllama.com/api/tags`
 - **Chat (cloud)**
-  - `POST https://ollama.com/api/chat` (shown in docs)
+  - `POST https://psyllama.com/api/chat` (shown in docs)
 - These calls require auth (see next section).
 
 ### 4) **Authentication, API keys, and account flows**
@@ -150,69 +150,69 @@ Referenced in:
 - `docs/cloud.mdx`
 - `docs/import.mdx`
 - `api/client.go`
-- `server/internal/client/ollama/registry.go`
+- `server/internal/client/psyllama/registry.go`
 - UI: `app/ui/ui.go`, `Settings.tsx`
 
-What it uses from `ollama.com`:
+What it uses from `psyllama.com`:
 - **Account requirement** for cloud features:
-  - `ollama signin` flow points users at `ollama.com`
+  - `psyllama signin` flow points users at `psyllama.com`
 - **API keys page**:
-  - `https://ollama.com/settings/keys`
+  - `https://psyllama.com/settings/keys`
   - used for direct API access with `OLLAMA_API_KEY`
 - **Signing scheme**:
   - `api/client.go` and `x/tools/websearch.go`/`webfetch.go` add a `ts` query param and create a signed challenge like:
     - `METHOD,PATH?ts=<unix>`
-  - `server/internal/client/ollama/registry.go` has an older token format using:
-    - `https://ollama.com?ts=<unix>` as part of the signature material
+  - `server/internal/client/psyllama/registry.go` has an older token format using:
+    - `https://psyllama.com?ts=<unix>` as part of the signature material
 
 ### 5) **Model registry/library pages (browsing + naming)**
 Referenced in:
-- `README.md` (`ollama.com/library`, specific model pages)
+- `README.md` (`psyllama.com/library`, specific model pages)
 - `docs/cloud.mdx` (cloud model library search link)
-- `api/types.go` (comments pointing to `https://ollama.com/library`)
-- `server/internal/client/ollama/registry.go` (default registry mask)
+- `api/types.go` (comments pointing to `https://psyllama.com/library`)
+- `server/internal/client/psyllama/registry.go` (default registry mask)
 
-What it uses from `ollama.com`:
+What it uses from `psyllama.com`:
 - **Library browsing**
-  - `https://ollama.com/library`
-  - `https://ollama.com/library/<model>`
-  - `https://ollama.com/search?c=cloud` (cloud models catalog)
+  - `https://psyllama.com/library`
+  - `https://psyllama.com/library/<model>`
+  - `https://psyllama.com/search?c=cloud` (cloud models catalog)
 - **Registry host for pulls/pushes**
-  - Default name mask: `registry.ollama.ai/library/_:latest` (note: this is `ollama.ai`, but it’s the registry backing the ollama.com library experience)
+  - Default name mask: `registry.psyllama.ai/library/_:latest` (note: this is `psyllama.ai`, but it’s the registry backing the psyllama.com library experience)
 - **Manifest format reference**
-  - code refers to `[ollama.com/manifest]` as the spec for manifests/layers.
+  - code refers to `[psyllama.com/manifest]` as the spec for manifests/layers.
 
 ### 6) **Upgrade / billing-style UX links**
 Referenced in:
 - `app/ui/app/src/components/DisplayUpgrade.tsx`
 
-What it uses from `ollama.com`:
+What it uses from `psyllama.com`:
 - Upgrade CTA URL:
-  - `https://ollama.com/upgrade`
+  - `https://psyllama.com/upgrade`
 
-### 7) **General “docs.ollama.com” links (not ollama.com but adjacent)**
-You didn’t ask for these, but they appear alongside `ollama.com` references in `README.md` and `docs/*`:
-- `https://docs.ollama.com/...` for API/CLI docs and guides.
+### 7) **General “docs.psyllama.com” links (not psyllama.com but adjacent)**
+You didn’t ask for these, but they appear alongside `psyllama.com` references in `README.md` and `docs/*`:
+- `https://docs.psyllama.com/...` for API/CLI docs and guides.
 
 ---
 
 ## Status
-- **Completed**: repo-wide scan for `ollama.com` references (grouped list + explanation of what each group uses it for).
+- **Completed**: repo-wide scan for `psyllama.com` references (grouped list + explanation of what each group uses it for).
 
 ### USER
-so what I am trying to do is convert this entire repo to use psyllama instead of ollama. this is going to be difficult. any suggestions where to start?
+so what I am trying to do is convert this entire repo to use psyllama instead of psyllama. this is going to be difficult. any suggestions where to start?
 
 ### ASSISTANT
 ## Where to start (so it doesn’t turn into a never-ending rename)
 
-You’re basically doing a **product + namespace fork**. The easiest way to succeed is to decide *what “psyllama instead of ollama” means* before touching code, because the repo currently uses “Ollama” in **four different ways**:
+You’re basically doing a **product + namespace fork**. The easiest way to succeed is to decide *what “psyllama instead of psyllama” means* before touching code, because the repo currently uses “Psyllama” in **four different ways**:
 
 - **Branding/UX strings** (UI, docs, CLI help)
-- **Binary/command name** (`ollama ...`)
-- **Go module/import path** (`github.com/ollama/ollama/...`)
-- **External services** (`ollama.com` cloud proxy, web search/fetch APIs, registry auth tokens)
+- **Binary/command name** (`psyllama ...`)
+- **Go module/import path** (`github.com/psyllama/psyllama/...`)
+- **External services** (`psyllama.com` cloud proxy, web search/fetch APIs, registry auth tokens)
 
-If you mix these up, you’ll either break builds or accidentally keep depending on `ollama.com`.
+If you mix these up, you’ll either break builds or accidentally keep depending on `psyllama.com`.
 
 ---
 
@@ -220,15 +220,15 @@ If you mix these up, you’ll either break builds or accidentally keep depending
 1. **Command name**
    - Do you want the CLI command to become `psyllama` (so users type `psyllama run ...`)?
 2. **Module path**
-   - Do you want to change the Go module path from `github.com/ollama/ollama` to something like `github.com/LordPsyan/psyllama`?
+   - Do you want to change the Go module path from `github.com/psyllama/psyllama` to something like `github.com/LordPsyan/psyllama`?
    - This is a big but *mechanical* change.
 3. **Env var compatibility**
    - Keep `OLLAMA_*` env vars for compatibility, or introduce `PSYLLAMA_*` (or support both)?
 4. **Cloud + hosted APIs**
-   - Should your fork still talk to `ollama.com` for:
+   - Should your fork still talk to `psyllama.com` for:
      - cloud models (`server/cloud_proxy.go`)
      - web search/fetch (`x/tools/websearch.go`, `x/tools/webfetch.go`)
-     - registry auth flows (`server/internal/client/ollama/registry.go`)
+     - registry auth flows (`server/internal/client/psyllama/registry.go`)
    - Or do you want to **remove/disable** those features, or point them to your own domain?
 
 ---
@@ -244,12 +244,12 @@ Goal: get a clean build with minimal semantics changed.
    - This is the biggest compile blocker and is relatively deterministic.
 
 2. **Keep the CLI command name and env vars temporarily**
-   - Don’t rename `ollama` → `psyllama` yet.
+   - Don’t rename `psyllama` → `psyllama` yet.
    - Don’t rename `OLLAMA_*` yet.
    - This keeps the surface area smaller while you stabilize builds/tests.
 
 3. **Do not touch cloud/search yet**
-   - Leave `ollama.com` references as-is initially.
+   - Leave `psyllama.com` references as-is initially.
    - You can later decide to:
      - keep them
      - gate them behind config
@@ -260,16 +260,16 @@ Why: this avoids changing core logic while you’re still fighting compiler erro
 ### Phase 2: Rename the user-facing product surface
 Once you can build:
 
-- Rename command/binary `ollama` → `psyllama`
+- Rename command/binary `psyllama` → `psyllama`
 - Update help text, UI labels, docs
 - Decide env var strategy:
   - **Best practical option**: support both `PSYLLAMA_*` and `OLLAMA_*` with `PSYLLAMA_*` taking precedence.
 
 ### Phase 3: External dependencies (the hard part)
-This repo *actively uses* `ollama.com` for:
-- **cloud proxy** (`server/cloud_proxy.go` default `https://ollama.com:443`)
+This repo *actively uses* `psyllama.com` for:
+- **cloud proxy** (`server/cloud_proxy.go` default `https://psyllama.com:443`)
 - **web search/fetch** (`x/tools/websearch.go`, `x/tools/webfetch.go`)
-- **auth signing assumptions** (`api/client.go` signs if host is `ollama.com`, plus registry token formats)
+- **auth signing assumptions** (`api/client.go` signs if host is `psyllama.com`, plus registry token formats)
 
 You’ll need to either:
 - **Stub/disable** those features for now (fastest to get “psyllama local-first”), or
@@ -283,17 +283,17 @@ Start with the **module/import rename**, because everything else depends on it.
 
 To do that safely I’d:
 - inspect `go.mod` (module name)
-- find external import usages of `github.com/ollama/ollama/...` within the repo
+- find external import usages of `github.com/psyllama/psyllama/...` within the repo
 - update go module path + rewrite imports
 - run `go test ./...` after (you’ll need to approve running commands)
 
 ### Permission check (per your rule)
-Do you want me to proceed with **read-only inspection** of `go.mod` + a repo-wide search for `module github.com/ollama/ollama` and `github.com/ollama/ollama/` imports to propose the exact rename plan?
+Do you want me to proceed with **read-only inspection** of `go.mod` + a repo-wide search for `module github.com/psyllama/psyllama` and `github.com/psyllama/psyllama/` imports to propose the exact rename plan?
 
 ### Quick questions (pick answers)
 - **[Q1]** Target module path: `github.com/LordPsyan/psyllama` (or something else)?
-- **[Q2]** Target CLI command: keep `ollama` for now, or switch to `psyllama` immediately?
-- **[Q3]** Cloud/search: keep `ollama.com` integration temporarily, or disable it in the fork?
+- **[Q2]** Target CLI command: keep `psyllama` for now, or switch to `psyllama` immediately?
+- **[Q3]** Cloud/search: keep `psyllama.com` integration temporarily, or disable it in the fork?
 
 ### USER
 ok, let me answer your first 4 questions from step 0:

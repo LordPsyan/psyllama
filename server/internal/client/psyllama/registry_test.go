@@ -557,7 +557,7 @@ func TestUnlink(t *testing.T) {
 		d := blob.DigestFromBytes("{}")
 		err := blob.PutBytes(rc.Cache, d, "{}")
 		check(err)
-		err = rc.Cache.Link("registry.psyllama.ai/library/single:latest", d)
+		err = rc.Cache.Link("registry.psyllama.com/library/single:latest", d)
 		check(err)
 
 		// confirm linked

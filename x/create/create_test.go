@@ -383,22 +383,22 @@ func TestResolveManifestPath(t *testing.T) {
 		{
 			name:      "simple model name",
 			modelName: "llama2",
-			wantParts: []string{"registry.psyllama.ai", "library", "llama2", "latest"},
+			wantParts: []string{"registry.psyllama.com", "library", "llama2", "latest"},
 		},
 		{
 			name:      "model name with tag",
 			modelName: "llama2:7b",
-			wantParts: []string{"registry.psyllama.ai", "library", "llama2", "7b"},
+			wantParts: []string{"registry.psyllama.com", "library", "llama2", "7b"},
 		},
 		{
 			name:      "model name with namespace",
 			modelName: "myuser/mymodel",
-			wantParts: []string{"registry.psyllama.ai", "myuser", "mymodel", "latest"},
+			wantParts: []string{"registry.psyllama.com", "myuser", "mymodel", "latest"},
 		},
 		{
 			name:      "model name with namespace and tag",
 			modelName: "myuser/mymodel:v1",
-			wantParts: []string{"registry.psyllama.ai", "myuser", "mymodel", "v1"},
+			wantParts: []string{"registry.psyllama.com", "myuser", "mymodel", "v1"},
 		},
 		{
 			name:      "fully qualified model name",

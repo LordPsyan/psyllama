@@ -137,7 +137,7 @@ func TestCreateFromBin(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -197,7 +197,7 @@ func TestCreateFromModel(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test", "latest"),
 	})
 
 	w = createRequest(t, s.CreateHandler, api.CreateRequest{
@@ -211,8 +211,8 @@ func TestCreateFromModel(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test2", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test2", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -307,7 +307,7 @@ func TestCreateRemovesLayers(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -328,7 +328,7 @@ func TestCreateRemovesLayers(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -358,7 +358,7 @@ func TestCreateUnsetsSystem(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -379,7 +379,7 @@ func TestCreateUnsetsSystem(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -412,7 +412,7 @@ func TestCreateMergeParameters(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -437,8 +437,8 @@ func TestCreateMergeParameters(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test2", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test2", "latest"),
 	})
 
 	// Display contents of each blob in the directory
@@ -496,8 +496,8 @@ func TestCreateMergeParameters(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test2", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test2", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -556,7 +556,7 @@ func TestCreateReplacesMessages(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -590,8 +590,8 @@ func TestCreateReplacesMessages(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test2", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test2", "latest"),
 	})
 
 	// Old layers will not have been pruned
@@ -651,7 +651,7 @@ func TestCreateTemplateSystem(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -851,7 +851,7 @@ func TestCreateLicenses(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.psyllama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.psyllama.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
