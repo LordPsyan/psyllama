@@ -68,10 +68,13 @@
 - [ ] Update any GitHub workflows, release configs, versioning metadata, and installers
 - [ ] Verify build artifacts and distribution names use `psyllama`
 - [x] Adjust release workflow to support unsigned/no-notarization alpha releases when signing secrets are not configured
-- [ ] Cut first alpha GitHub release from tag `v0.0.1`
+- [ ] Cut alpha GitHub release from tag `v0.0.2`
 
 ## Phase 7 — Verification
 - [x] `go test ./...` - **✅ 100% GREEN TEST SUITE**
 - [ ] Build the UI (if applicable) and run basic flows
 - [ ] Run a minimal end-to-end: start server, run a prompt locally
-- [ ] Verify release artifacts are published by GitHub Actions for `v0.0.1` (unsigned)
+- [ ] Verify release artifacts are published by GitHub Actions for `v0.0.2` (unsigned)
+
+## Housekeeping
+- [x] Ignore local IDE/project state directories: `.windsurf/`, `Service Worker/`

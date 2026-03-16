@@ -50,8 +50,11 @@ The repository references `psyllama.com` for multiple distinct concerns:
   - Config backup temp dir renamed from `psyllama-backups` to `psyllama-backups`.
   - Permission-based tests in `cmd/config` are skipped when running as `root` (since root bypasses chmod-based failure conditions).
 
+- **Housekeeping**:
+  - Ignore local IDE/project state directories: `.windsurf/`, `Service Worker/`.
+
 - **Release**:
-  - Planned first alpha release tag: `v0.0.1`.
+  - Current working version: `v0.0.2`.
   - Release pipeline is configured to allow an unsigned/no-notarization alpha release without requiring GitHub Actions signing/notarization secrets.
 
 - **Phase 2 (product surface):**
