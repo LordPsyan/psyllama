@@ -219,6 +219,10 @@ func (b *blobUpload) uploadPart(ctx context.Context, method string, requestURL *
 	headers := make(http.Header)
 	headers.Set("Content-Type", "application/octet-stream")
 	headers.Set("Content-Length", strconv.FormatInt(part.Size, 10))
+	// Avoid streaming huge request bodies through proxies when auth may fail.
+	// With 100-continue, the server can reject (e.g., token expired) before we
+	// send the body, preventing Apache proxy broken pipes and client-visible 502s.
+	headers.Set("Expect", "100-continue")
 
 	if method == http.MethodPatch {
 		headers.Set("X-Redirect-Uploads", "1")
@@ -285,8 +289,7 @@ func (b *blobUpload) uploadPart(ctx context.Context, method string, requestURL *
 		if err != nil {
 			return err
 		}
-
-		opts.Token = token
+		setRegistryToken(opts, token, &challenge)
 		fallthrough
 	case resp.StatusCode >= http.StatusBadRequest:
 		w.Rollback()

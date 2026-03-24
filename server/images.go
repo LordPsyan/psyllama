@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -19,6 +20,8 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/LordPsyan/psyllama/api"
 	"github.com/LordPsyan/psyllama/envconfig"
@@ -50,6 +53,11 @@ type registryOptions struct {
 	Username string
 	Password string
 	Token    string
+
+	mu             sync.Mutex
+	lastChallenge  *registryChallenge
+	tokenExpiresAt time.Time
+	tokenSkew      time.Duration
 
 	CheckRedirect func(req *http.Request, via []*http.Request) error
 }
@@ -865,7 +873,9 @@ func makeRequestWithRetry(ctx context.Context, method string, requestURL *url.UR
 			if err != nil {
 				return nil, err
 			}
-			regOpts.Token = token
+			if regOpts != nil {
+				setRegistryToken(regOpts, token, &challenge)
+			}
 			if body != nil {
 				_, err = body.Seek(0, io.SeekStart)
 				if err != nil {
@@ -910,6 +920,12 @@ func makeRequest(ctx context.Context, method string, requestURL *url.URL, header
 		requestURL.Scheme = "http"
 	}
 
+	if regOpts != nil {
+		// Best-effort proactive refresh to avoid long uploads hitting token expiry.
+		// This is critical behind proxies that may convert upstream 401s into 502s.
+		_ = refreshRegistryTokenIfNeeded(ctx, requestURL.Host, regOpts)
+	}
+
 	req, err := http.NewRequestWithContext(ctx, method, requestURL.String(), body)
 	if err != nil {
 		return nil, err
@@ -938,15 +954,92 @@ func makeRequest(ctx context.Context, method string, requestURL *url.URL, header
 		req.ContentLength = contentLength
 	}
 
+	tr := http.DefaultTransport.(*http.Transport).Clone()
+	// Give the upstream time to respond to Expect: 100-continue before we stream
+	// huge bodies through Apache, otherwise the proxy can end up with broken pipes
+	// and client-visible 502s.
+	tr.ExpectContinueTimeout = 10 * time.Second
+	if testMakeRequestDialContext != nil {
+		tr.DialContext = testMakeRequestDialContext
+	}
+
 	c := &http.Client{
+		Transport:     tr,
 		CheckRedirect: regOpts.CheckRedirect,
 	}
-	if testMakeRequestDialContext != nil {
-		tr := http.DefaultTransport.(*http.Transport).Clone()
-		tr.DialContext = testMakeRequestDialContext
-		c.Transport = tr
-	}
 	return c.Do(req)
+}
+
+type jwtClaims struct {
+	Exp int64 `json:"exp"`
+}
+
+func parseJWTExpiry(token string) (time.Time, bool) {
+	parts := strings.Split(token, ".")
+	if len(parts) < 2 {
+		return time.Time{}, false
+	}
+	payload, err := base64.RawURLEncoding.DecodeString(parts[1])
+	if err != nil {
+		return time.Time{}, false
+	}
+	var c jwtClaims
+	if err := json.Unmarshal(payload, &c); err != nil {
+		return time.Time{}, false
+	}
+	if c.Exp <= 0 {
+		return time.Time{}, false
+	}
+	return time.Unix(c.Exp, 0), true
+}
+
+func setRegistryToken(opts *registryOptions, token string, challenge *registryChallenge) {
+	if opts == nil {
+		return
+	}
+	opts.mu.Lock()
+	defer opts.mu.Unlock()
+
+	opts.Token = token
+	if exp, ok := parseJWTExpiry(token); ok {
+		opts.tokenExpiresAt = exp
+	}
+	if challenge != nil {
+		// store a copy so subsequent refreshes can mint a new token without waiting
+		// for an upstream 401 (which may be masked as 502 by proxies).
+		c := *challenge
+		opts.lastChallenge = &c
+	}
+	if opts.tokenSkew == 0 {
+		opts.tokenSkew = 2 * time.Minute
+	}
+}
+
+func refreshRegistryTokenIfNeeded(ctx context.Context, host string, opts *registryOptions) error {
+	if opts == nil {
+		return nil
+	}
+
+	opts.mu.Lock()
+	tok := opts.Token
+	exp := opts.tokenExpiresAt
+	skew := opts.tokenSkew
+	ch := opts.lastChallenge
+	opts.mu.Unlock()
+
+	if tok == "" || exp.IsZero() || ch == nil {
+		return nil
+	}
+	if time.Until(exp) > skew {
+		return nil
+	}
+
+	newTok, err := getAuthorizationToken(ctx, *ch, host)
+	if err != nil {
+		return err
+	}
+	setRegistryToken(opts, newTok, ch)
+	return nil
 }
 
 func getValue(header, key string) string {
