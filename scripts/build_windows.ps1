@@ -16,6 +16,7 @@ function checkEnv {
         $script:ARCH = $env:ARCH
     } else {
         $arch=([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)
+
         if ($null -ne $arch) {
             $script:ARCH = ($arch.ToString().ToLower()).Replace("x64", "amd64")
         } else {
@@ -28,10 +29,30 @@ function checkEnv {
     Write-Output "Locating required tools and paths"
     $script:SRC_DIR=$PWD
 
+    # Ensure CMake --strip can locate objdump. llvm-mingw provides llvm-objdump.exe
+    # but CMake may look for objdump.exe.
+    $llvmMingwBin = "C:\Tools\llvm-mingw\bin"
+    if (Test-Path $llvmMingwBin) {
+        $env:PATH = "$llvmMingwBin;$env:PATH"
+
+        $script:LLVM_OBJDUMP = Join-Path $llvmMingwBin "llvm-objdump.exe"
+        if (-Not (Test-Path $script:LLVM_OBJDUMP)) {
+            $script:LLVM_OBJDUMP = ""
+        }
+
+        if ($script:LLVM_OBJDUMP) {
+            $shimDir = Join-Path $script:SRC_DIR "build\tools"
+            New-Item -ItemType Directory -Force -Path $shimDir | Out-Null
+            Copy-Item -Force -Path $script:LLVM_OBJDUMP -Destination (Join-Path $shimDir "objdump.exe")
+            $env:PATH = "$shimDir;$env:PATH"
+        }
+    }
+
     # Locate CUDA versions
     $cudaList=(get-item "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v*\bin\" -ea 'silentlycontinue')
     if ($cudaList.length -eq 0) {
         $d=(get-command -ea 'silentlycontinue' nvcc).path
+
         if ($null -ne $d) {
             $script:CUDA_DIRS=@($d| split-path -parent)
         }
@@ -53,9 +74,15 @@ function checkEnv {
         $script:HIP_PATH=$env:HIP_PATH
     }
     
-    $inoSetup=(get-item "C:\Program Files*\Inno Setup*\")
-    if ($inoSetup.length -gt 0) {
-        $script:INNO_SETUP_DIR=$inoSetup[0]
+    if ($env:INNO_SETUP_DIR -and (Test-Path (Join-Path $env:INNO_SETUP_DIR "ISCC.exe"))) {
+        $script:INNO_SETUP_DIR = $env:INNO_SETUP_DIR
+    } elseif (Test-Path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe") {
+        $script:INNO_SETUP_DIR = "C:\Program Files (x86)\Inno Setup 6"
+    } else {
+        $inoSetup=(get-item "C:\Program Files*\Inno Setup*\" -ea 'silentlycontinue')
+        if ($inoSetup.length -gt 0) {
+            $script:INNO_SETUP_DIR=$inoSetup[0]
+        }
     }
 
     $script:DIST_DIR="${script:SRC_DIR}\dist\windows-${script:TARGET_ARCH}"
@@ -76,6 +103,17 @@ function checkEnv {
     } else {
         $script:VERSION=$env:VERSION
     }
+
+    if (-not $script:VERSION) {
+        $versionFile = Join-Path $script:SRC_DIR "version\version.go"
+        if (Test-Path $versionFile) {
+            $m = Select-String -Path $versionFile -Pattern 'Version\s+string\s*=\s*"([^"]+)"' -ErrorAction SilentlyContinue
+            if ($m -and $m.Matches -and $m.Matches.Count -gt 0) {
+                $script:VERSION = $m.Matches[0].Groups[1].Value
+            }
+        }
+    }
+
     $pattern = "(\d+[.]\d+[.]\d+).*"
     if ($script:VERSION -match $pattern) {
         $script:PKG_VERSION=$matches[1]
@@ -126,11 +164,13 @@ function cpu {
         Remove-Item -ea 0 -recurse -force -path "${script:SRC_DIR}\dist\windows-${script:ARCH}"
         New-Item "${script:SRC_DIR}\dist\windows-${script:ARCH}\lib\psyllama\" -ItemType Directory -ea 0
 
-        & cmake -B build\cpu --preset CPU --install-prefix $script:DIST_DIR
+        # Avoid embedding a Windows path (e.g. C:\Tools\...) into cmake_install.cmake which can
+        # trigger invalid escape parsing. Rely on PATH/shim instead.
+        & cmake -B build\cpu --preset CPU --install-prefix $script:DIST_DIR -DCMAKE_OBJDUMP=llvm-objdump
         if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
         & cmake --build build\cpu --target ggml-cpu --config Release --parallel $script:JOBS
         if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
-        & cmake --install build\cpu --component CPU --strip
+        & cmake --install build\cpu --component CPU
         if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
     }
 }
@@ -157,7 +197,7 @@ function cuda11 {
             if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
             & cmake --build build\cuda_v$cudaMajorVer --target ggml-cuda --config Release --parallel $script:JOBS
             if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
-            & cmake --install build\cuda_v$cudaMajorVer --component "CUDA" --strip
+            & cmake --install build\cuda_v$cudaMajorVer --component "CUDA"
             if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
         } else {
             Write-Output "CUDA v$cudaMajorVer not detected, skipping"
@@ -189,7 +229,7 @@ function cudaCommon {
             if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
             & cmake --build build\cuda_v$cudaMajorVer --target ggml-cuda --config Release --parallel $script:JOBS
             if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
-            & cmake --install build\cuda_v$cudaMajorVer --component "CUDA" --strip
+            & cmake --install build\cuda_v$cudaMajorVer --component "CUDA"
             if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
         } else {
             Write-Output "CUDA v$cudaMajorVer not detected, skipping"
@@ -233,7 +273,7 @@ function rocm6 {
             $env:CXX=""
             & cmake --build build\rocm --target ggml-hip --config Release --parallel $script:JOBS
             if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
-            & cmake --install build\rocm --component "HIP" --strip
+            & cmake --install build\rocm --component "HIP"
             if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
             Remove-Item -Path $script:DIST_DIR\lib\psyllama\rocm\rocblas\library\*gfx906* -ErrorAction SilentlyContinue
         } else {
@@ -249,7 +289,7 @@ function vulkan {
         if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
         & cmake --build build\vulkan --target ggml-vulkan --config Release --parallel $script:JOBS
         if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
-        & cmake --install build\vulkan  --component Vulkan --strip
+        & cmake --install build\vulkan  --component Vulkan
         if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
     } else {
         Write-Output "Vulkan not detected, skipping"
@@ -306,7 +346,7 @@ function mlxCuda13 {
             if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
             & cmake --build build\mlx_cuda_v$cudaMajorVer --target mlx --target mlxc --config Release --parallel $script:JOBS -- /nodeReuse:false
             if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
-            & cmake --install build\mlx_cuda_v$cudaMajorVer --component "MLX" --strip
+            & cmake --install build\mlx_cuda_v$cudaMajorVer --component "MLX"
             if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
         } else {
             Write-Output "CUDA v$cudaMajorVer not detected, skipping MLX build"
@@ -317,7 +357,11 @@ function mlxCuda13 {
 function psyllama {
     mkdir -Force -path "${script:DIST_DIR}\" | Out-Null
     Write-Output "Building psyllama CLI"
-    & go build -trimpath -ldflags "-s -w -X=github.com/psyllama/psyllama/version.Version=$script:VERSION -X=github.com/psyllama/psyllama/server.mode=release" .
+    $ldflags = "-s -w -X=github.com/LordPsyan/psyllama/server.mode=release"
+    if ($script:VERSION) {
+        $ldflags = "$ldflags -X=github.com/LordPsyan/psyllama/version.Version=$script:VERSION"
+    }
+    & go build -trimpath -ldflags $ldflags .
     if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
     cp .\psyllama.exe "${script:DIST_DIR}\"
 }
@@ -369,12 +413,20 @@ function app {
         exit 1
     }
 
+    $embedDir = Join-Path $script:SRC_DIR "app\ui\embed"
+    mkdir -Force -path $embedDir | Out-Null
+    Copy-Item -Force -Recurse -Path "dist\*" -Destination $embedDir
+
     Pop-Location
 
     Write-Output "Running go generate"
     & go generate ./...
     if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
-	& go build -trimpath -ldflags "-s -w -H windowsgui -X=github.com/psyllama/psyllama/app/version.Version=$script:VERSION" -o .\dist\windows-psyllama-app-${script:ARCH}.exe ./app/cmd/app/
+    $appLdflags = "-s -w -H windowsgui"
+    if ($script:VERSION) {
+        $appLdflags = "$appLdflags -X=github.com/LordPsyan/psyllama/app/version.Version=$script:VERSION"
+    }
+    & go build -trimpath -ldflags $appLdflags -o .\dist\windows-psyllama-app-${script:ARCH}.exe ./app/cmd/app/
     if ($LASTEXITCODE -ne 0) { exit($LASTEXITCODE)}
 }
 

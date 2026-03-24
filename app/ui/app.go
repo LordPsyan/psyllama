@@ -12,14 +12,14 @@ import (
 	"time"
 )
 
-//go:embed app/dist
+//go:embed embed
 var appFS embed.FS
 
 // appHandler returns an HTTP handler that serves the React SPA.
 // It tries to serve real files first, then falls back to index.html for React Router.
 func (s *Server) appHandler() http.Handler {
-	// Strip the dist prefix so URLs look clean
-	fsys, _ := fs.Sub(appFS, "app/dist")
+	// Strip the embed prefix so URLs look clean
+	fsys, _ := fs.Sub(appFS, "embed")
 	fileServer := http.FileServer(http.FS(fsys))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

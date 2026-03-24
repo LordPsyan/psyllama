@@ -21,7 +21,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/LordPsyan/psyllama/app/auth"
 	"github.com/LordPsyan/psyllama/app/logrotate"
 	"github.com/LordPsyan/psyllama/app/server"
@@ -30,6 +29,7 @@ import (
 	"github.com/LordPsyan/psyllama/app/ui"
 	"github.com/LordPsyan/psyllama/app/updater"
 	"github.com/LordPsyan/psyllama/app/version"
+	"github.com/google/uuid"
 )
 
 var (

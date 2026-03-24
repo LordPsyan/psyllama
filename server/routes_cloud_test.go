@@ -13,10 +13,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/LordPsyan/psyllama/api"
 	internalcloud "github.com/LordPsyan/psyllama/internal/cloud"
 	"github.com/LordPsyan/psyllama/middleware"
+	"github.com/gin-gonic/gin"
 )
 
 func TestStatusHandler(t *testing.T) {

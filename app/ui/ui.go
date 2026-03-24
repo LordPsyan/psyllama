@@ -21,7 +21,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/LordPsyan/psyllama/api"
 	"github.com/LordPsyan/psyllama/app/server"
 	"github.com/LordPsyan/psyllama/app/store"
@@ -33,6 +32,7 @@ import (
 	psyllamaAuth "github.com/LordPsyan/psyllama/auth"
 	"github.com/LordPsyan/psyllama/envconfig"
 	"github.com/LordPsyan/psyllama/types/model"
+	"github.com/google/uuid"
 	_ "github.com/tkrajina/typescriptify-golang-structs/typescriptify"
 )
 
@@ -1671,7 +1671,6 @@ func ptr[T any](v T) *T { return &v }
 func supportsBrowserTools(model string) bool {
 	return strings.HasPrefix(strings.ToLower(model), "gpt-oss")
 }
-
 
 // buildChatRequest converts store.Chat to api.ChatRequest
 func (s *Server) buildChatRequest(chat *store.Chat, model string, think any, availableTools []map[string]any) (*api.ChatRequest, error) {

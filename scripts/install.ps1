@@ -49,14 +49,16 @@ $Version      = if ($env:PSYLLAMA_VERSION) { $env:PSYLLAMA_VERSION } else { "" }
 $InstallDir   = if ($env:PSYLLAMA_INSTALL_DIR) { $env:PSYLLAMA_INSTALL_DIR } else { "" }
 $Uninstall    = $env:PSYLLAMA_UNINSTALL -eq "1"
 $DebugInstall = [bool]$env:PSYLLAMA_DEBUG
+$SkipSignature = $env:PSYLLAMA_SKIP_SIGNATURE_CHECK -eq "1"
 
 # --------------------------------------------------------------------------
 # Constants
 # --------------------------------------------------------------------------
 
 # PSYLLAMA_DOWNLOAD_URL for developer testing only
-$DownloadBaseURL = if ($env:PSYLLAMA_DOWNLOAD_URL) { $env:PSYLLAMA_DOWNLOAD_URL.TrimEnd('/') } else { "https://psyllama.com/download" }
-$InnoSetupUninstallGuid = "{44E83376-CE68-45EB-8FC1-393500EB558C}_is1"
+$GitHubRepo = if ($env:PSYLLAMA_GITHUB_REPO) { $env:PSYLLAMA_GITHUB_REPO } else { "LordPsyan/psyllama" }
+$DownloadBaseURL = if ($env:PSYLLAMA_DOWNLOAD_URL) { $env:PSYLLAMA_DOWNLOAD_URL.TrimEnd('/') } else { "https://github.com/$GitHubRepo/releases" }
+$InnoSetupUninstallGuid = "{A6D6E4A0-0C5E-4F1C-9E2F-2C3B8B7D2A4A}_is1"
 
 # --------------------------------------------------------------------------
 # Helpers
@@ -246,9 +248,13 @@ function Invoke-Uninstall {
 function Invoke-Install {
     # Determine installer URL
     if ($Version) {
-        $installerUrl = "$DownloadBaseURL/PsyllamaSetup.exe?version=$Version"
+        $tag = $Version
+        if ($tag -notmatch '^v') {
+            $tag = "v$tag"
+        }
+        $installerUrl = "$DownloadBaseURL/download/$tag/PsyllamaSetup.exe"
     } else {
-        $installerUrl = "$DownloadBaseURL/PsyllamaSetup.exe"
+        $installerUrl = "$DownloadBaseURL/latest/download/PsyllamaSetup.exe"
     }
 
     # Download installer
@@ -262,9 +268,11 @@ function Invoke-Install {
 
     # Verify signature
     Write-Step "Verifying signature"
-    if (-not (Test-Signature -FilePath $tempInstaller)) {
-        Remove-Item $tempInstaller -Force -ErrorAction SilentlyContinue
-        throw "Installer signature verification failed"
+    if (-not $SkipSignature) {
+        if (-not (Test-Signature -FilePath $tempInstaller)) {
+            Remove-Item $tempInstaller -Force -ErrorAction SilentlyContinue
+            throw "Installer signature verification failed"
+        }
     }
 
     # Build installer arguments

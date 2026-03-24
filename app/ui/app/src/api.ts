@@ -13,7 +13,7 @@ import {
 } from "@/gotypes";
 import { parseJsonlFromResponse } from "./util/jsonl-parsing";
 import { psyllamaClient as psyllama } from "./lib/psyllama-client";
-import type { ModelResponse } from "psyllama/browser";
+import type { ListModelResponse } from "./lib/psyllama-client";
 import { API_BASE, PSYLLAMA_DOT_COM } from "./lib/config";
 
 // Extend Model class with utility methods
@@ -118,7 +118,7 @@ export async function getModels(query?: string): Promise<Model[]> {
     const { models: modelsResponse } = await psyllama.list();
 
     let models: Model[] = modelsResponse
-      .filter((m: ModelResponse) => {
+      .filter((m: ListModelResponse) => {
         const families = m.details?.families;
 
         if (!families || families.length === 0) {
@@ -131,7 +131,7 @@ export async function getModels(query?: string): Promise<Model[]> {
 
         return !isBertOnly;
       })
-      .map((m: ModelResponse) => {
+      .map((m: ListModelResponse) => {
         // Remove the latest tag from the returned model
         const modelName = m.name.replace(/:latest$/, "");
 
